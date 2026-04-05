@@ -1,11 +1,17 @@
 const mongoose = require("mongoose");
-require("dotenv").config();
-
-const DB_UTIL = process.env.MONGO_URI;
+require("./env");
 
 const connectDB = async () => {
   try {
-    await mongoose.connect(DB_UTIL);
+    const mongoUri = process.env.MONGO_URI;
+
+    if (!mongoUri) {
+      throw new Error(
+        "Missing MONGO_URI. Add it to backend/.env before starting the server.",
+      );
+    }
+
+    await mongoose.connect(mongoUri);
   } catch (err) {
     console.log("Error connecting to MongoDB", err);
     process.exit(1);

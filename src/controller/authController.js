@@ -32,10 +32,6 @@ exports.postSignup = [
       return true;
     }),
 
-  check("terms")
-    .notEmpty()
-    .withMessage("You must accept the terms and conditions"),
-
   async (req, res, next) => {
     try {
       const errors = validationResult(req);

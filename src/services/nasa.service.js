@@ -20,3 +20,49 @@ exports.getApod = async () => {
     throw error;
   }
 };
+
+exports.getAsteroids = async () => {
+  const date = new Date().toISOString().slice(0, 10);
+  const cacheKey = `asteroids-${date}`;
+  const cachedData = cache.get(cacheKey);
+  if (cachedData) {
+    return cachedData;
+  }
+  try {
+    const response = await axios.get("https://api.nasa.gov/neo/rest/v1/feed", {
+      params: {
+        start_date: date,
+        end_date: date,
+        api_key: process.env.NASA_API_KEY,
+      },
+    });
+    cache.set(cacheKey, response.data, 24 * 60 * 60 * 1000);
+    return response.data;
+  } catch (error) {
+    console.error("Full error", error.message);
+    throw error;
+  }
+};
+
+exports.searchNasaMedia = async (query, mediaType = "image") => {
+  const cacheKey = `nasa-media-${query}-${mediaType}`;
+  const cachedData = cache.get(cacheKey);
+  if (cachedData) {
+    return cachedData;
+  }
+  try {
+    const res = await fetch(
+      `https://images-api.nasa.gov/search?q=${query}&media_type=${mediaType}`,
+    );
+    if (!res.ok) throw new Error(`NASA API error: ${res.status}`);
+    const data = await res.json();
+    cache.set(cacheKey, data, 60 * 60 * 1000);
+    return data;
+  } catch (error) {
+    console.error("Full error", error.message);
+    throw error;
+  }
+};
+
+//EONET (later)
+//Insight/Mars Weather (later)

@@ -4,10 +4,23 @@ const cookieParser = require("cookie-parser");
 const authRouter = require("./src/routes/authRouter");
 const journalRouter = require("./src/routes/journalRouter");
 const spaceRouter = require("./src/routes/spaceRouter");
+const helmet = require("helmet");
+const cors = require("cors");
+const rateLimit = require("express-rate-limit");
+const loginLimiter = rateLimit({ windowMs: 10 * 60 * 1000, max: 20 });
 
+//CORS = controls who can access your backend
+app.use(
+  cors({
+    origin: `http://localhost:${process.env.FRONTEND_PORT || 3000}`,
+    credentials: true,
+  }),
+);
+app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use("/api/auth/login", loginLimiter);
 app.use("/api/auth", authRouter);
 app.use("/api/space", spaceRouter);
 app.use("/api/journal", journalRouter);

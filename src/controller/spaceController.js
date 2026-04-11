@@ -1,145 +1,84 @@
 const nasaService = require("../services/nasa.service");
 const spacexService = require("../services/spacex.service");
 const newsservice = require("../services/news.service");
+const asyncHandler = require("../utils/asyncHandler");
 
-exports.getApod = async (req, res, next) => {
-  try {
-    const apodData = await nasaService.getApod();
-    res.json(apodData);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+exports.getApod = asyncHandler(async (req, res, next) => {
+  const apodData = await nasaService.getApod();
+  res.json(apodData);
+});
+exports.getLatestLaunch = asyncHandler(async (req, res, next) => {
+  const data = await spacexService.getLatestLaunch();
+  res.json(data);
+});
+exports.getLaunchById = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+  const data = await spacexService.getLaunchById(id);
+  res.json(data);
+});
 
-exports.getLatestLaunch = async (req, res) => {
-  try {
-    const data = await spacexService.getLatestLaunch();
-    res.json(data);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+exports.getUpcomingLaunches = asyncHandler(async (req, res, next) => {
+  const data = await spacexService.getUpcomingLaunches();
+  res.json(data);
+});
 
-exports.getLaunchById = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const data = await spacexService.getLaunchById(id);
-    res.json(data);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+exports.getPastLaunches = asyncHandler(async (req, res, next) => {
+  const data = await spacexService.getPastLaunches();
+  res.json(data);
+});
 
-exports.getUpcomingLaunches = async (req, res) => {
-  try {
-    const data = await spacexService.getUpcomingLaunches();
-    res.json(data);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+exports.getRockets = asyncHandler(async (req, res, next) => {
+  const data = await spacexService.getRockets();
+  res.json(data);
+});
 
-exports.getPastLaunches = async (req, res) => {
-  try {
-    const data = await spacexService.getPastLaunches();
-    res.json(data);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+exports.getRocketById = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+  const data = await spacexService.getRocketById(id);
+  res.json(data);
+});
 
-exports.getRockets = async (req, res) => {
-  try {
-    const data = await spacexService.getRockets();
-    res.json(data);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+exports.getCrew = asyncHandler(async (req, res, next) => {
+  const data = await spacexService.getCrew();
+  res.json(data);
+});
 
-exports.getRocketById = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const data = await spacexService.getRocketById(id);
-    res.json(data);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+exports.getCrewById = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+  const data = await spacexService.getCrewById(id);
+  res.json(data);
+});
 
-exports.getCrew = async (req, res) => {
-  try {
-    const data = await spacexService.getCrew();
-    res.json(data);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+exports.getLaunchPads = asyncHandler(async (req, res, next) => {
+  const data = await spacexService.getLaunchPads();
+  res.json(data);
+});
 
-exports.getCrewById = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const data = await spacexService.getCrewById(id);
-    res.json(data);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+exports.getLandPads = asyncHandler(async (req, res, next) => {
+  const data = await spacexService.getLandPads();
+  res.json(data);
+});
 
-exports.getLaunchPads = async (req, res) => {
-  try {
-    const data = await spacexService.getLaunchPads();
-    res.json(data);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+exports.getRoadster = asyncHandler(async (req, res, next) => {
+  const data = await spacexService.getRoadster();
+  res.json(data);
+});
 
-exports.getLandPads = async (req, res) => {
-  try {
-    const data = await spacexService.getLandPads();
-    res.json(data);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+exports.getAsteroids = asyncHandler(async (req, res, next) => {
+  const data = await nasaService.getAsteroids();
+  res.json(data);
+});
 
-exports.getRoadster = async (req, res) => {
-  try {
-    const data = await spacexService.getRoadster();
-    res.json(data);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+exports.searchNasaMedia = asyncHandler(async (req, res, next) => {
+  const { query, mediaType } = req.query;
+  if (!query) {
+    return res.status(400).json({ error: "Query parameter is required" });
   }
-};
+  const data = await nasaService.searchNasaMedia(query, mediaType);
+  res.json(data);
+});
 
-exports.getAsteroids = async (req, res, next) => {
-  try {
-    const data = await nasaService.getAsteroids();
-    res.json(data);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-exports.searchNasaMedia = async (req, res, next) => {
-  try {
-    const { query, mediaType } = req.query;
-    if (!query) {
-      return res.status(400).json({ error: "Query parameter is required" });
-    }
-    const data = await nasaService.searchNasaMedia(query, mediaType);
-    res.json(data);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-exports.getSpaceNews = async (req, res, next) => {
-  try {
-    const data = await newsservice.getSpaceNews();
-    res.json(data);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+exports.getSpaceNews = asyncHandler(async (req, res, next) => {
+  const data = await newsservice.getSpaceNews();
+  res.json(data);
+});

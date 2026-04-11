@@ -1,6 +1,7 @@
 const journalEntry = require("../models/journalEntry");
+const asyncHandler = require("../utils/asyncHandler");
 
-exports.getJournalEntries = async (req, res, next) => {
+exports.getJournalEntries = asyncHandler(async (req, res, next) => {
   const page = parseInt(req.query.page) || 1;
   const limit = 10;
 
@@ -11,9 +12,8 @@ exports.getJournalEntries = async (req, res, next) => {
     .limit(limit);
 
   res.json({ entries });
-};
-
-exports.getJournalEntryById = async (req, res, next) => {
+});
+exports.getJournalEntryById = asyncHandler(async (req, res, next) => {
   const entry = await journalEntry.findOne({ _id: req.params.id });
   if (!entry) {
     return res.status(404).json({ message: "Journal entry not found" });
@@ -22,9 +22,12 @@ exports.getJournalEntryById = async (req, res, next) => {
     return res.status(403).json({ message: "Unauthorized" });
   }
   res.json({ entry });
-};
+});
 
-exports.createJournalEntry = async (req, res, next) => {
+exports.createJournalEntry = asyncHandler(async (req, res, next) => {
+  if (!title || !content) {
+    return res.status(400).json({ error: "Title and content are required" });
+  }
   const { title, content, mood, tags, linkedApod } = req.body;
   const newEntry = new journalEntry({
     userId: req.user._id,
@@ -36,9 +39,8 @@ exports.createJournalEntry = async (req, res, next) => {
   });
   await newEntry.save();
   res.status(201).json({ entry: newEntry });
-};
-
-exports.updateJournalEntry = async (req, res, next) => {
+});
+exports.updateJournalEntry = asyncHandler(async (req, res, next) => {
   const { title, content, mood, tags, linkedApod } = req.body;
   const updateEntry = await journalEntry.findOne({ _id: req.params.id });
   if (!updateEntry) {
@@ -56,9 +58,8 @@ exports.updateJournalEntry = async (req, res, next) => {
 
   await updateEntry.save();
   res.json({ entry: updateEntry });
-};
-
-exports.deleteJournalEntry = async (req, res, next) => {
+});
+exports.deleteJournalEntry = asyncHandler(async (req, res, next) => {
   const deleteEntry = await journalEntry.findOne({ _id: req.params.id });
   if (!deleteEntry) {
     return res.status(404).json({ message: "Journal entry not found" });
@@ -68,4 +69,4 @@ exports.deleteJournalEntry = async (req, res, next) => {
   }
   await deleteEntry.deleteOne({ _id: req.params.id });
   res.json({ message: "Journal entry deleted" });
-};
+});

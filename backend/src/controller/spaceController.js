@@ -82,3 +82,22 @@ exports.getSpaceNews = asyncHandler(async (req, res, next) => {
   const data = await newsservice.getSpaceNews();
   res.json(data);
 });
+
+exports.getEarthEvents = asyncHandler(async (req, res) => {
+  const data = await nasaService.getEarthEvents();
+  res.json(data);
+});
+
+const astronomyService = require("../services/astronomy.service");
+
+exports.getAstronomyEvents = asyncHandler(async (req, res) => {
+  const data = await astronomyService.getAstronomyEvents();
+  res.json(data);
+});
+
+exports.getAstronomyToken = (req, res) => {
+  const authString = Buffer.from(
+    `${process.env.ASTRONOMY_API_ID}:${process.env.ASTRONOMY_API_SECRET}`,
+  ).toString("base64");
+  res.json({ token: authString });
+};

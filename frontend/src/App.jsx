@@ -1,9 +1,9 @@
-import React from "react";
+import AppRoutes from "./routes/AppRouter";
 
 const App = () => {
   return (
     <>
-      <h1 className="bg-amber-50">Welcome to the React App!</h1>
+      <AppRoutes />
     </>
   );
 };

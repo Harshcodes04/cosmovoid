@@ -25,10 +25,10 @@ exports.getJournalEntryById = asyncHandler(async (req, res, next) => {
 });
 
 exports.createJournalEntry = asyncHandler(async (req, res, next) => {
+  const { title, content, mood, tags, linkedApod } = req.body;
   if (!title || !content) {
     return res.status(400).json({ error: "Title and content are required" });
   }
-  const { title, content, mood, tags, linkedApod } = req.body;
   const newEntry = new journalEntry({
     userId: req.user._id,
     title,

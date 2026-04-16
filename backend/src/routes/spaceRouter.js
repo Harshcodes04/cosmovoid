@@ -19,6 +19,5 @@ spaceRouter.get("/media/search", spaceController.searchNasaMedia);
 spaceRouter.get("/news", spaceController.getSpaceNews);
 spaceRouter.get("/events/earth", spaceController.getEarthEvents);
 spaceRouter.get("/events/astronomy", spaceController.getAstronomyEvents);
-spaceRouter.get("/astronomy/token", spaceController.getAstronomyToken);
 
 module.exports = spaceRouter;

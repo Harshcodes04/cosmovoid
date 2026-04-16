@@ -1,1 +1,68 @@
 @import "tailwindcss";
+
+:root {
+  color-scheme: dark;
+  font-family:
+    "Trebuchet MS", "Segoe UI", "Gill Sans", sans-serif;
+  background:
+    radial-gradient(circle at top, #2a1256 0%, #12071f 40%, #04030a 100%);
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top, #2a1256 0%, #12071f 40%, #04030a 100%);
+  color: #f6edff;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+@keyframes floatNebula {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  50% {
+    transform: translate3d(0, -18px, 0) scale(1.04);
+  }
+}
+
+@keyframes starPulse {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(0.9);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes driftGlow {
+  0% {
+    transform: translate3d(-4%, 0, 0);
+  }
+
+  100% {
+    transform: translate3d(4%, -4%, 0);
+  }
+}
+
+.cosmos-nebula {
+  animation: floatNebula 14s ease-in-out infinite;
+}
+
+.cosmos-star {
+  animation: starPulse 4.4s ease-in-out infinite;
+}
+
+.cosmos-drift {
+  animation: driftGlow 20s linear infinite alternate;
+}

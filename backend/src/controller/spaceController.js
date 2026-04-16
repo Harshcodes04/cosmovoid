@@ -94,10 +94,3 @@ exports.getAstronomyEvents = asyncHandler(async (req, res) => {
   const data = await astronomyService.getAstronomyEvents();
   res.json(data);
 });
-
-exports.getAstronomyToken = (req, res) => {
-  const authString = Buffer.from(
-    `${process.env.ASTRONOMY_API_ID}:${process.env.ASTRONOMY_API_SECRET}`,
-  ).toString("base64");
-  res.json({ token: authString });
-};

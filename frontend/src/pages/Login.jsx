@@ -1,13 +1,40 @@
 import { useState } from "react";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/useAuth";
 
 const Login = () => {
+  const { user, login } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e) => {
+  const redirectTo = location.state?.from?.pathname || "/dashboard";
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log({ identifier, password });
+    setError("");
+    setSubmitting(true);
+
+    try {
+      await login(identifier, password);
+      navigate(redirectTo, { replace: true });
+    } catch (err) {
+      const message =
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        "Unable to log in right now. Please try again.";
+      setError(message);
+    } finally {
+      setSubmitting(false);
+    }
   };
+
+  if (user) {
+    return <Navigate to={redirectTo} replace />;
+  }
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-[#020617] via-[#050a1f] to-[#000814] text-white flex flex-col">
@@ -28,6 +55,11 @@ const Login = () => {
               </p>
             </div>
             <form onSubmit={handleSubmit} className="space-y-5">
+              {error ? (
+                <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+                  {error}
+                </div>
+              ) : null}
               <div className="relative">
                 <input
                   type="text"
@@ -56,16 +88,17 @@ const Login = () => {
               </div>
               <button
                 type="submit"
+                disabled={submitting}
                 className="w-full py-3 rounded-lg bg-blue-700 hover:bg-blue-800 transition font-semibold tracking-wide"
               >
-                Launch Session
+                {submitting ? "Launching..." : "Launch Session"}
               </button>
             </form>
             <p className="text-center text-sm text-white/50">
               New here?{" "}
-              <span className="text-blue-400 hover:underline cursor-pointer">
+              <Link to="/signup" className="text-blue-400 hover:underline">
                 Create your logbook
-              </span>
+              </Link>
             </p>
           </div>
         </div>
@@ -75,3 +108,5 @@ const Login = () => {
 };
 
 export default Login;
+
+//useLocation is used to get the previous page the user was on before being redirected to login. After successful login, we can redirect them back to that page instead of always going to a default dashboard.

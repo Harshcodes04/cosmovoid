@@ -1,9 +1,16 @@
+import Navbar from "../components/NavBar";
+
 const Journal = () => {
   return (
-    <main>
-      <h1>Journal</h1>
-      <p>Your protected journal entries will appear here.</p>
-    </main>
+    <>
+      <header>
+        <Navbar></Navbar>
+      </header>
+      <main>
+        <h1>Journal</h1>
+        <p>Your protected journal entries will appear here.</p>
+      </main>
+    </>
   );
 };
 

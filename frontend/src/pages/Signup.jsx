@@ -1,20 +1,47 @@
 import { useState } from "react";
+import { Link, Navigate, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/useAuth";
 
 const Signup = () => {
+  const { user, signup } = useAuth();
+  const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
 
     if (password !== confirm) {
-      return alert("Passwords do not match");
+      setError("Passwords do not match");
+      return;
     }
 
-    console.log({ username, email, password });
+    setSubmitting(true);
+
+    try {
+      await signup(username, email, password, confirm);
+      navigate("/dashboard", { replace: true });
+    } catch (err) {
+      const validationMessage = err.response?.data?.errors?.[0]?.msg;
+      const message =
+        validationMessage ||
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        "Unable to create your account right now. Please try again.";
+      setError(message);
+    } finally {
+      setSubmitting(false);
+    }
   };
+
+  if (user) {
+    return <Navigate to="/dashboard" replace />;
+  }
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-[#020617] via-[#050a1f] to-[#000814] text-white flex flex-col">
@@ -28,13 +55,18 @@ const Signup = () => {
           <div className="max-w-md mx-auto space-y-6">
             <div className="text-center">
               <h2 className="text-3xl font-semibold text-white">
-                Create your logbook
+                Create your Account
               </h2>
               <p className="text-sm text-white/50 mt-2">
                 Begin your journey through the cosmos
               </p>
             </div>
             <form onSubmit={handleSubmit} className="space-y-5">
+              {error ? (
+                <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+                  {error}
+                </div>
+              ) : null}
               <div className="relative">
                 <input
                   type="text"
@@ -49,7 +81,6 @@ const Signup = () => {
                 </span>
               </div>
 
-              {/* Email */}
               <div className="relative">
                 <input
                   type="email"
@@ -64,7 +95,6 @@ const Signup = () => {
                 </span>
               </div>
 
-              {/* Password */}
               <div className="relative">
                 <input
                   type="password"
@@ -94,16 +124,17 @@ const Signup = () => {
               </div>
               <button
                 type="submit"
+                disabled={submitting}
                 className="w-full py-3 rounded-lg bg-blue-700 hover:bg-blue-800 transition font-semibold tracking-wide"
               >
-                Launch Account
+                {submitting ? "Creating Account..." : "Launch Account"}
               </button>
             </form>
             <p className="text-center text-sm text-white/50">
               Already have an account?{" "}
-              <span className="text-blue-400 hover:underline cursor-pointer">
+              <Link to="/login" className="text-blue-400 hover:underline">
                 Login
-              </span>
+              </Link>
             </p>
           </div>
         </div>

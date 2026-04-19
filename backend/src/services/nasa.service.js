@@ -64,5 +64,20 @@ exports.searchNasaMedia = async (query, mediaType = "image") => {
   }
 };
 
-//EONET (later)
+exports.getEarthEvents = async () => {
+  const cached = cache.get("eonet-events");
+  if (cached) return cached;
+
+  const response = await axios.get("https://eonet.gsfc.nasa.gov/api/v3/events", {
+    params: {
+      status: "open",
+      limit: 20,
+      api_key: process.env.NASA_API_KEY
+    }
+  });
+
+  cache.set("eonet-events", response.data, 60 * 60 * 1000); // 1 hour
+  return response.data;
+};
+
 //Insight/Mars Weather (later)

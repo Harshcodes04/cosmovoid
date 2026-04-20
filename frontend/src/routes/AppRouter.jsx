@@ -31,14 +31,7 @@ const AppRouter = () => {
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
-      <Route
-        path="/explore"
-        element={
-          <ProtectedRoute>
-            <Explore />
-          </ProtectedRoute>
-        }
-      />
+      <Route path="/explore" element={<Explore />} />
       <Route
         path="/dashboard"
         element={
@@ -71,118 +64,20 @@ const AppRouter = () => {
           </ProtectedRoute>
         }
       />
-      <Route
-        path="/launches"
-        element={
-          <ProtectedRoute>
-            <Launches />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/launches/:id"
-        element={
-          <ProtectedRoute>
-            <LaunchDetails />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/rockets"
-        element={
-          <ProtectedRoute>
-            <Rockets />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/rockets/:id"
-        element={
-          <ProtectedRoute>
-            <RocketDetails />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/crew"
-        element={
-          <ProtectedRoute>
-            <Crew />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/crew/:id"
-        element={
-          <ProtectedRoute>
-            <CrewDetails />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/launchpads"
-        element={
-          <ProtectedRoute>
-            <Launchpads />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/landpads"
-        element={
-          <ProtectedRoute>
-            <Landpads />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/roadster"
-        element={
-          <ProtectedRoute>
-            <Roadster />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/asteroids"
-        element={
-          <ProtectedRoute>
-            <Asteroids />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/news"
-        element={
-          <ProtectedRoute>
-            <News />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/events"
-        element={
-          <ProtectedRoute>
-            <Events />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/search"
-        element={
-          <ProtectedRoute>
-            <Search />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/gallery"
-        element={
-          <ProtectedRoute>
-            <Gallery />
-          </ProtectedRoute>
-        }
-      />
+      <Route path="/launches" element={<Launches />} />
+      <Route path="/launches/:id" element={<LaunchDetails />} />
+      <Route path="/rockets" element={<Rockets />} />
+      <Route path="/rockets/:id" element={<RocketDetails />} />
+      <Route path="/crew" element={<Crew />} />
+      <Route path="/crew/:id" element={<CrewDetails />} />
+      <Route path="/launchpads" element={<Launchpads />} />
+      <Route path="/landpads" element={<Landpads />} />
+      <Route path="/roadster" element={<Roadster />} />
+      <Route path="/asteroids" element={<Asteroids />} />
+      <Route path="/news" element={<News />} />
+      <Route path="/events" element={<Events />} />
+      <Route path="/search" element={<Search />} />
+      <Route path="/gallery" element={<Gallery />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

@@ -12,7 +12,7 @@ const loginLimiter = rateLimit({ windowMs: 10 * 60 * 1000, max: 20 });
 //CORS = controls who can access your backend
 app.use(
   cors({
-    origin: `http://localhost:${process.env.FRONTEND_PORT || 3000}`,
+    origin: `http://localhost:${process.env.FRONTEND_PORT || 5173}`,
     credentials: true,
   }),
 );

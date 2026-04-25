@@ -57,7 +57,7 @@ const Navbar = () => {
         `}
       </style>
 
-      <nav className="cosmovoid-nav relative flex items-center justify-between border-b border-white/10 bg-zinc-950/80 px-6 py-4 shadow-[0_18px_48px_rgba(0,0,0,0.28)] backdrop-blur-xl md:px-12 lg:px-24 xl:px-40">
+      <nav className="cosmovoid-nav relative z-[100] flex items-center justify-between border-b border-white/10 bg-zinc-950/80 px-6 py-4 shadow-[0_18px_48px_rgba(0,0,0,0.28)] backdrop-blur-xl md:px-12 lg:px-24 xl:px-40">
         <Link
           to="/"
           className="text-lg font-semibold tracking-[0.24em] text-zinc-50"
@@ -149,7 +149,7 @@ const Navbar = () => {
         </button>
 
         {menuOpen && (
-          <div className="absolute left-0 top-full z-50 flex w-full flex-col gap-1 border-t border-white/10 bg-zinc-950/95 p-5 shadow-2xl md:hidden">
+          <div className="fixed inset-x-0 top-[61px] z-[120] flex max-h-[calc(100vh-61px)] flex-col gap-1 overflow-y-auto border-t border-white/10 bg-zinc-950 p-5 shadow-2xl md:hidden">
             {navItems.map((item) => (
               <NavLink
                 key={item.to}

@@ -3,612 +3,441 @@ import { Link } from "react-router-dom";
 import Navbar from "../components/NavBar";
 import { useAuth } from "../context/useAuth";
 import {
-  getApod,
-  getAsteroids,
-  getJournalEntries,
-  getLatestLaunch,
-  getNews,
-  getUpcomingLaunches,
+  getApod, getAsteroids, getJournalEntries,
+  getLatestLaunch, getNews, getUpcomingLaunches,
 } from "../api/space";
 
+/* ── helpers ───────────────────────────────────────────────── */
+const fmt = (v, extra = {}) =>
+  v ? new Intl.DateTimeFormat("en-IN", {
+    timeZone: "Asia/Kolkata", day: "numeric",
+    month: "short", year: "numeric", ...extra,
+  }).format(new Date(v)) : "—";
+
+const trim = (s, n) => s && s.length > n ? s.slice(0, n).trimEnd() + "…" : s || "";
+
+const pickNext = (arr = []) =>
+  [...arr].sort((a, b) => new Date(a.date_utc) - new Date(b.date_utc))
+    .find(l => new Date(l.date_utc) >= new Date());
+
+const neos = p => {
+  if (!p?.near_earth_objects) return [];
+  const [d] = Object.keys(p.near_earth_objects);
+  return p.near_earth_objects[d] || [];
+};
+
 const quickLinks = [
-  { label: "Launches", to: "/launches", copy: "Track the next missions" },
-  { label: "News", to: "/news", copy: "Catch today's space headlines" },
-  { label: "Gallery", to: "/gallery", copy: "Browse NASA visuals" },
-  { label: "Crew", to: "/crew", copy: "Meet the people in orbit" },
-  { label: "Events", to: "/events", copy: "See what's happening above Earth" },
-  { label: "Search", to: "/search", copy: "Find images and media fast" },
+  { label: "Launches", to: "/launches", icon: "🚀", copy: "Track active missions" },
+  { label: "Rockets",  to: "/rockets",  icon: "🛸", copy: "Explore rocket specs" },
+  { label: "Crew",     to: "/crew",     icon: "👨‍🚀", copy: "Meet people in orbit" },
+  { label: "Gallery",  to: "/gallery",  icon: "🌌", copy: "Browse NASA visuals" },
+  { label: "News",     to: "/news",     icon: "📡", copy: "Space headlines today" },
+  { label: "Events",   to: "/events",   icon: "🛰️", copy: "Cosmic events feed" },
 ];
 
-const formatDate = (value, options = {}) => {
-  if (!value) return "Not available yet";
+/* ── reusable card shell ───────────────────────────────────── */
+const Card = ({ children, className = "", style = {} }) => (
+  <div
+    style={style}
+    className={`rounded-[1.75rem] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.35)] backdrop-blur-sm ${className}`}
+  >{children}</div>
+);
 
-  return new Intl.DateTimeFormat("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-    ...options,
-  }).format(new Date(value));
-};
+const Label = ({ children }) => (
+  <p className="text-[10px] uppercase tracking-[0.28em] text-zinc-500">{children}</p>
+);
 
-const trimText = (value, limit) => {
-  if (!value) return "";
-  if (value.length <= limit) return value;
-  return `${value.slice(0, limit).trim()}...`;
-};
+const SectionHead = ({ label, title, to, linkLabel = "See all" }) => (
+  <div className="flex items-center justify-between gap-4 mb-5">
+    <div>
+      <Label>{label}</Label>
+      <h2 className="mt-1.5 text-xl font-medium tracking-[-0.04em] text-white">{title}</h2>
+    </div>
+    {to && (
+      <Link to={to} className="text-[11px] uppercase tracking-[0.2em] text-zinc-400 border border-white/10 rounded-full px-3 py-1.5 hover:bg-white/6 transition-colors">
+        {linkLabel}
+      </Link>
+    )}
+  </div>
+);
 
-const pickNextLaunch = (launches = []) => {
-  return [...launches]
-    .sort((a, b) => new Date(a.date_utc) - new Date(b.date_utc))
-    .find((launch) => new Date(launch.date_utc) >= new Date());
-};
+/* ── loading skeleton ──────────────────────────────────────── */
+const Skeleton = ({ h = "h-20" }) => (
+  <div className={`${h} rounded-2xl bg-white/4 animate-pulse`} />
+);
 
-const getAsteroidWatchlist = (payload) => {
-  const byDate = payload?.near_earth_objects;
-
-  if (!byDate) return [];
-
-  const [firstDate] = Object.keys(byDate);
-  return byDate[firstDate] || [];
-};
-
+/* ══════════════════════════════════════════════════════════════
+   DASHBOARD
+══════════════════════════════════════════════════════════════ */
 const Dashboard = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [snapshot, setSnapshot] = useState({
-    apod: null,
-    latestLaunch: null,
-    nextLaunch: null,
-    news: [],
-    asteroidWatchlist: [],
-    journalEntries: [],
+  const [apodExpanded, setApodExpanded] = useState(false);
+  const [snap, setSnap] = useState({
+    apod: null, latestLaunch: null, nextLaunch: null,
+    news: [], asteroids: [], journal: [],
   });
 
   useEffect(() => {
-    let active = true;
-
-    const loadDashboard = async () => {
+    let live = true;
+    (async () => {
       setLoading(true);
-      setError("");
-
-      const results = await Promise.allSettled([
-        getApod(),
-        getLatestLaunch(),
-        getUpcomingLaunches(),
-        getNews(),
-        getAsteroids(),
-        getJournalEntries(),
+      const [apodR, latR, upR, newsR, astR, jR] = await Promise.allSettled([
+        getApod(), getLatestLaunch(), getUpcomingLaunches(),
+        getNews(), getAsteroids(), getJournalEntries(),
       ]);
-
-      if (!active) return;
-
-      const [
-        apodResult,
-        latestLaunchResult,
-        upcomingLaunchesResult,
-        newsResult,
-        asteroidsResult,
-        journalResult,
-      ] = results;
-
-      const nextLaunch =
-        upcomingLaunchesResult.status === "fulfilled"
-          ? pickNextLaunch(upcomingLaunchesResult.value.data)
-          : null;
-
-      setSnapshot({
-        apod: apodResult.status === "fulfilled" ? apodResult.value.data : null,
-        latestLaunch:
-          latestLaunchResult.status === "fulfilled"
-            ? latestLaunchResult.value.data
-            : null,
-        nextLaunch,
-        news:
-          newsResult.status === "fulfilled"
-            ? newsResult.value.data?.results || []
-            : [],
-        asteroidWatchlist:
-          asteroidsResult.status === "fulfilled"
-            ? getAsteroidWatchlist(asteroidsResult.value.data)
-            : [],
-        journalEntries:
-          journalResult.status === "fulfilled"
-            ? journalResult.value.data?.entries || []
-            : [],
+      if (!live) return;
+      const ok = r => r.status === "fulfilled";
+      setSnap({
+        apod:        ok(apodR) ? apodR.value.data : null,
+        latestLaunch:ok(latR)  ? latR.value.data  : null,
+        nextLaunch:  ok(upR)   ? pickNext(upR.value.data) : null,
+        news:        ok(newsR) ? newsR.value.data?.results || [] : [],
+        asteroids:   ok(astR)  ? neos(astR.value.data) : [],
+        journal:     ok(jR)    ? jR.value.data?.entries || [] : [],
       });
-
-      const failedCount = results.filter(
-        (result) => result.status === "rejected",
-      ).length;
-
-      if (failedCount === results.length) {
-        setError("Mission control could not load your dashboard right now.");
-      } else if (failedCount > 0) {
-        setError("Some dashboard panels are temporarily offline.");
-      }
-
+      const fails = [apodR,latR,upR,newsR,astR,jR].filter(r=>!ok(r)).length;
+      if (fails === 6) setError("Mission Control could not reach its data feeds right now.");
+      else if (fails > 0) setError("Some panels are temporarily offline.");
       setLoading(false);
-    };
-
-    loadDashboard();
-
-    return () => {
-      active = false;
-    };
+    })();
+    return () => { live = false; };
   }, []);
 
-  const firstName = user?.username || "Explorer";
-  const journalEntries = snapshot.journalEntries.slice(0, 4);
-  const newsItems = snapshot.news.slice(0, 3);
-  const asteroidWatchlist = snapshot.asteroidWatchlist.slice(0, 3);
-  const dashboardRail = (
-    <div className="space-y-6 rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(7,10,22,0.98)_0%,rgba(17,24,39,0.96)_100%)] p-6 shadow-[0_30px_70px_rgba(0,0,0,0.35)]">
-      <section className="rounded-[1.6rem] border border-cyan-300/14 bg-cyan-300/8 p-5">
-        <p className="text-xs uppercase tracking-[0.22em] text-cyan-100/75">
-          Pilot profile
-        </p>
-        <h2 className="mt-3 text-2xl font-medium text-white">
-          {user?.username || "Explorer"}
-        </h2>
-        <p className="mt-2 text-sm text-zinc-200">
-          Signed in and ready to keep building your personal record of the
-          cosmos.
-        </p>
-      </section>
+  const name       = user?.username || "Explorer";
+  const journals   = snap.journal.slice(0, 4);
+  const newsItems  = snap.news.slice(0, 3);
+  const watchlist  = snap.asteroids.slice(0, 3);
+  const apodText   = snap.apod?.explanation || "";
+  const apodLong   = apodText.length > 200;
 
-      <section>
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <p className="text-xs uppercase tracking-[0.22em] text-zinc-400">
-              Your journal
-            </p>
-            <h2 className="mt-2 text-2xl font-medium tracking-[-0.04em] text-white">
-              Recent entries
-            </h2>
+  /* ── right sidebar ─────────────────────────────────────────── */
+  const Sidebar = () => (
+    <div className="space-y-5">
+      {/* Pilot */}
+      <Card className="bg-gradient-to-b from-cyan-400/10 to-transparent p-5">
+        <Label>Pilot profile</Label>
+        <div className="mt-3 flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-cyan-300/15 border border-cyan-300/20 text-cyan-200 text-lg font-semibold select-none">
+            {name[0].toUpperCase()}
           </div>
-          <Link
-            to="/journal"
-            className="text-sm font-medium text-cyan-200 transition-colors hover:text-white"
-          >
-            See all
-          </Link>
+          <div>
+            <p className="text-sm font-semibold text-white">{name}</p>
+            <p className="text-[11px] text-zinc-500 mt-0.5">Mission ready</p>
+          </div>
+          <span className="ml-auto flex items-center gap-1.5 text-[10px] uppercase tracking-[0.2em] text-cyan-300">
+            <span className="h-1.5 w-1.5 rounded-full bg-cyan-300 shadow-[0_0_8px_rgba(103,232,249,0.9)]" />
+            Online
+          </span>
         </div>
+        <div className="mt-4 grid grid-cols-3 gap-2 text-center">
+          {[
+            ["Journal", snap.journal.length],
+            ["Headlines", snap.news.length],
+            ["NEOs", snap.asteroids.length],
+          ].map(([k, v]) => (
+            <div key={k} className="rounded-xl bg-black/20 py-2.5">
+              <p className="text-lg font-semibold text-white">{v}</p>
+              <p className="text-[10px] text-zinc-500">{k}</p>
+            </div>
+          ))}
+        </div>
+      </Card>
 
-        <div className="mt-5 space-y-4">
-          {loading ? (
-            <div className="rounded-[1.4rem] border border-white/10 bg-black/16 p-5 text-sm text-zinc-300">
-              Loading your journal rail...
-            </div>
-          ) : journalEntries.length ? (
-            journalEntries.map((entry) => (
-              <Link
-                key={entry._id}
-                to={`/journal/${entry._id}`}
-                className="block rounded-[1.4rem] border border-white/10 bg-black/18 p-4 transition-colors hover:border-cyan-200/20 hover:bg-white/6"
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-sm font-medium text-white">
-                    {entry.title}
-                  </p>
-                  {entry.mood ? (
-                    <span className="rounded-full border border-white/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-zinc-300">
-                      {entry.mood}
-                    </span>
-                  ) : null}
-                </div>
-                <p className="mt-3 text-sm leading-6 text-zinc-300">
-                  {trimText(entry.content, 110)}
-                </p>
-                <p className="mt-3 text-xs uppercase tracking-[0.18em] text-zinc-500">
-                  {formatDate(entry.createdAt)}
-                </p>
-              </Link>
-            ))
-          ) : (
-            <div className="rounded-[1.4rem] border border-dashed border-white/12 bg-black/12 p-5 text-sm text-zinc-300">
-              Your previous entries will show up here. Start one and it will
-              become part of this rail.
-            </div>
+      {/* Journal rail */}
+      <Card className="bg-zinc-950/70 p-5">
+        <SectionHead label="Your journal" title="Recent entries" to="/journal" />
+        <div className="space-y-3">
+          {loading ? <Skeleton /> : journals.length ? journals.map(e => (
+            <Link key={e._id} to={`/journal/${e._id}`}
+              className="block rounded-xl border border-white/8 bg-black/20 p-3.5 hover:border-cyan-300/20 hover:bg-white/5 transition-colors">
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-sm font-medium text-white leading-tight">{trim(e.title, 38)}</p>
+                {e.mood && <span className="shrink-0 rounded-full border border-white/10 px-2 py-0.5 text-[9px] uppercase tracking-[0.16em] text-zinc-400">{e.mood}</span>}
+              </div>
+              <p className="mt-1.5 text-xs leading-5 text-zinc-400">{trim(e.content, 80)}</p>
+              <p className="mt-2 text-[10px] uppercase tracking-[0.16em] text-zinc-600">{fmt(e.createdAt)}</p>
+            </Link>
+          )) : (
+            <p className="rounded-xl border border-dashed border-white/10 p-4 text-xs text-zinc-500">
+              Your journal entries will appear here.
+            </p>
           )}
         </div>
-      </section>
-
-      <section className="grid gap-3">
-        <Link
-          to="/journal"
-          className="inline-flex items-center justify-center rounded-full border border-white/14 bg-white/6 px-5 py-3 text-sm font-medium text-zinc-100 transition-colors hover:bg-white/10"
-        >
-          Go to my journal section
-        </Link>
-        <Link
-          to="/journal/new"
-          className="inline-flex items-center justify-center rounded-full bg-white px-5 py-3 text-sm font-semibold text-zinc-950 transition-transform duration-300 hover:-translate-y-0.5"
-        >
-          Write a new entry
-        </Link>
-      </section>
+        <div className="mt-4 grid gap-2">
+          <Link to="/journal/new"
+            className="flex items-center justify-center rounded-full bg-white px-4 py-2.5 text-sm font-semibold text-zinc-950 hover:-translate-y-0.5 transition-transform">
+            + Write new entry
+          </Link>
+          <Link to="/journal"
+            className="flex items-center justify-center rounded-full border border-white/12 bg-white/5 px-4 py-2.5 text-sm text-zinc-200 hover:bg-white/10 transition-colors">
+            Open journal
+          </Link>
+        </div>
+      </Card>
     </div>
   );
 
   return (
     <>
-      <header>
-        <Navbar />
-      </header>
+      <style>{`
+        @keyframes dashFadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+        .dash-animate{animation:dashFadeUp 0.7s cubic-bezier(.22,1,.36,1) both}
+        .dash-animate:nth-child(1){animation-delay:.05s}
+        .dash-animate:nth-child(2){animation-delay:.12s}
+        .dash-animate:nth-child(3){animation-delay:.18s}
+        .dash-animate:nth-child(4){animation-delay:.24s}
+        .dash-animate:nth-child(5){animation-delay:.30s}
+        .dash-animate:nth-child(6){animation-delay:.36s}
+        .ql-card:hover{transform:translateY(-3px)}
+        .ql-card{transition:transform .25s,border-color .25s}
+      `}</style>
 
-      <main className="relative overflow-x-hidden px-6 pb-16 pt-8 md:px-10 lg:px-14 xl:px-20">
+      <header><Navbar /></header>
+
+      <main className="relative min-h-screen overflow-x-hidden px-5 pb-16 pt-8 md:px-10 lg:px-14 xl:px-20">
+
+        {/* nebula bg */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="cosmos-nebula absolute left-[-8%] top-14 h-72 w-72 rounded-full bg-cyan-400/14 blur-3xl" />
-          <div className="cosmos-drift absolute right-[-10%] top-28 h-[26rem] w-[26rem] rounded-full bg-sky-500/10 blur-3xl" />
-          <div className="absolute bottom-0 left-1/3 h-72 w-72 rounded-full bg-fuchsia-500/8 blur-3xl" />
+          <div className="cosmos-nebula absolute -left-20 top-10 h-96 w-96 rounded-full bg-cyan-500/10 blur-3xl" />
+          <div className="cosmos-drift absolute -right-20 top-32 h-[28rem] w-[28rem] rounded-full bg-violet-500/10 blur-3xl" />
+          <div className="absolute bottom-20 left-1/3 h-72 w-72 rounded-full bg-fuchsia-500/6 blur-3xl" />
         </div>
 
-        <section className="relative mx-auto grid max-w-7xl gap-8 xl:gap-12 xl:grid-cols-[minmax(0,1fr)_380px]">
-          <div className="space-y-8">
-            <section className="overflow-hidden rounded-[2rem] border border-white/10 bg-[linear-gradient(135deg,rgba(12,19,45,0.96)_0%,rgba(24,32,73,0.94)_48%,rgba(10,12,24,0.96)_100%)] p-6 shadow-[0_30px_70px_rgba(0,0,0,0.35)] sm:p-8">
-              <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
-                <div className="max-w-2xl space-y-4">
-                  <p className="inline-flex items-center gap-3 rounded-full border border-cyan-300/20 bg-cyan-300/8 px-4 py-2 text-xs font-medium uppercase tracking-[0.26em] text-cyan-100">
-                    <span className="h-2 w-2 rounded-full bg-cyan-300 shadow-[0_0_16px_rgba(103,232,249,0.95)]" />
+        <div className="relative mx-auto grid max-w-7xl gap-6 xl:grid-cols-[1fr_340px]">
+
+          {/* ── MAIN COLUMN ─────────────────────────────────────── */}
+          <div className="space-y-6">
+
+            {/* HERO */}
+            <Card className="dash-animate overflow-hidden bg-gradient-to-br from-[#0d1b3e] via-[#0a1228] to-[#060a18] p-7 sm:p-9">
+              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-300/30 to-transparent" />
+              <div className="flex flex-col gap-7 sm:flex-row sm:items-end sm:justify-between">
+                <div className="space-y-3">
+                  <span className="inline-flex items-center gap-2 rounded-full border border-cyan-300/20 bg-cyan-300/8 px-3.5 py-1.5 text-[10px] uppercase tracking-[0.28em] text-cyan-200">
+                    <span className="h-1.5 w-1.5 rounded-full bg-cyan-300 shadow-[0_0_8px_rgba(103,232,249,1)]" />
                     Personal Mission Control
+                  </span>
+                  <h1 className="text-4xl font-light tracking-[-0.06em] text-white sm:text-5xl">
+                    Welcome back,<br />
+                    <span className="font-semibold bg-gradient-to-r from-white to-cyan-200 bg-clip-text text-transparent">{name}</span>
+                  </h1>
+                  <p className="max-w-lg text-sm leading-7 text-zinc-400">
+                    Your command deck pulls live launches, NASA imagery, space headlines, asteroid alerts, and your personal journal — all in one orbit.
                   </p>
-                  <div className="space-y-3">
-                    <h1 className="text-4xl font-light tracking-[-0.06em] text-white sm:text-5xl">
-                      Welcome back, {firstName}
-                    </h1>
-                    <p className="max-w-2xl text-sm leading-7 text-zinc-300 sm:text-base">
-                      Your dashboard now pulls together the best bits of
-                      Cosmovoid: sky highlights, launch movement, headline
-                      stories, asteroid watch, and your own journal trail.
-                    </p>
+                </div>
+                <div className="flex shrink-0 flex-wrap gap-2">
+                  <Link to="/journal" className="rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-zinc-950 hover:-translate-y-0.5 transition-transform">
+                    Open journal
+                  </Link>
+                  <Link to="/explore" className="rounded-full border border-white/14 bg-white/6 px-5 py-2.5 text-sm text-zinc-200 hover:bg-white/10 transition-colors">
+                    Explore
+                  </Link>
+                </div>
+              </div>
+
+              {/* stat chips */}
+              <div className="mt-7 grid grid-cols-3 gap-3">
+                {[
+                  { label: "Journal entries", value: snap.journal.length, color: "text-violet-300" },
+                  { label: "Headlines live",  value: snap.news.length,    color: "text-cyan-300" },
+                  { label: "Asteroids today", value: snap.asteroids.length, color: "text-amber-300" },
+                ].map(s => (
+                  <div key={s.label} className="rounded-2xl border border-white/8 bg-black/20 p-4">
+                    <p className={`text-3xl font-semibold ${s.color}`}>{loading ? "—" : s.value}</p>
+                    <p className="mt-1 text-[10px] uppercase tracking-[0.2em] text-zinc-500">{s.label}</p>
                   </div>
-                </div>
-
-                <div className="flex flex-wrap gap-3">
-                  <Link
-                    to="/journal"
-                    className="inline-flex items-center justify-center rounded-full bg-white px-5 py-3 text-sm font-semibold text-zinc-950 transition-transform duration-300 hover:-translate-y-0.5"
-                  >
-                    Open my journal
-                  </Link>
-                  <Link
-                    to="/journal/new"
-                    className="inline-flex items-center justify-center rounded-full border border-white/14 bg-white/6 px-5 py-3 text-sm font-medium text-zinc-100 transition-colors hover:bg-white/10"
-                  >
-                    Write more
-                  </Link>
-                </div>
+                ))}
               </div>
 
-              <div className="mt-8 grid gap-4 md:grid-cols-3">
-                <article className="rounded-[1.5rem] border border-white/10 bg-white/6 p-4 backdrop-blur-sm">
-                  <p className="text-xs uppercase tracking-[0.22em] text-zinc-400">
-                    Journal entries
-                  </p>
-                  <p className="mt-3 text-3xl font-semibold text-white">
-                    {snapshot.journalEntries.length}
-                  </p>
-                  <p className="mt-2 text-sm text-zinc-300">
-                    Private notes and reflections saved in your orbit.
-                  </p>
-                </article>
-                <article className="rounded-[1.5rem] border border-white/10 bg-white/6 p-4 backdrop-blur-sm">
-                  <p className="text-xs uppercase tracking-[0.22em] text-zinc-400">
-                    Headlines loaded
-                  </p>
-                  <p className="mt-3 text-3xl font-semibold text-white">
-                    {snapshot.news.length}
-                  </p>
-                  <p className="mt-2 text-sm text-zinc-300">
-                    Fresh stories pulled into today's command deck.
-                  </p>
-                </article>
-                <article className="rounded-[1.5rem] border border-white/10 bg-white/6 p-4 backdrop-blur-sm">
-                  <p className="text-xs uppercase tracking-[0.22em] text-zinc-400">
-                    Asteroid watch
-                  </p>
-                  <p className="mt-3 text-3xl font-semibold text-white">
-                    {snapshot.asteroidWatchlist.length}
-                  </p>
-                  <p className="mt-2 text-sm text-zinc-300">
-                    Near-Earth objects listed in today's NASA feed.
-                  </p>
-                </article>
-              </div>
-
-              {error ? (
-                <div className="mt-6 rounded-2xl border border-amber-300/20 bg-amber-300/10 px-4 py-3 text-sm text-amber-100">
-                  {error}
+              {error && (
+                <div className="mt-5 rounded-2xl border border-amber-300/20 bg-amber-300/8 px-4 py-3 text-xs text-amber-200">
+                  ⚠ {error}
                 </div>
-              ) : null}
-            </section>
+              )}
+            </Card>
 
-            <section className="grid gap-6 lg:grid-cols-2">
-              <article className="overflow-hidden rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.07)_0%,rgba(255,255,255,0.02)_100%)] shadow-[0_26px_56px_rgba(0,0,0,0.3)]">
-                {snapshot.apod?.media_type === "image" ? (
-                  <img
-                    src={snapshot.apod.url}
-                    alt={snapshot.apod.title || "Astronomy Picture of the Day"}
-                    className="h-64 w-full object-cover"
-                  />
+            {/* APOD + LAUNCH ROW */}
+            <div className="dash-animate grid gap-6 lg:grid-cols-2">
+
+              {/* APOD */}
+              <Card className="overflow-hidden bg-zinc-950/80">
+                {snap.apod?.media_type === "image" ? (
+                  <img src={snap.apod.url} alt={snap.apod.title}
+                    className="h-52 w-full object-cover" loading="lazy" />
                 ) : (
-                  <div className="flex h-64 items-center justify-center bg-[radial-gradient(circle_at_top,rgba(125,211,252,0.22),rgba(6,8,20,0.98))] px-6 text-center">
-                    <div>
-                      <p className="text-sm uppercase tracking-[0.22em] text-cyan-100/80">
-                        APOD Feature
-                      </p>
-                      <h2 className="mt-3 text-2xl font-medium text-white">
-                        {snapshot.apod?.title || "Today's sky highlight"}
-                      </h2>
-                    </div>
+                  <div className="flex h-52 items-center justify-center bg-gradient-to-b from-sky-900/40 to-zinc-950">
+                    <p className="text-sm text-zinc-500">Video / feed pending</p>
                   </div>
                 )}
-
-                <div className="space-y-4 p-6">
-                  <div className="flex items-center justify-between gap-3">
+                <div className="p-5 space-y-3">
+                  <div className="flex items-start justify-between gap-3">
                     <div>
-                      <p className="text-xs uppercase tracking-[0.22em] text-zinc-400">
-                        Picture of the day
-                      </p>
-                      <h2 className="mt-2 text-2xl font-medium tracking-[-0.04em] text-white">
-                        {snapshot.apod?.title || "Awaiting NASA image feed"}
+                      <Label>Picture of the day</Label>
+                      <h2 className="mt-1.5 text-lg font-medium text-white leading-snug">
+                        {loading ? "Loading…" : snap.apod?.title || "Awaiting NASA feed"}
                       </h2>
                     </div>
-                    <Link
-                      to="/gallery"
-                      className="rounded-full border border-white/12 px-4 py-2 text-xs font-medium uppercase tracking-[0.16em] text-zinc-200 transition-colors hover:bg-white/8"
-                    >
-                      Open gallery
+                    <Link to="/gallery" className="shrink-0 rounded-full border border-white/10 px-3 py-1.5 text-[10px] uppercase tracking-[0.18em] text-zinc-400 hover:bg-white/6 transition-colors">
+                      Gallery
                     </Link>
                   </div>
-
-                  <p className="text-sm leading-7 text-zinc-300">
-                    {snapshot.apod?.explanation
-                      ? trimText(snapshot.apod.explanation, 220)
-                      : "We'll place today's featured sky story here as soon as the feed responds."}
+                  {loading ? <Skeleton h="h-10" /> : (
+                    <p className="text-xs leading-6 text-zinc-400">
+                      {apodText ? (apodExpanded ? apodText : trim(apodText, 200)) : "Sky story pending."}
+                    </p>
+                  )}
+                  {apodLong && (
+                    <button onClick={() => setApodExpanded(x => !x)}
+                      className="text-xs font-medium text-cyan-300 hover:text-white transition-colors">
+                      {apodExpanded ? "Show less ↑" : "Read more ↓"}
+                    </button>
+                  )}
+                  <p className="text-[10px] uppercase tracking-[0.16em] text-zinc-600">
+                    {snap.apod?.date ? `Captured ${fmt(snap.apod.date)}` : ""}
                   </p>
-
-                  <p className="text-xs uppercase tracking-[0.2em] text-zinc-500">
-                    {snapshot.apod?.date
-                      ? `Captured ${formatDate(snapshot.apod.date)}`
-                      : "Waiting for today's issue"}
-                  </p>
                 </div>
-              </article>
+              </Card>
 
-              <article className="rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(119,147,255,0.12)_0%,rgba(8,10,24,0.95)_100%)] p-6 shadow-[0_26px_56px_rgba(0,0,0,0.3)]">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.22em] text-zinc-400">
-                      Flight deck
-                    </p>
-                    <h2 className="mt-2 text-2xl font-medium tracking-[-0.04em] text-white">
-                      Launch pulse
-                    </h2>
-                  </div>
-                  <Link
-                    to="/launches"
-                    className="rounded-full border border-white/12 px-4 py-2 text-xs font-medium uppercase tracking-[0.16em] text-zinc-200 transition-colors hover:bg-white/8"
-                  >
-                    View launches
-                  </Link>
+              {/* LAUNCH PULSE */}
+              <Card className="bg-gradient-to-b from-[#141d40]/90 to-zinc-950/80 p-5 space-y-4">
+                <SectionHead label="Flight deck" title="Launch pulse" to="/launches" linkLabel="All launches" />
+
+                {/* Latest */}
+                <div className="rounded-2xl border border-white/10 bg-black/25 p-4 space-y-2">
+                  <Label>Latest launch</Label>
+                  {loading ? <Skeleton h="h-14" /> : (
+                    <>
+                      <p className="text-base font-semibold text-white">
+                        {snap.latestLaunch?.name || "—"}
+                      </p>
+                      <p className="text-xs text-zinc-500">
+                        {fmt(snap.latestLaunch?.date_utc, { hour: "numeric", minute: "2-digit", timeZoneName: "short" })}
+                      </p>
+                      <p className="text-xs leading-5 text-zinc-400">
+                        {trim(snap.latestLaunch?.details, 110) || "Summary unavailable."}
+                      </p>
+                    </>
+                  )}
                 </div>
 
-                <div className="mt-6 grid gap-4">
-                  <div className="rounded-[1.5rem] border border-white/10 bg-black/18 p-5">
-                    <p className="text-xs uppercase tracking-[0.2em] text-zinc-400">
-                      Latest launch
-                    </p>
-                    <h3 className="mt-3 text-xl font-medium text-white">
-                      {snapshot.latestLaunch?.name || "No recent launch loaded"}
-                    </h3>
-                    <p className="mt-2 text-sm text-zinc-300">
-                      {snapshot.latestLaunch?.date_utc
-                        ? formatDate(snapshot.latestLaunch.date_utc, {
-                            hour: "numeric",
-                            minute: "2-digit",
-                          })
-                        : "Launch timing unavailable"}
-                    </p>
-                    <p className="mt-4 text-sm leading-6 text-zinc-300">
-                      {snapshot.latestLaunch?.details
-                        ? trimText(snapshot.latestLaunch.details, 140)
-                        : "This panel will summarize the most recent mission once data is available."}
-                    </p>
+                {/* Next */}
+                <div className="rounded-2xl border border-cyan-300/15 bg-cyan-300/6 p-4 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Label>Next launch</Label>
+                    <span className="h-1.5 w-1.5 rounded-full bg-cyan-300 shadow-[0_0_8px_rgba(103,232,249,0.9)]" />
                   </div>
-
-                  <div className="rounded-[1.5rem] border border-cyan-200/12 bg-cyan-300/8 p-5">
-                    <p className="text-xs uppercase tracking-[0.2em] text-cyan-100/75">
-                      Next up
-                    </p>
-                    <h3 className="mt-3 text-xl font-medium text-white">
-                      {snapshot.nextLaunch?.name ||
-                        "Watching for the next launch"}
-                    </h3>
-                    <p className="mt-2 text-sm text-zinc-200">
-                      {snapshot.nextLaunch?.date_utc
-                        ? formatDate(snapshot.nextLaunch.date_utc, {
-                            hour: "numeric",
-                            minute: "2-digit",
-                          })
-                        : "Schedule pending"}
-                    </p>
-                    <p className="mt-4 text-sm leading-6 text-zinc-300">
-                      {snapshot.nextLaunch?.details
-                        ? trimText(snapshot.nextLaunch.details, 140)
-                        : "As new flights show up in the SpaceX feed, this card will keep the next window front and center."}
-                    </p>
-                  </div>
+                  {loading ? <Skeleton h="h-14" /> : (
+                    <>
+                      <p className="text-base font-semibold text-white">
+                        {snap.nextLaunch?.name || "Watching for window…"}
+                      </p>
+                      <p className="text-xs text-cyan-300/80">
+                        {fmt(snap.nextLaunch?.date_utc, { hour: "numeric", minute: "2-digit", timeZoneName: "short" })}
+                      </p>
+                      <p className="text-xs leading-5 text-zinc-400">
+                        {trim(snap.nextLaunch?.details, 110) || "Schedule will appear when feed updates."}
+                      </p>
+                    </>
+                  )}
                 </div>
-              </article>
-            </section>
+              </Card>
+            </div>
 
-            <section className="grid gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
-              <article className="rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.05)_0%,rgba(255,255,255,0.02)_100%)] p-6 shadow-[0_26px_56px_rgba(0,0,0,0.3)]">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.22em] text-zinc-400">
-                      Top stories
-                    </p>
-                    <h2 className="mt-2 text-2xl font-medium tracking-[-0.04em] text-white">
-                      Space news briefing
-                    </h2>
-                  </div>
-                  <Link
-                    to="/news"
-                    className="rounded-full border border-white/12 px-4 py-2 text-xs font-medium uppercase tracking-[0.16em] text-zinc-200 transition-colors hover:bg-white/8"
-                  >
-                    Open news
-                  </Link>
-                </div>
+            {/* NEWS + ASTEROIDS */}
+            <div className="dash-animate grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
 
-                <div className="mt-6 grid gap-4">
-                  {newsItems.length ? (
-                    newsItems.map((story) => (
-                      <article
-                        key={story.id}
-                        className="rounded-[1.4rem] border border-white/10 bg-black/18 p-4"
-                      >
-                        <div className="flex flex-wrap items-center gap-3 text-xs uppercase tracking-[0.18em] text-zinc-500">
-                          <span>{story.news_site}</span>
-                          <span>{formatDate(story.published_at)}</span>
+              {/* NEWS */}
+              <Card className="bg-zinc-950/80 p-5">
+                <SectionHead label="Top stories" title="Space news briefing" to="/news" linkLabel="Open news" />
+                <div className="space-y-3">
+                  {loading ? [1,2,3].map(i => <Skeleton key={i} />) :
+                    newsItems.length ? newsItems.map(s => (
+                      <div key={s.id} className="rounded-2xl border border-white/8 bg-black/20 p-4 space-y-2">
+                        <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.16em] text-zinc-600">
+                          <span className="rounded-full border border-white/10 px-2 py-0.5">{s.news_site}</span>
+                          <span>{fmt(s.published_at)}</span>
                         </div>
-                        <h3 className="mt-3 text-lg font-medium text-white">
-                          {story.title}
-                        </h3>
-                        <p className="mt-2 text-sm leading-6 text-zinc-300">
-                          {trimText(story.summary, 150)}
-                        </p>
-                        <a
-                          href={story.url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="mt-4 inline-flex text-sm font-medium text-cyan-200 transition-colors hover:text-white"
-                        >
-                          Read source
+                        <p className="text-sm font-medium text-white leading-snug">{s.title}</p>
+                        <p className="text-xs leading-5 text-zinc-400">{trim(s.summary, 130)}</p>
+                        <a href={s.url} target="_blank" rel="noreferrer"
+                          className="text-[11px] font-medium text-cyan-300 hover:text-white transition-colors">
+                          Read source ↗
                         </a>
-                      </article>
-                    ))
-                  ) : (
-                    <div className="rounded-[1.4rem] border border-dashed border-white/12 bg-black/12 p-5 text-sm text-zinc-300">
-                      News cards will appear here once the feed responds.
+                      </div>
+                    )) : (
+                      <p className="rounded-2xl border border-dashed border-white/10 p-4 text-xs text-zinc-500">
+                        News feed pending.
+                      </p>
+                    )}
+                </div>
+              </Card>
+
+              {/* ASTEROIDS */}
+              <Card className="bg-gradient-to-b from-emerald-950/30 to-zinc-950/80 p-5">
+                <SectionHead label="Near-Earth objects" title="Asteroid watch" to="/asteroids" linkLabel="Full list" />
+                <div className="space-y-3">
+                  {loading ? [1,2,3].map(i => <Skeleton key={i} />) :
+                    watchlist.length ? watchlist.map(a => {
+                      const hazard = a.is_potentially_hazardous_asteroid;
+                      const km = Math.round(a.estimated_diameter?.kilometers?.estimated_diameter_max || 0);
+                      const miss = Number(a.close_approach_data?.[0]?.miss_distance?.kilometers || 0)
+                        .toLocaleString("en-IN", { maximumFractionDigits: 0 });
+                      return (
+                        <div key={a.id} className={`rounded-2xl border p-4 space-y-1.5 ${hazard ? "border-red-500/20 bg-red-500/6" : "border-white/8 bg-black/20"}`}>
+                          <div className="flex items-center justify-between gap-2">
+                            <p className="text-sm font-semibold text-white leading-tight">{a.name}</p>
+                            {hazard && (
+                              <span className="shrink-0 rounded-full border border-red-400/30 bg-red-500/15 px-2 py-0.5 text-[9px] uppercase tracking-[0.18em] text-red-300">
+                                Hazardous
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[11px] text-zinc-400">Diameter ≤ {km} km</p>
+                          <p className="text-[11px] text-zinc-400">Miss {miss} km</p>
+                        </div>
+                      );
+                    }) : (
+                      <p className="rounded-2xl border border-dashed border-white/10 p-4 text-xs text-zinc-500">
+                        Asteroid feed pending.
+                      </p>
+                    )}
+                </div>
+              </Card>
+            </div>
+
+            {/* QUICK NAV */}
+            <Card className="dash-animate bg-zinc-950/70 p-5">
+              <SectionHead label="Jump points" title="Explore Cosmovoid" to="/explore" linkLabel="Explore all" />
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {quickLinks.map(q => (
+                  <Link key={q.to} to={q.to}
+                    className="ql-card group rounded-2xl border border-white/8 bg-black/20 p-4 hover:border-cyan-300/20 hover:bg-white/5">
+                    <div className="flex items-center gap-3 mb-2">
+                      <span className="text-xl">{q.icon}</span>
+                      <p className="text-sm font-semibold text-white">{q.label}</p>
                     </div>
-                  )}
-                </div>
-              </article>
-
-              <article className="rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(34,197,94,0.08)_0%,rgba(7,11,20,0.96)_100%)] p-6 shadow-[0_26px_56px_rgba(0,0,0,0.3)]">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.22em] text-zinc-400">
-                      Near-Earth objects
-                    </p>
-                    <h2 className="mt-2 text-2xl font-medium tracking-[-0.04em] text-white">
-                      Asteroid watch
-                    </h2>
-                  </div>
-                  <Link
-                    to="/asteroids"
-                    className="rounded-full border border-white/12 px-4 py-2 text-xs font-medium uppercase tracking-[0.16em] text-zinc-200 transition-colors hover:bg-white/8"
-                  >
-                    Full watchlist
-                  </Link>
-                </div>
-
-                <div className="mt-6 space-y-4">
-                  {asteroidWatchlist.length ? (
-                    asteroidWatchlist.map((asteroid) => (
-                      <article
-                        key={asteroid.id}
-                        className="rounded-[1.4rem] border border-white/10 bg-black/18 p-4"
-                      >
-                        <h3 className="text-lg font-medium text-white">
-                          {asteroid.name}
-                        </h3>
-                        <p className="mt-2 text-sm text-zinc-300">
-                          Diameter up to{" "}
-                          {Math.round(
-                            asteroid.estimated_diameter.kilometers
-                              .estimated_diameter_max,
-                          )}{" "}
-                          km
-                        </p>
-                        <p className="mt-2 text-sm text-zinc-300">
-                          Miss distance{" "}
-                          {Number(
-                            asteroid.close_approach_data?.[0]?.miss_distance
-                              ?.kilometers || 0,
-                          ).toLocaleString("en-US", {
-                            maximumFractionDigits: 0,
-                          })}{" "}
-                          km
-                        </p>
-                      </article>
-                    ))
-                  ) : (
-                    <div className="rounded-[1.4rem] border border-dashed border-white/12 bg-black/12 p-5 text-sm text-zinc-300">
-                      Today's asteroid watchlist will appear here when NASA data
-                      is available.
-                    </div>
-                  )}
-                </div>
-              </article>
-            </section>
-
-            <section className="rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.05)_0%,rgba(255,255,255,0.02)_100%)] p-6 shadow-[0_26px_56px_rgba(0,0,0,0.3)]">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-xs uppercase tracking-[0.22em] text-zinc-400">
-                    Jump points
-                  </p>
-                  <h2 className="mt-2 text-2xl font-medium tracking-[-0.04em] text-white">
-                    Explore the rest of Cosmovoid
-                  </h2>
-                </div>
-                <Link
-                  to="/explore"
-                  className="rounded-full border border-white/12 px-4 py-2 text-xs font-medium uppercase tracking-[0.16em] text-zinc-200 transition-colors hover:bg-white/8"
-                >
-                  Explore all
-                </Link>
-              </div>
-
-              <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                {quickLinks.map((item) => (
-                  <Link
-                    key={item.to}
-                    to={item.to}
-                    className="group rounded-[1.5rem] border border-white/10 bg-black/16 p-5 transition-transform duration-300 hover:-translate-y-1 hover:bg-white/6"
-                  >
-                    <p className="text-xs uppercase tracking-[0.2em] text-zinc-500">
-                      Route
-                    </p>
-                    <h3 className="mt-3 text-xl font-medium text-white">
-                      {item.label}
-                    </h3>
-                    <p className="mt-2 text-sm leading-6 text-zinc-300">
-                      {item.copy}
-                    </p>
-                    <span className="mt-4 inline-flex text-sm font-medium text-cyan-200 transition-colors group-hover:text-white">
-                      Open page
-                    </span>
+                    <p className="text-xs text-zinc-500 leading-5">{q.copy}</p>
+                    <p className="mt-2 text-[11px] font-medium text-cyan-300 group-hover:text-white transition-colors">Open →</p>
                   </Link>
                 ))}
               </div>
-            </section>
+            </Card>
           </div>
 
+          {/* ── SIDEBAR ─────────────────────────────────────────── */}
           <aside className="hidden xl:block">
-            <div className="fixed top-30 z-20 w-[450px] max-h-[calc(130vh-0rem)] overflow-y-auto pr-8 right-[calc((85vw-79rem)/2)]">
-              {dashboardRail}
+            <div className="sticky top-24">
+              <Sidebar />
             </div>
           </aside>
-        </section>
+        </div>
 
-        <aside className="mx-auto mt-8 max-w-7xl xl:hidden">
-          {dashboardRail}
-        </aside>
+        {/* mobile sidebar */}
+        <div className="mx-auto mt-6 max-w-7xl xl:hidden">
+          <Sidebar />
+        </div>
       </main>
     </>
   );

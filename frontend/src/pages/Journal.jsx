@@ -4,7 +4,8 @@ import Navbar from "../components/NavBar";
 import { getJournalEntries } from "../api/space";
 
 const formatDate = (value) => {
-  return new Intl.DateTimeFormat("en-US", {
+  return new Intl.DateTimeFormat("en-IN", {
+    timeZone: "Asia/Kolkata",
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -70,9 +71,16 @@ const Journal = () => {
               <p className="text-xs uppercase tracking-[0.26em] text-zinc-400">
                 My journal
               </p>
-              <h1 className="text-4xl font-light tracking-[-0.06em] text-white sm:text-5xl">
-                Your written orbit
-              </h1>
+              <div className="flex items-center gap-3">
+                <h1 className="text-4xl font-light tracking-[-0.06em] text-white sm:text-5xl">
+                  Your written orbit
+                </h1>
+                {!loading && entries.length > 0 && (
+                  <span className="self-start mt-2 rounded-full border border-cyan-300/25 bg-cyan-300/10 px-2.5 py-0.5 text-xs font-semibold text-cyan-200">
+                    {entries.length}
+                  </span>
+                )}
+              </div>
               <p className="max-w-2xl text-sm leading-7 text-zinc-300 sm:text-base">
                 Keep track of discoveries, thoughts, moods, and the stories
                 you want to remember after each deep-space rabbit hole.

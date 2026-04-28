@@ -98,10 +98,28 @@ const Footer = () => (
       <div className="flex flex-wrap items-center justify-between gap-4">
         <p className="text-[11px] tracking-wide text-zinc-700">
           © {year} Cosmovoid &middot; Data from SpaceX API, NASA APOD &amp;
-          Spaceflight News API
+          Spaceflight News API &middot;{" "}
+          <span className="text-zinc-600">Built with ♥ for space explorers</span>
         </p>
 
         <div className="flex items-center gap-5">
+          <a
+            href="https://github.com"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="GitHub"
+            className="flex items-center justify-center rounded-full border border-white/10 bg-white/5 p-2 text-zinc-400 transition-colors hover:bg-white/10 hover:text-white"
+          >
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M12 2C6.477 2 2 6.484 2 12.021c0 4.428 2.865 8.184 6.839 9.504.5.092.682-.217.682-.483 0-.237-.009-.868-.013-1.703-2.782.605-3.369-1.342-3.369-1.342-.454-1.155-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.026 2.747-1.026.546 1.378.202 2.397.1 2.65.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .268.18.58.688.482C19.138 20.2 22 16.447 22 12.021 22 6.484 17.523 2 12 2z" />
+            </svg>
+          </a>
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
             className="cursor-pointer rounded-full border border-white/10 bg-white/5 px-3.5 py-1.5 text-[11px] tracking-wide text-zinc-400 transition-colors hover:bg-white/10 hover:text-white"

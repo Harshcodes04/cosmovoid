@@ -60,10 +60,11 @@ const Navbar = () => {
       <nav className="cosmovoid-nav relative z-[100] flex items-center justify-between border-b border-white/10 bg-zinc-950/80 px-6 py-4 shadow-[0_18px_48px_rgba(0,0,0,0.28)] backdrop-blur-xl md:px-12 lg:px-24 xl:px-40">
         <Link
           to="/"
-          className="text-lg font-semibold tracking-[0.24em] text-zinc-50"
+          className="flex items-center gap-2.5 text-lg font-semibold tracking-[0.24em] text-zinc-50"
           onClick={closeMenu}
         >
           COSMOVOID
+          <span className="h-1.5 w-1.5 rounded-full bg-cyan-300 shadow-[0_0_8px_rgba(103,232,249,0.9)] animate-pulse" />
         </Link>
 
         <div className="hidden items-center gap-2 rounded-full border border-white/10 bg-white/5 px-1 py-1 md:flex">

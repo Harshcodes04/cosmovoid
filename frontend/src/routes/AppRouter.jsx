@@ -1,5 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import ProtectedRoute from "../components/ProtectedRoute";
+import ExploreLayout from "../layouts/ExploreLayout";
 
 import Home from "../pages/Home";
 import Explore from "../pages/Explore";
@@ -31,7 +32,23 @@ const AppRouter = () => {
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
-      <Route path="/explore" element={<Explore />} />
+      <Route element={<ExploreLayout />}>
+        <Route path="/explore" element={<Explore />} />
+        <Route path="/launches" element={<Launches />} />
+        <Route path="/launches/:id" element={<LaunchDetails />} />
+        <Route path="/rockets" element={<Rockets />} />
+        <Route path="/rockets/:id" element={<RocketDetails />} />
+        <Route path="/crew" element={<Crew />} />
+        <Route path="/crew/:id" element={<CrewDetails />} />
+        <Route path="/launchpads" element={<Launchpads />} />
+        <Route path="/landpads" element={<Landpads />} />
+        <Route path="/roadster" element={<Roadster />} />
+        <Route path="/asteroids" element={<Asteroids />} />
+        <Route path="/news" element={<News />} />
+        <Route path="/events" element={<Events />} />
+        <Route path="/search" element={<Search />} />
+        <Route path="/gallery" element={<Gallery />} />
+      </Route>
       <Route
         path="/dashboard"
         element={
@@ -64,20 +81,6 @@ const AppRouter = () => {
           </ProtectedRoute>
         }
       />
-      <Route path="/launches" element={<Launches />} />
-      <Route path="/launches/:id" element={<LaunchDetails />} />
-      <Route path="/rockets" element={<Rockets />} />
-      <Route path="/rockets/:id" element={<RocketDetails />} />
-      <Route path="/crew" element={<Crew />} />
-      <Route path="/crew/:id" element={<CrewDetails />} />
-      <Route path="/launchpads" element={<Launchpads />} />
-      <Route path="/landpads" element={<Landpads />} />
-      <Route path="/roadster" element={<Roadster />} />
-      <Route path="/asteroids" element={<Asteroids />} />
-      <Route path="/news" element={<News />} />
-      <Route path="/events" element={<Events />} />
-      <Route path="/search" element={<Search />} />
-      <Route path="/gallery" element={<Gallery />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

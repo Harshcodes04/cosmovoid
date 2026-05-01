@@ -84,7 +84,7 @@ const Contact = () => {
                   key={card.label}
                   href={card.href}
                   target={card.href ? "_blank" : undefined}
-                  rel={card.href ? "noreferrer" : undefined}
+                  rel={card.href ? "noopener noreferrer" : undefined}
                   className="group rounded-[1.35rem] border border-white/8 bg-black/20 p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-cyan-300/20 hover:bg-white/5"
                 >
                   <div className="flex items-start gap-4">

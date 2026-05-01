@@ -158,7 +158,7 @@ const Dashboard = () => {
   const apodLong = apodText.length > 200;
 
   /* ── right sidebar ─────────────────────────────────────────── */
-  const Sidebar = () => (
+  const renderSidebar = () => (
     <div className="space-y-5">
       {/* Pilot */}
       <Card className="bg-gradient-to-b from-cyan-400/10 to-transparent p-5">
@@ -632,14 +632,14 @@ const Dashboard = () => {
           {/* ── SIDEBAR ─────────────────────────────────────────── */}
           <aside className="hidden xl:block">
             <div className="sticky top-24">
-              <Sidebar />
+              {renderSidebar()}
             </div>
           </aside>
         </div>
 
         {/* mobile sidebar */}
         <div className="mx-auto mt-6 max-w-7xl xl:hidden">
-          <Sidebar />
+          {renderSidebar()}
         </div>
       </main>
     </>

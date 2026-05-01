@@ -9,6 +9,8 @@ const navItems = [
   { label: "Journal", to: "/journal" },
   { label: "News", to: "/news" },
   { label: "Gallery", to: "/gallery" },
+  { label: "About", to: "/about" },
+  { label: "Contact", to: "/contact" },
 ];
 
 const navLinkClass = ({ isActive }) =>

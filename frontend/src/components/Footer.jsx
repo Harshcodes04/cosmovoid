@@ -24,6 +24,7 @@ const cols = [
       { label: "Events", to: "/events" },
       { label: "Asteroids", to: "/asteroids" },
       { label: "Launchpads", to: "/launchpads" },
+      { label: "About", to: "/about" },
     ],
   },
   {
@@ -34,6 +35,7 @@ const cols = [
       { label: "New entry", to: "/journal/new" },
       { label: "Search", to: "/search" },
       { label: "Explore", to: "/explore" },
+      { label: "Contact", to: "/contact" },
     ],
   },
 ];

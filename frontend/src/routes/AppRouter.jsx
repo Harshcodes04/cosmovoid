@@ -24,6 +24,8 @@ import Asteroids from "../pages/Asteroids";
 import News from "../pages/News";
 import Events from "../pages/Events";
 import Search from "../pages/Search";
+import About from "../pages/About";
+import Contact from "../pages/Contact";
 import NotFound from "../pages/NotFound";
 
 const AppRouter = () => {
@@ -48,6 +50,8 @@ const AppRouter = () => {
         <Route path="/events" element={<Events />} />
         <Route path="/search" element={<Search />} />
         <Route path="/gallery" element={<Gallery />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
       </Route>
       <Route
         path="/dashboard"

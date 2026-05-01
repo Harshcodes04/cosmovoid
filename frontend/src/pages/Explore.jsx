@@ -1,7 +1,9 @@
 import { Link } from "react-router-dom";
 import {
   FaCarSide,
+  FaEnvelope,
   FaImages,
+  FaInfoCircle,
   FaMapMarkerAlt,
   FaNewspaper,
   FaRocket,
@@ -77,6 +79,18 @@ const sections = [
     label: "Search",
     to: "/search",
     desc: "Search NASA media and space content",
+  },
+  {
+    Icon: FaInfoCircle,
+    label: "About",
+    to: "/about",
+    desc: "Learn what Cosmovoid brings together",
+  },
+  {
+    Icon: FaEnvelope,
+    label: "Contact",
+    to: "/contact",
+    desc: "Send feedback to Mission Control",
   },
 ];
 

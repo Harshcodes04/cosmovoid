@@ -5,7 +5,7 @@ exports.getApod = async () => {
   const cacheKey = `apod-${new Date().toISOString().slice(0, 10)}`;
 
   try {
-    const cachedData = cache.get(cacheKey);
+    const cachedData = await cache.get(cacheKey);
     if (cachedData) {
       return cachedData;
     }
@@ -24,7 +24,7 @@ exports.getApod = async () => {
 exports.getAsteroids = async () => {
   const date = new Date().toISOString().slice(0, 10);
   const cacheKey = `asteroids-${date}`;
-  const cachedData = cache.get(cacheKey);
+  const cachedData = await cache.get(cacheKey);
   if (cachedData) {
     return cachedData;
   }
@@ -46,7 +46,7 @@ exports.getAsteroids = async () => {
 
 exports.searchNasaMedia = async (query, mediaType = "image") => {
   const cacheKey = `nasa-media-${query}-${mediaType}`;
-  const cachedData = cache.get(cacheKey);
+  const cachedData = await cache.get(cacheKey);
   if (cachedData) {
     return cachedData;
   }
@@ -65,7 +65,7 @@ exports.searchNasaMedia = async (query, mediaType = "image") => {
 };
 
 exports.getEarthEvents = async () => {
-  const cached = cache.get("eonet-events");
+  const cached = await cache.get("eonet-events");
   if (cached) return cached;
 
   const response = await axios.get("https://eonet.gsfc.nasa.gov/api/v3/events", {

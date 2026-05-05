@@ -2,7 +2,7 @@ const axios = require("axios");
 const cache = require("../utils/cache");
 
 exports.getAstronomyEvents = async () => {
-  const cached = cache.get("astronomy-events");
+  const cached = await cache.get("astronomy-events");
   if (cached) return cached;
 
   const authString = Buffer.from(

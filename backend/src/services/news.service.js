@@ -3,7 +3,7 @@ const axios = require("axios");
 
 exports.getSpaceNews = async () => {
   const cacheKey = "space-news";
-  const cachedData = cache.get(cacheKey);
+  const cachedData = await cache.get(cacheKey);
   if (cachedData) {
     return cachedData;
   }

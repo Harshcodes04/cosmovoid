@@ -5,67 +5,8 @@ const spacexAPI = axios.create({
   baseURL: "https://api.spacexdata.com/v4",
 });
 
-exports.getLatestLaunch = async () => {
-  const cached = cache.get("spacex-latest-launch");
-
-  if (cached) {
-    return cached;
-  }
-  try {
-    const response = await spacexAPI.get("/launches/latest");
-    //well this sets it for 1 hour
-    cache.set("spacex-latest-launch", response.data, 60 * 60 * 1000);
-    return response.data;
-  } catch {
-    throw new Error("Failed to fetch latest SpaceX launch data");
-  }
-};
-
-exports.getLaunchById = async (id) => {
-  const cacheKey = `launch-${id}`;
-  const cached = cache.get(cacheKey);
-  if (cached) return cached;
-  try {
-    const response = await spacexAPI.get(`/launches/${id}`);
-    cache.set(cacheKey, response.data, 60 * 60 * 1000);
-    return response.data;
-  } catch (error) {
-    throw new Error("Failed to fetch SpaceX launch data");
-  }
-};
-
-exports.getUpcomingLaunches = async () => {
-  const cached = cache.get("spacex-upcoming-launches");
-  if (cached) {
-    return cached;
-  }
-  try {
-    const response = await spacexAPI.get("/launches/upcoming");
-    //well this sets it for 1 hour as well
-    cache.set("spacex-upcoming-launches", response.data, 60 * 60 * 1000);
-    return response.data;
-  } catch {
-    throw new Error("Failed to fetch upcoming SpaceX launch data");
-  }
-};
-
-exports.getPastLaunches = async () => {
-  const cached = cache.get("spacex-past-launches");
-  if (cached) {
-    return cached;
-  }
-  try {
-    const response = await spacexAPI.get("/launches/past");
-    //well this sets it for 1 hour as well
-    cache.set("spacex-past-launches", response.data, 60 * 60 * 1000);
-    return response.data;
-  } catch {
-    throw new Error("Failed to fetch past SpaceX launch data");
-  }
-};
-
 exports.getRockets = async () => {
-  const cached = cache.get("spacex-rockets");
+  const cached = await cache.get("spacex-rockets");
   if (cached) {
     return cached;
   }
@@ -81,7 +22,7 @@ exports.getRockets = async () => {
 
 exports.getRocketById = async (id) => {
   const cacheKey = `rocket-${id}`;
-  const cached = cache.get(cacheKey);
+  const cached = await cache.get(cacheKey);
   if (cached) return cached;
   try {
     const response = await spacexAPI.get(`/rockets/${id}`);
@@ -92,38 +33,8 @@ exports.getRocketById = async (id) => {
   }
 };
 
-exports.getCrew = async () => {
-  const cached = cache.get("spacex-crew");
-  if (cached) {
-    return cached;
-  }
-  try {
-    const response = await spacexAPI.get("/crew");
-    //well this sets it for 24 hours because it barely changes
-    cache.set("spacex-crew", response.data, 24 * 60 * 60 * 1000);
-    return response.data;
-  } catch {
-    throw new Error("Failed to fetch crew data");
-  }
-};
-
-exports.getCrewById = async (id) => {
-  const cacheKey = `crew-${id}`;
-  const cached = cache.get(cacheKey);
-
-  if (cached) return cached;
-
-  try {
-    const response = await spacexAPI.get(`/crew/${id}`);
-    cache.set(cacheKey, response.data, 24 * 60 * 60 * 1000);
-    return response.data;
-  } catch (error) {
-    throw new Error("Failed to fetch SpaceX crew data");
-  }
-};
-
 exports.getLaunchPads = async () => {
-  const cached = cache.get("spacex-launchpads");
+  const cached = await cache.get("spacex-launchpads");
   if (cached) {
     return cached;
   }
@@ -138,7 +49,7 @@ exports.getLaunchPads = async () => {
 };
 
 exports.getLandPads = async () => {
-  const cached = cache.get("spacex-landpads");
+  const cached = await cache.get("spacex-landpads");
   if (cached) {
     return cached;
   }
@@ -153,7 +64,7 @@ exports.getLandPads = async () => {
 };
 
 exports.getRoadster = async () => {
-  const cached = cache.get("spacex-roadster");
+  const cached = await cache.get("spacex-roadster");
   if (cached) {
     return cached;
   }

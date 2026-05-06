@@ -3,7 +3,8 @@ const ApiCache = require("../models/apiCache");
 exports.get = async (key) => {
   try {
     const dbItem = await ApiCache.findOne({ key }).lean();
-    if (dbItem && Date.now() < dbItem.expiry) {
+    // expiresAt check is a safety net — MongoDB TTL index handles actual deletion
+    if (dbItem && new Date() < new Date(dbItem.expiresAt)) {
       return dbItem.data;
     }
   } catch (err) {
@@ -12,13 +13,11 @@ exports.get = async (key) => {
   return null;
 };
 
-// Fallback to get expired/stale data if API fails (rate limits)
+// Returns stale data even if expired — used as fallback when API is rate-limited
 exports.getStale = async (key) => {
   try {
     const dbItem = await ApiCache.findOne({ key }).lean();
-    if (dbItem) {
-      return dbItem.data;
-    }
+    if (dbItem) return dbItem.data;
   } catch (err) {
     console.error("Cache DB getStale error:", err.message);
   }
@@ -26,11 +25,11 @@ exports.getStale = async (key) => {
 };
 
 exports.set = (key, data, ttlMs) => {
-  const expiry = Date.now() + ttlMs;
-  
+  const expiresAt = new Date(Date.now() + ttlMs);
+
   ApiCache.findOneAndUpdate(
     { key },
-    { data, expiry },
-    { upsert: true, returnDocument: 'after' }
-  ).catch(err => console.error("Cache DB write error:", err.message));
+    { data, expiresAt },
+    { upsert: true, returnDocument: "after" }
+  ).catch((err) => console.error("Cache DB write error:", err.message));
 };

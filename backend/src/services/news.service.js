@@ -1,20 +1,19 @@
-const cache = require("../utils/cache");
 const axios = require("axios");
+const { getOrRefresh } = require("../utils/staleCache");
 
-exports.getSpaceNews = async () => {
-  const cacheKey = "space-news";
-  const cachedData = await cache.get(cacheKey);
-  if (cachedData) {
-    return cachedData;
-  }
-  try {
-    const res = await axios.get(
-      "https://api.spaceflightnewsapi.net/v4/articles/?limit=20",
-    );
-    cache.set(cacheKey, res.data, 60 * 60 * 1000);
-    return res.data;
-  } catch (error) {
-    console.error("Error fetching space news", error.message);
-    throw error;
-  }
-};
+const HOUR = 60 * 60 * 1000;
+const DAY = 24 * HOUR;
+
+exports.getSpaceNews = () =>
+  getOrRefresh({
+    key: "space-news",
+    source: "spaceflight-news",
+    ttlMs: HOUR,
+    staleMs: 7 * DAY,
+    fetcher: async () => {
+      const res = await axios.get(
+        "https://api.spaceflightnewsapi.net/v4/articles/?limit=20",
+      );
+      return res.data;
+    },
+  });

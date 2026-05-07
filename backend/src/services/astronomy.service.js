@@ -1,33 +1,40 @@
 const axios = require("axios");
-const cache = require("../utils/cache");
+const { getOrRefresh } = require("../utils/staleCache");
 
-exports.getAstronomyEvents = async () => {
-  const cached = await cache.get("astronomy-events");
-  if (cached) return cached;
+const DAY = 24 * 60 * 60 * 1000;
 
-  const authString = Buffer.from(
-    `${process.env.ASTRONOMY_API_ID}:${process.env.ASTRONOMY_API_SECRET}`,
-  ).toString("base64");
+exports.getAstronomyEvents = () => {
+  const fromDate = new Date().toISOString().slice(0, 10);
+  const toDate = new Date(Date.now() + 30 * DAY).toISOString().slice(0, 10);
 
-  const response = await axios.get(
-    "https://api.astronomyapi.com/api/v2/bodies/events",
-    {
-      headers: {
-        Authorization: `Basic ${authString}`,
-      },
-      params: {
-        latitude: 28.6139, // default to Delhi for now frontend will pass location later onnnnnn
-        longitude: 77.209,
-        elevation: 0,
-        from_date: new Date().toISOString().slice(0, 10),
-        to_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-          .toISOString()
-          .slice(0, 10), // 30 days ahead
-        time: "00:00:00",
-      },
+  return getOrRefresh({
+    key: `astronomy-events:${fromDate}:${toDate}`,
+    source: "astronomy-api",
+    ttlMs: DAY,
+    staleMs: 14 * DAY,
+    fetcher: async () => {
+      const authString = Buffer.from(
+        `${process.env.ASTRONOMY_API_ID}:${process.env.ASTRONOMY_API_SECRET}`,
+      ).toString("base64");
+
+      const response = await axios.get(
+        "https://api.astronomyapi.com/api/v2/bodies/events",
+        {
+          headers: {
+            Authorization: `Basic ${authString}`,
+          },
+          params: {
+            latitude: 28.6139,
+            longitude: 77.209,
+            elevation: 0,
+            from_date: fromDate,
+            to_date: toDate,
+            time: "00:00:00",
+          },
+        },
+      );
+
+      return response.data;
     },
-  );
-
-  cache.set("astronomy-events", response.data, 24 * 60 * 60 * 1000); // 24 hours
-  return response.data;
+  });
 };

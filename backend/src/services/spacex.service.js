@@ -1,79 +1,127 @@
 const axios = require("axios");
-const cache = require("../utils/cache");
+const { getOrRefresh } = require("../utils/staleCache");
+
+const HOUR = 60 * 60 * 1000;
+const DAY = 24 * HOUR;
 
 const spacexAPI = axios.create({
   baseURL: "https://api.spacexdata.com/v4",
+  timeout: 10000,
 });
 
-exports.getRockets = async () => {
-  const cached = await cache.get("spacex-rockets");
-  if (cached) {
-    return cached;
-  }
-  try {
-    const response = await spacexAPI.get("/rockets");
-    //well this sets it for 24 hours because it barely changes
-    cache.set("spacex-rockets", response.data, 24 * 60 * 60 * 1000);
-    return response.data;
-  } catch {
-    throw new Error("Failed to fetch SpaceX rocket data");
-  }
-};
+const cachedGet = ({ key, path, ttlMs, staleMs, errorMessage }) =>
+  getOrRefresh({
+    key,
+    source: "spacex",
+    ttlMs,
+    staleMs,
+    fetcher: async () => {
+      try {
+        const response = await spacexAPI.get(path);
+        return response.data;
+      } catch (error) {
+        error.message = errorMessage;
+        error.status = error.response?.status;
+        throw error;
+      }
+    },
+  });
 
-exports.getRocketById = async (id) => {
-  const cacheKey = `rocket-${id}`;
-  const cached = await cache.get(cacheKey);
-  if (cached) return cached;
-  try {
-    const response = await spacexAPI.get(`/rockets/${id}`);
-    cache.set(cacheKey, response.data, 60 * 60 * 1000);
-    return response.data;
-  } catch (error) {
-    throw new Error("Failed to fetch SpaceX rocket data");
-  }
-};
+exports.getLatestLaunch = () =>
+  cachedGet({
+    key: "spacex-latest-launch",
+    path: "/launches/latest",
+    ttlMs: HOUR,
+    staleMs: 7 * DAY,
+    errorMessage: "Failed to fetch latest SpaceX launch data",
+  });
 
-exports.getLaunchPads = async () => {
-  const cached = await cache.get("spacex-launchpads");
-  if (cached) {
-    return cached;
-  }
-  try {
-    const response = await spacexAPI.get("/launchpads");
-    //well this sets it for 24 hours because it barely changes
-    cache.set("spacex-launchpads", response.data, 24 * 60 * 60 * 1000);
-    return response.data;
-  } catch {
-    throw new Error("Failed to fetch launch pad data");
-  }
-};
+exports.getLaunchById = (id) =>
+  cachedGet({
+    key: `spacex-launch:${id}`,
+    path: `/launches/${id}`,
+    ttlMs: HOUR,
+    staleMs: 30 * DAY,
+    errorMessage: "Failed to fetch SpaceX launch data",
+  });
 
-exports.getLandPads = async () => {
-  const cached = await cache.get("spacex-landpads");
-  if (cached) {
-    return cached;
-  }
-  try {
-    const response = await spacexAPI.get("/landpads");
-    //well this sets it for 24 hours because it barely changes
-    cache.set("spacex-landpads", response.data, 24 * 60 * 60 * 1000);
-    return response.data;
-  } catch {
-    throw new Error("Failed to fetch land pad data");
-  }
-};
+exports.getUpcomingLaunches = () =>
+  cachedGet({
+    key: "spacex-upcoming-launches",
+    path: "/launches/upcoming",
+    ttlMs: HOUR,
+    staleMs: 7 * DAY,
+    errorMessage: "Failed to fetch upcoming SpaceX launch data",
+  });
 
-exports.getRoadster = async () => {
-  const cached = await cache.get("spacex-roadster");
-  if (cached) {
-    return cached;
-  }
-  try {
-    const response = await spacexAPI.get("/roadster");
-    //well this sets it for 24 hours because it barely changes
-    cache.set("spacex-roadster", response.data, 24 * 60 * 60 * 1000);
-    return response.data;
-  } catch {
-    throw new Error("Failed to fetch roadster data");
-  }
-};
+exports.getPastLaunches = () =>
+  cachedGet({
+    key: "spacex-past-launches",
+    path: "/launches/past",
+    ttlMs: 6 * HOUR,
+    staleMs: 30 * DAY,
+    errorMessage: "Failed to fetch past SpaceX launch data",
+  });
+
+exports.getRockets = () =>
+  cachedGet({
+    key: "spacex-rockets",
+    path: "/rockets",
+    ttlMs: DAY,
+    staleMs: 90 * DAY,
+    errorMessage: "Failed to fetch SpaceX rocket data",
+  });
+
+exports.getRocketById = (id) =>
+  cachedGet({
+    key: `spacex-rocket:${id}`,
+    path: `/rockets/${id}`,
+    ttlMs: DAY,
+    staleMs: 90 * DAY,
+    errorMessage: "Failed to fetch SpaceX rocket data",
+  });
+
+exports.getCrew = () =>
+  cachedGet({
+    key: "spacex-crew",
+    path: "/crew",
+    ttlMs: DAY,
+    staleMs: 90 * DAY,
+    errorMessage: "Failed to fetch crew data",
+  });
+
+exports.getCrewById = (id) =>
+  cachedGet({
+    key: `spacex-crew:${id}`,
+    path: `/crew/${id}`,
+    ttlMs: DAY,
+    staleMs: 90 * DAY,
+    errorMessage: "Failed to fetch SpaceX crew data",
+  });
+
+exports.getLaunchPads = () =>
+  cachedGet({
+    key: "spacex-launchpads",
+    path: "/launchpads",
+    ttlMs: DAY,
+    staleMs: 90 * DAY,
+    errorMessage: "Failed to fetch launch pad data",
+  });
+
+exports.getLandPads = () =>
+  cachedGet({
+    key: "spacex-landpads",
+    path: "/landpads",
+    ttlMs: DAY,
+    staleMs: 90 * DAY,
+    errorMessage: "Failed to fetch land pad data",
+  });
+
+exports.getRoadster = () =>
+  cachedGet({
+    key: "spacex-roadster",
+    path: "/roadster",
+    ttlMs: DAY,
+    staleMs: 90 * DAY,
+    errorMessage: "Failed to fetch roadster data",
+  });

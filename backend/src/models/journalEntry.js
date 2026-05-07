@@ -18,7 +18,7 @@ const journalEntrySchema = new mongoose.Schema({
     enum: ["excited", "curious", "reflective", "sad", "happy"],
   },
   tags: [String],
-  linkedApod: String,
+  observationLocation: String,
   createdAt: {
     type: Date,
     default: Date.now

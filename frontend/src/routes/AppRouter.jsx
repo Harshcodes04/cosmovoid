@@ -9,6 +9,7 @@ import Signup from "../pages/Signup";
 import Dashboard from "../pages/Dashboard";
 import Journal from "../pages/Journal";
 import JournalCreate from "../pages/JournalCreate";
+import JournalEdit from "../pages/JournalEdit";
 import JournalDetails from "../pages/JournalDetails";
 import Launches from "../pages/Launches";
 import LaunchDetails from "../pages/LaunchDetails";
@@ -73,6 +74,14 @@ const AppRouter = () => {
         element={
           <ProtectedRoute>
             <JournalCreate />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/journal/:id/edit"
+        element={
+          <ProtectedRoute>
+            <JournalEdit />
           </ProtectedRoute>
         }
       />

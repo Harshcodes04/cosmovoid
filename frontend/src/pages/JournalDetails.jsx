@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import Navbar from "../components/NavBar";
-import { getJournalEntryById } from "../api/space";
+import { getJournalEntryById, deleteJournalEntry } from "../api/space";
 
 const formatDate = (value) => {
   return new Intl.DateTimeFormat("en-US", {
@@ -13,9 +13,23 @@ const formatDate = (value) => {
 
 const JournalDetails = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [entry, setEntry] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [deleting, setDeleting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  const handleDelete = async () => {
+    setDeleting(true);
+    try {
+      await deleteJournalEntry(id);
+      navigate("/journal", { replace: true });
+    } catch (err) {
+      setError("Failed to delete journal entry.");
+      setDeleting(false);
+    }
+  };
 
   useEffect(() => {
     let active = true;
@@ -60,7 +74,7 @@ const JournalDetails = () => {
       <main className="relative overflow-hidden px-6 pb-16 pt-8 md:px-10 lg:px-14 xl:px-20">
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute left-[8%] top-20 h-72 w-72 rounded-full bg-cyan-400/10 blur-3xl" />
-          <div className="absolute right-[10%] top-24 h-72 w-72 rounded-full bg-fuchsia-400/8 blur-3xl" />
+          <div className="absolute right-[10%] top-24 h-72 w-72 rounded-full bg-zinc-600/6 blur-3xl" />
         </div>
 
         <section className="relative mx-auto max-w-4xl space-y-8">
@@ -71,6 +85,19 @@ const JournalDetails = () => {
             >
               Back to my journal
             </Link>
+            <Link
+              to={`/journal/${id}/edit`}
+              className="inline-flex items-center justify-center rounded-full border border-white/14 bg-white/6 px-5 py-3 text-sm font-medium text-zinc-100 transition-colors hover:bg-white/10"
+            >
+              Edit
+            </Link>
+            <button
+              onClick={() => setShowDeleteConfirm(true)}
+              disabled={deleting}
+              className="inline-flex items-center justify-center rounded-full border border-rose-500/30 bg-rose-500/10 px-5 py-3 text-sm font-medium text-rose-200 transition-colors hover:bg-rose-500/20 disabled:opacity-50"
+            >
+              {deleting ? "Deleting..." : "Delete"}
+            </button>
             <Link
               to="/journal/new"
               className="inline-flex items-center justify-center rounded-full bg-white px-5 py-3 text-sm font-semibold text-zinc-950 transition-transform duration-300 hover:-translate-y-0.5"
@@ -119,16 +146,7 @@ const JournalDetails = () => {
                 </div>
               ) : null}
 
-              {entry.linkedApod ? (
-                <a
-                  href={entry.linkedApod}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="mt-8 inline-flex text-sm font-medium text-cyan-200 transition-colors hover:text-white"
-                >
-                  Open linked APOD reference
-                </a>
-              ) : null}
+              {`Location: ${entry.observationLocation}`}
             </article>
           ) : (
             <div className="rounded-[2rem] border border-white/10 bg-white/6 p-6 text-sm text-zinc-300">
@@ -136,6 +154,31 @@ const JournalDetails = () => {
             </div>
           )}
         </section>
+
+        {showDeleteConfirm && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 backdrop-blur-sm">
+            <div className="w-full max-w-sm rounded-[2rem] border border-white/10 bg-[linear-gradient(135deg,rgba(12,18,40,0.96)_0%,rgba(10,12,24,0.98)_100%)] p-6 shadow-[0_26px_56px_rgba(0,0,0,0.3)]">
+              <h3 className="text-xl font-medium text-white">Delete Entry?</h3>
+              <p className="mt-3 text-sm text-zinc-300">
+                Are you sure you want to delete this journal entry? This action cannot be undone.
+              </p>
+              <div className="mt-6 flex justify-end gap-3">
+                <button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  className="rounded-full border border-white/14 bg-white/6 px-5 py-2 text-sm font-medium text-zinc-100 transition-colors hover:bg-white/10"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDelete}
+                  className="rounded-full bg-rose-500/20 px-5 py-2 text-sm font-medium text-rose-200 transition-colors hover:bg-rose-500/30"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </>
   );

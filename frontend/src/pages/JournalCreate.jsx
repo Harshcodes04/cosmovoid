@@ -12,7 +12,7 @@ const JournalCreate = () => {
     content: "",
     mood: "curious",
     tags: "",
-    linkedApod: "",
+    observationLocation: "",
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -36,7 +36,7 @@ const JournalCreate = () => {
           .split(",")
           .map((tag) => tag.trim())
           .filter(Boolean),
-        linkedApod: form.linkedApod.trim(),
+        observationLocation: form.observationLocation.trim(),
       };
 
       const response = await createJournalEntry(payload);
@@ -65,7 +65,7 @@ const JournalCreate = () => {
       <main className="relative overflow-hidden px-6 pb-16 pt-8 md:px-10 lg:px-14 xl:px-20">
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute left-[4%] top-14 h-72 w-72 rounded-full bg-cyan-400/10 blur-3xl" />
-          <div className="absolute right-[8%] top-28 h-72 w-72 rounded-full bg-violet-400/10 blur-3xl" />
+          <div className="absolute right-[8%] top-28 h-72 w-72 rounded-full bg-zinc-600/8 blur-3xl" />
         </div>
 
         <section className="relative mx-auto max-w-4xl space-y-8">
@@ -156,14 +156,14 @@ const JournalCreate = () => {
 
               <label className="space-y-2">
                 <span className="text-sm font-medium text-zinc-100">
-                  Linked APOD URL
+                  Observation location
                 </span>
                 <input
-                  type="url"
-                  name="linkedApod"
-                  value={form.linkedApod}
+                  type="text"
+                  name="observationLocation"
+                  value={form.observationLocation}
                   onChange={handleChange}
-                  placeholder="https://apod.nasa.gov/..."
+                  placeholder="Anywhere on Earth"
                   className="w-full rounded-2xl border border-white/12 bg-black/20 px-4 py-3 text-sm text-white outline-none transition-colors placeholder:text-zinc-500 focus:border-cyan-300/40"
                 />
               </label>

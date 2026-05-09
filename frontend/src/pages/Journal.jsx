@@ -62,7 +62,7 @@ const Journal = () => {
       <main className="relative overflow-hidden px-6 pb-16 pt-8 md:px-10 lg:px-14 xl:px-20">
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute left-[-8%] top-20 h-72 w-72 rounded-full bg-cyan-400/10 blur-3xl" />
-          <div className="absolute right-[-8%] top-32 h-80 w-80 rounded-full bg-fuchsia-400/8 blur-3xl" />
+          <div className="absolute right-[-8%] top-32 h-80 w-80 rounded-full bg-zinc-600/6 blur-3xl" />
         </div>
 
         <section className="relative mx-auto max-w-6xl space-y-8">

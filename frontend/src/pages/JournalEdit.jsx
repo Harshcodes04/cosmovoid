@@ -1,11 +1,12 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import Navbar from "../components/NavBar";
-import { createJournalEntry } from "../api/space";
+import { getJournalEntryById, updateJournalEntry } from "../api/space";
 
 const moodOptions = ["excited", "curious", "reflective", "sad", "happy"];
 
-const JournalCreate = () => {
+const JournalEdit = () => {
+  const { id } = useParams();
   const navigate = useNavigate();
   const [form, setForm] = useState({
     title: "",
@@ -14,8 +15,32 @@ const JournalCreate = () => {
     tags: "",
     observationLocation: "",
   });
+  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    const loadEntry = async () => {
+      try {
+        const response = await getJournalEntryById(id);
+        const entry = response.data?.entry;
+        if (entry) {
+          setForm({
+            title: entry.title || "",
+            content: entry.content || "",
+            mood: entry.mood || "curious",
+            tags: entry.tags ? entry.tags.join(", ") : "",
+            observationLocation: entry.observationLocation || "",
+          });
+        }
+      } catch (err) {
+        setError("Could not load journal entry.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadEntry();
+  }, [id]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -39,22 +64,31 @@ const JournalCreate = () => {
         observationLocation: form.observationLocation.trim(),
       };
 
-      const response = await createJournalEntry(payload);
-      const entryId = response.data?.entry?._id;
-
-      navigate(entryId ? `/journal/${entryId}` : "/journal", {
-        replace: true,
-      });
+      await updateJournalEntry(id, payload);
+      navigate(`/journal/${id}`, { replace: true });
     } catch (requestError) {
       setError(
         requestError.response?.data?.error ||
           requestError.response?.data?.message ||
-          "We could not save your journal entry right now.",
+          "We could not save your journal entry right now."
       );
     } finally {
       setSubmitting(false);
     }
   };
+
+  if (loading) {
+    return (
+      <>
+        <header><Navbar /></header>
+        <main className="relative overflow-hidden px-6 pb-16 pt-8 md:px-10 lg:px-14 xl:px-20">
+          <div className="rounded-[2rem] border border-white/10 bg-white/6 p-6 text-sm text-zinc-300">
+            Loading your journal entry...
+          </div>
+        </main>
+      </>
+    );
+  }
 
   return (
     <>
@@ -72,22 +106,21 @@ const JournalCreate = () => {
           <div className="flex flex-col gap-5 rounded-[2rem] border border-white/10 bg-[linear-gradient(135deg,rgba(12,18,40,0.96)_0%,rgba(10,12,24,0.98)_100%)] p-6 shadow-[0_26px_56px_rgba(0,0,0,0.3)] sm:flex-row sm:items-end sm:justify-between sm:p-8">
             <div className="space-y-3">
               <p className="text-xs uppercase tracking-[0.26em] text-zinc-400">
-                New journal entry
+                Edit journal entry
               </p>
               <h1 className="text-4xl font-light tracking-[-0.06em] text-white sm:text-5xl">
-                Write what pulled you in
+                Refine your thoughts
               </h1>
               <p className="max-w-2xl text-sm leading-7 text-zinc-300 sm:text-base">
-                Save the launches, images, questions, and late-night thoughts
-                you want to revisit later.
+                Update your notes, correct details, or add new discoveries.
               </p>
             </div>
 
             <Link
-              to="/journal"
+              to={`/journal/${id}`}
               className="inline-flex items-center justify-center rounded-full border border-white/14 bg-white/6 px-5 py-3 text-sm font-medium text-zinc-100 transition-colors hover:bg-white/10"
             >
-              Back to my journal
+              Back to entry
             </Link>
           </div>
 
@@ -181,10 +214,10 @@ const JournalCreate = () => {
                 disabled={submitting}
                 className="inline-flex cursor-pointer items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-zinc-950 transition-transform duration-300 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70"
               >
-                {submitting ? "Saving entry..." : "Save journal entry"}
+                {submitting ? "Saving entry..." : "Save changes"}
               </button>
               <Link
-                to="/journal"
+                to={`/journal/${id}`}
                 className="inline-flex items-center justify-center rounded-full border border-white/14 bg-white/6 px-6 py-3 text-sm font-medium text-zinc-100 transition-colors hover:bg-white/10"
               >
                 Cancel
@@ -197,4 +230,4 @@ const JournalCreate = () => {
   );
 };
 
-export default JournalCreate;
+export default JournalEdit;

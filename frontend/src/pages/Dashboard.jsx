@@ -6,9 +6,9 @@ import {
   getApod,
   getAsteroids,
   getJournalEntries,
-  getLatestLaunch,
   getNews,
-  getUpcomingLaunches,
+  getGlobalUpcomingLaunches,
+  getGlobalPreviousLaunches,
 } from "../api/space";
 
 /* ── helpers ───────────────────────────────────────────────── */
@@ -28,8 +28,8 @@ const trim = (s, n) =>
 
 const pickNext = (arr = []) =>
   [...arr]
-    .sort((a, b) => new Date(a.date_utc) - new Date(b.date_utc))
-    .find((l) => new Date(l.date_utc) >= new Date());
+    .sort((a, b) => new Date(a.date_utc || a.net) - new Date(b.date_utc || b.net))
+    .find((l) => new Date(l.date_utc || l.net) >= new Date());
 
 const neos = (p) => {
   if (!p?.near_earth_objects) return [];
@@ -120,8 +120,8 @@ const Dashboard = () => {
       setLoading(true);
       const [apodR, latR, upR, newsR, astR, jR] = await Promise.allSettled([
         getApod(),
-        getLatestLaunch(),
-        getUpcomingLaunches(),
+        getGlobalPreviousLaunches(1),
+        getGlobalUpcomingLaunches(5),
         getNews(),
         getAsteroids(),
         getJournalEntries(),
@@ -130,8 +130,8 @@ const Dashboard = () => {
       const ok = (r) => r.status === "fulfilled";
       setSnap({
         apod: ok(apodR) ? apodR.value.data : null,
-        latestLaunch: ok(latR) ? latR.value.data : null,
-        nextLaunch: ok(upR) ? pickNext(upR.value.data) : null,
+        latestLaunch: ok(latR) ? latR.value.data?.results?.[0] : null,
+        nextLaunch: ok(upR) ? pickNext(upR.value.data?.results) : null,
         news: ok(newsR) ? newsR.value.data?.results || [] : [],
         asteroids: ok(astR) ? neos(astR.value.data) : [],
         journal: ok(jR) ? jR.value.data?.entries || [] : [],
@@ -272,8 +272,8 @@ const Dashboard = () => {
         {/* nebula bg */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div className="cosmos-nebula absolute -left-20 top-10 h-96 w-96 rounded-full bg-cyan-500/10 blur-3xl" />
-          <div className="cosmos-drift absolute -right-20 top-32 h-[28rem] w-[28rem] rounded-full bg-violet-500/10 blur-3xl" />
-          <div className="absolute bottom-20 left-1/3 h-72 w-72 rounded-full bg-fuchsia-500/6 blur-3xl" />
+          <div className="cosmos-drift absolute -right-20 top-32 h-[28rem] w-[28rem] rounded-full bg-zinc-600/8 blur-3xl" />
+          <div className="absolute bottom-20 left-1/3 h-72 w-72 rounded-full bg-zinc-700/5 blur-3xl" />
         </div>
 
         <div className="relative mx-auto grid max-w-7xl gap-6 xl:grid-cols-[1fr_340px]">
@@ -323,7 +323,7 @@ const Dashboard = () => {
                   {
                     label: "Journal entries",
                     value: snap.journal.length,
-                    color: "text-violet-300",
+                    color: "text-zinc-300",
                   },
                   {
                     label: "Headlines live",
@@ -381,6 +381,12 @@ const Dashboard = () => {
                     className="h-52 w-full object-cover"
                     loading="lazy"
                   />
+                ) : snap.apod?.media_type === "video" ? (
+                  snap.apod.url.endsWith(".mp4") ? (
+                    <video src={snap.apod.url} className="h-52 w-full object-cover bg-black" controls autoPlay muted loop playsInline />
+                  ) : (
+                    <iframe src={snap.apod.url} title={snap.apod.title} className="h-52 w-full object-cover" allowFullScreen />
+                  )
                 ) : (
                   <div className="flex h-52 items-center justify-center bg-gradient-to-b from-sky-900/40 to-zinc-950">
                     <p className="text-sm text-zinc-500">
@@ -450,14 +456,14 @@ const Dashboard = () => {
                         {snap.latestLaunch?.name || "—"}
                       </p>
                       <p className="text-xs text-zinc-500">
-                        {fmt(snap.latestLaunch?.date_utc, {
+                        {fmt(snap.latestLaunch?.net, {
                           hour: "numeric",
                           minute: "2-digit",
                           timeZoneName: "short",
                         })}
                       </p>
                       <p className="text-xs leading-5 text-zinc-400">
-                        {trim(snap.latestLaunch?.details, 110) ||
+                        {trim(snap.latestLaunch?.mission?.description, 110) ||
                           "Summary unavailable."}
                       </p>
                     </>
@@ -478,14 +484,14 @@ const Dashboard = () => {
                         {snap.nextLaunch?.name || "Watching for window…"}
                       </p>
                       <p className="text-xs text-cyan-300/80">
-                        {fmt(snap.nextLaunch?.date_utc, {
+                        {fmt(snap.nextLaunch?.net, {
                           hour: "numeric",
                           minute: "2-digit",
                           timeZoneName: "short",
                         })}
                       </p>
                       <p className="text-xs leading-5 text-zinc-400">
-                        {trim(snap.nextLaunch?.details, 110) ||
+                        {trim(snap.nextLaunch?.mission?.description, 110) ||
                           "Schedule will appear when feed updates."}
                       </p>
                     </>

@@ -1,287 +1,463 @@
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../components/NavBar";
 import { useAuth } from "../context/useAuth";
+import { getApod, getAsteroids, getGlobalUpcomingLaunches, getNews } from "../api/space";
 
-const featureChips = [
-  {
-    title: "Mission Briefs",
-    accent: "from-sky-300/80 via-cyan-200/60 to-white/20",
-  },
-  {
-    title: "Launch Intel",
-    accent: "from-zinc-200/80 via-zinc-400/40 to-white/10",
-  },
-  {
-    title: "Journal Logs",
-    accent: "from-fuchsia-300/70 via-violet-300/45 to-white/10",
-  },
+const CSS = `
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+.hm { font-family:'Inter',sans-serif; }
+.dot-bg { background-image:radial-gradient(rgba(255,255,255,0.07) 1px,transparent 1px); background-size:28px 28px; }
+.rv,.rvl,.rvr { opacity:0; transition:opacity .7s cubic-bezier(.22,1,.36,1),transform .7s cubic-bezier(.22,1,.36,1); }
+.rv{transform:translateY(26px)}.rvl{transform:translateX(-26px)}.rvr{transform:translateX(26px)}
+.rv.on,.rvl.on,.rvr.on{opacity:1;transform:none}
+.d1{transition-delay:.07s}.d2{transition-delay:.15s}.d3{transition-delay:.23s}.d4{transition-delay:.31s}.d5{transition-delay:.39s}
+@keyframes hI{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+.ha{animation:hI .8s cubic-bezier(.22,1,.36,1) both}
+.ha1{animation-delay:.04s}.ha2{animation-delay:.16s}.ha3{animation-delay:.28s}.ha4{animation-delay:.44s}.ha5{animation-delay:.60s}.ha6{animation-delay:.76s}
+@keyframes mq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.mqr{animation:mq 32s linear infinite;white-space:nowrap;display:flex;gap:2.5rem}
+@keyframes gp{0%,100%{opacity:.4;transform:scale(.9)}50%{opacity:1;transform:scale(1.2)}}
+.gp{animation:gp 2.4s ease-in-out infinite}
+@keyframes fl{0%,100%{transform:translate(0,0)}40%{transform:translate(18px,-20px)}70%{transform:translate(-14px,12px)}}
+.fl1{animation:fl 18s ease-in-out infinite}.fl2{animation:fl 25s ease-in-out infinite reverse;animation-delay:-10s}
+@keyframes si{0%,100%{opacity:.3;transform:translateY(0)}50%{opacity:.8;transform:translateY(7px)}}
+.si{animation:si 2.1s ease-in-out infinite}
+@keyframes cntdown{0%{opacity:1}49%{opacity:1}50%{opacity:.3}99%{opacity:.3}100%{opacity:1}}
+.colon{animation:cntdown 1s step-end infinite}
+.scanline{background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.06) 3px,rgba(0,0,0,.06) 4px)}
+.hov-lift{transition:transform .3s cubic-bezier(.22,1,.36,1),box-shadow .3s}
+.hov-lift:hover{transform:translateY(-4px);box-shadow:0 24px 48px rgba(0,0,0,.6)}
+.feat-line{height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.07) 30%,rgba(255,255,255,0.07) 70%,transparent)}
+`;
+
+const MQ_WORDS = ["Falcon 9","·","Starship","·","ISS","·","James Webb","·","APOD","·","Asteroids","·","Crew Dragon","·","Artemis","·","SpaceX","·","Mission Control","·","Deep Field","·","Orbital Deck"];
+
+const FEATS = [
+  { n:"01", tag:"LAUNCH INTELLIGENCE", h:"Track every mission, live.", p:"SpaceX launches past and future — live countdowns, payload specs, booster landings, and full mission briefs the moment they drop.", to:"/launches", flip:false },
+  { n:"02", tag:"NASA IMAGERY", h:"A new universe, every single day.", p:"NASA's Astronomy Picture of the Day in full fidelity. Galaxies, nebulae, solar events, and deep field shots curated into your personal gallery.", to:"/gallery", flip:true },
+  { n:"03", tag:"PERSONAL JOURNAL", h:"Your own cosmic archive.", p:"Write private mission logs, attach them to launches or APOD images, tag them by mood, and build a trail of everything that pulled you deeper into space.", to:"/journal", flip:false },
 ];
 
-const snapshotPanels = [
-  {
-    title: "Aurora Watch",
-    copy: "Live sky moods above Earth",
-    className:
-      "min-h-[210px] bg-[radial-gradient(circle_at_top,#84ffe0_0%,rgba(62,176,255,0.2)_38%,rgba(8,10,24,0.96)_100%)]",
-  },
-  {
-    title: "Moon Atlas",
-    copy: "Surface stories and orbit data",
-    className:
-      "min-h-[210px] bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.58),transparent_22%),linear-gradient(180deg,#0d1632_0%,#15264a_44%,#0a0f22_100%)]",
-  },
-  {
-    title: "Orbital Deck",
-    copy: "Track capsules, crews, and routes",
-    className:
-      "min-h-[150px] bg-[linear-gradient(135deg,#19325b_0%,#0d132b_52%,#04050d_100%)]",
-  },
-  {
-    title: "Deep Field",
-    copy: "A cinematic archive of distant light",
-    className:
-      "min-h-[260px] bg-[radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.22),transparent_10%),radial-gradient(circle_at_20%_30%,rgba(136,183,255,0.26),transparent_18%),linear-gradient(180deg,#060816_0%,#0d1632_100%)]",
-  },
-  {
-    title: "Flight Window",
-    copy: "See what is lifting off next",
-    className:
-      "min-h-[180px] bg-[linear-gradient(160deg,#7690c9_0%,#1e315f_40%,#08101f_100%)]",
-  },
-];
+function DashMockup({ globalUpcoming, news, asteroids, loading }) {
+  const trim = (s, n) => s && s.length > n ? s.slice(0, n) + "…" : s || "—";
+  const neos = asteroids.slice(0, 2);
+  const next2 = globalUpcoming.slice(0, 2);
+  const fmtDate = (iso) => iso ? new Date(iso).toLocaleDateString("en-IN", { day:"numeric", month:"short" }) : "TBD";
 
-const Home = () => {
+  return (
+    <div className="scanline relative overflow-hidden rounded-3xl border border-white/10 bg-[#080808] shadow-[0_40px_80px_rgba(0,0,0,0.7)]">
+      {/* title bar */}
+      <div className="flex items-center gap-2.5 border-b border-white/8 px-5 py-3.5">
+        <span className="h-2.5 w-2.5 rounded-full bg-red-500/60" />
+        <span className="h-2.5 w-2.5 rounded-full bg-amber-500/60" />
+        <span className="h-2.5 w-2.5 rounded-full bg-emerald-500/60" />
+        <span className="ml-3 text-[10px] uppercase tracking-[0.3em] text-zinc-600">Mission Control</span>
+        <span className="ml-auto flex items-center gap-1.5 text-[9px] text-cyan-400 uppercase tracking-widest">
+          <span className="gp h-1.5 w-1.5 rounded-full bg-cyan-400" />Live
+        </span>
+      </div>
+
+      {/* upcoming global missions */}
+      <div className="border-b border-white/6 px-5 py-4">
+        <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-zinc-600 mb-3">Upcoming Missions</p>
+        {loading ? (
+          <div className="space-y-3">{[0,1].map(i => <div key={i} className="h-12 animate-pulse rounded-xl bg-white/5" />)}</div>
+        ) : next2.length ? next2.map((l) => (
+          <div key={l.id} className="mb-2.5 rounded-xl border border-white/6 bg-white/3 px-3.5 py-2.5">
+            <div className="flex items-start justify-between gap-2">
+              <p className="text-xs font-semibold text-white leading-snug">{trim(l.name, 30)}</p>
+              <span className="shrink-0 font-mono text-[10px] text-cyan-300">{fmtDate(l.net)}</span>
+            </div>
+            <p className="mt-0.5 text-[10px] text-zinc-600">
+              {l.launch_service_provider?.abbrev || l.launch_service_provider?.name || "—"}
+              {l.rocket?.configuration?.name ? ` · ${trim(l.rocket.configuration.name, 20)}` : ""}
+            </p>
+          </div>
+        )) : <p className="text-xs text-zinc-600">No upcoming missions</p>}
+      </div>
+
+      {/* space news headline */}
+      <div className="border-b border-white/6 px-5 py-4">
+        <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-zinc-600 mb-3">Latest Headline</p>
+        {loading ? (
+          <div className="h-10 animate-pulse rounded-lg bg-white/5" />
+        ) : news ? (
+          <div>
+            <p className="text-sm font-medium text-white leading-snug line-clamp-2">{trim(news.title, 72)}</p>
+            <p className="mt-1 text-[10px] text-zinc-600">{news.news_site || "Space News"}</p>
+          </div>
+        ) : <p className="text-xs text-zinc-600">No news available</p>}
+      </div>
+
+      {/* asteroid panel */}
+      <div className="px-5 py-4">
+        <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-zinc-600 mb-3">Near-Earth Objects</p>
+        {loading ? (
+          <div className="space-y-2">{[0,1].map(i => <div key={i} className="h-6 animate-pulse rounded bg-white/5" />)}</div>
+        ) : neos.length ? neos.map((a) => {
+          const miss = Number(a.close_approach_data?.[0]?.miss_distance?.astronomical || 0).toFixed(3);
+          const hazard = a.is_potentially_hazardous_asteroid;
+          return (
+            <div key={a.id} className="flex items-center justify-between py-1.5">
+              <div className="flex items-center gap-2">
+                <span className={`h-1.5 w-1.5 rounded-full ${hazard ? "bg-red-400" : "bg-zinc-500"}`} />
+                <span className="font-mono text-xs text-zinc-300">{trim(a.name, 18)}</span>
+              </div>
+              <span className="font-mono text-[10px] text-zinc-600">{miss} AU</span>
+            </div>
+          );
+        }) : <p className="text-xs text-zinc-600">No data</p>}
+      </div>
+    </div>
+  );
+}
+
+export default function Home() {
   const { user } = useAuth();
+  const canvasRef = useRef(null);
+  const cta = user ? { to:"/dashboard", label:"Open Mission Control" } : { to:"/signup", label:"Start for free" };
+  const sec = user ? { to:"/explore", label:"Browse sections" } : { to:"/login", label:"Sign in" };
 
-  const loggedIn = user
-    ? { to: "/dashboard", label: "Open dashboard" }
-    : { to: "/signup", label: "Start exploring" };
+  const [liveData, setLiveData] = useState({ launch: null, apod: null, asteroids: [], upcoming: [], globalUpcoming: [], journalEntries: [], launchCount: 0, loading: true });
 
-  const guest = user
-    ? { to: "/explore", label: "Browse routes" }
-    : { to: "/login", label: "Sign in" };
+  useEffect(() => {
+    let live = true;
+
+    const neos = (p) => {
+      if (!p?.near_earth_objects) return [];
+      const [d] = Object.keys(p.near_earth_objects);
+      return p.near_earth_objects[d] || [];
+    };
+    const imports = [getApod(), getAsteroids(), getGlobalUpcomingLaunches(5), getNews()];
+    if (user) imports.push(import("../api/space").then(m => m.getJournalEntries()));
+    (async () => {
+      const [apodR, astR, globalR, newsR, jR] = await Promise.allSettled(imports);
+      if (!live) return;
+      const newsArr = newsR.status === "fulfilled" ? newsR.value.data : null;
+      setLiveData({
+        globalLaunchCount: globalR.status === "fulfilled" ? (globalR.value.data?.count || 0) : 0,
+        globalUpcoming: globalR.status === "fulfilled" ? (globalR.value.data?.results || []) : [],
+        news: Array.isArray(newsArr) ? newsArr[0] : (newsArr?.results?.[0] || null),
+        apod:   apodR.status === "fulfilled" ? apodR.value.data : null,
+        asteroids: astR.status === "fulfilled" ? neos(astR.value.data) : [],
+        journalEntries: jR?.status === "fulfilled" ? (jR.value.data?.entries || []) : [],
+        loading: false,
+      });
+    })();
+    return () => { live = false; };
+  }, [user]);
+
+  useEffect(() => {
+    const c = canvasRef.current;
+    if (!c) return;
+    const ctx = c.getContext("2d");
+    let raf, stars = [];
+    const init = () => {
+      c.width = c.offsetWidth; c.height = c.offsetHeight;
+      stars = Array.from({length:220}, () => ({
+        x: Math.random()*c.width, y: Math.random()*c.height,
+        r: Math.random()*1.1+0.2, o: Math.random()*.6+.1,
+        d: (Math.random()>.5?1:-1)*.007,
+      }));
+    };
+    init();
+    const tick = () => {
+      ctx.clearRect(0,0,c.width,c.height);
+      stars.forEach(s => {
+        s.o += s.d; if(s.o>.85||s.o<.05) s.d*=-1;
+        ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+        ctx.fillStyle=`rgba(255,255,255,${s.o})`; ctx.fill();
+      });
+      raf = requestAnimationFrame(tick);
+    };
+    tick();
+    window.addEventListener("resize",init);
+    return () => { cancelAnimationFrame(raf); window.removeEventListener("resize",init); };
+  },[]);
+
+  useEffect(() => {
+    const obs = new IntersectionObserver(
+      e => e.forEach(x => { if(x.isIntersecting) x.target.classList.add("on"); }),
+      { threshold:.08, rootMargin:"0px 0px -44px 0px" }
+    );
+    document.querySelectorAll(".rv,.rvl,.rvr").forEach(el => obs.observe(el));
+    return () => obs.disconnect();
+  },[]);
 
   return (
     <>
-      <header>
-        <Navbar />
-      </header>
+      <style>{CSS}</style>
+      <header><Navbar /></header>
+      <main className="hm">
 
-      <main className="relative overflow-hidden">
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute left-[-10%] top-12 h-72 w-72 rounded-full bg-sky-500/18 blur-3xl" />
-          <div className="absolute right-[-6%] top-28 h-80 w-80 rounded-full bg-violet-400/16 blur-3xl" />
-          <div className="absolute bottom-10 left-1/3 h-64 w-64 rounded-full bg-cyan-300/10 blur-3xl" />
-        </div>
+        {/* ── HERO ─────────────────────────────────────── */}
+        <section className="relative min-h-screen overflow-hidden">
+          <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
+          <div className="dot-bg absolute inset-0 opacity-60" />
+          {/* orbs */}
+          <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+            <div className="fl1 absolute -left-40 top-1/4 h-[450px] w-[450px] rounded-full bg-cyan-500/6 blur-[110px]" />
+            <div className="fl2 absolute -right-48 top-1/3 h-[500px] w-[500px] rounded-full bg-zinc-500/8 blur-[130px]" />
+          </div>
 
-        <section className="relative mx-auto grid max-w-7xl gap-12 px-6 pb-20 pt-10 md:px-10 lg:grid-cols-[minmax(0,1.2fr)_420px] lg:px-16 xl:px-20">
-          <div className="space-y-10">
-            <div className="space-y-6">
-              <p className="inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/6 px-4 py-2 text-xs font-medium uppercase tracking-[0.28em] text-zinc-300">
-                <span className="h-2 w-2 rounded-full bg-cyan-300 shadow-[0_0_16px_rgba(103,232,249,0.9)]" />
-                Cosmovoid Mission Control
-              </p>
-
-              <div className="max-w-4xl space-y-5">
-                <h1 className="text-5xl font-light leading-none tracking-[-0.06em] text-white sm:text-6xl lg:text-7xl xl:text-[7.6rem]">
-                  Your gateway
-                  <br />
-                  to the stars
-                </h1>
-                <p className="max-w-2xl text-base leading-7 text-zinc-300 sm:text-lg">
-                  Explore launches, cosmic photography, near-Earth alerts, and
-                  your own journal logs from a home page designed to feel like a
-                  private observatory.
-                </p>
+          <div className="relative z-10 mx-auto grid max-w-7xl gap-10 px-6 pt-28 pb-24 md:px-10 lg:grid-cols-2 lg:items-start lg:gap-20 lg:px-16 xl:px-20">
+            {/* text col */}
+            <div>
+              <div className="ha ha1">
+                <span className="inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[10px] uppercase tracking-[0.32em] text-zinc-400 backdrop-blur-sm">
+                  <span className="gp h-2 w-2 rounded-full bg-cyan-300 shadow-[0_0_12px_rgba(103,232,249,0.9)]" />
+                  Personal space observatory
+                </span>
               </div>
-
-              <div className="flex flex-wrap gap-3">
-                {featureChips.map((chip) => (
-                  <div
-                    key={chip.title}
-                    className="group inline-flex items-center gap-3 rounded-full border border-white/10 bg-zinc-950/60 px-4 py-3 text-sm text-zinc-100 backdrop-blur-sm transition-transform duration-300 hover:-translate-y-0.5"
-                  >
-                    <span
-                      className={`h-9 w-9 rounded-full bg-gradient-to-br ${chip.accent} ring-1 ring-white/10`}
-                    />
-                    <span>{chip.title}</span>
-                  </div>
-                ))}
+              <h1 className="mt-8 font-light leading-[1.05] tracking-[-0.05em] text-white" style={{fontSize:"clamp(2.6rem,5.8vw,6rem)"}}>
+                <span className="ha ha2 block">Your private</span>
+                <span className="ha ha3 block text-zinc-500 italic">observatory</span>
+                <span className="ha ha4 block">for space.</span>
+              </h1>
+              <p className="ha ha5 mt-12 max-w-lg text-base leading-7 text-zinc-500 sm:text-lg">
+                SpaceX launches, NASA imagery, asteroid alerts, and space news — live, in one focused dark interface. Plus a private journal for your cosmic notes.
+              </p>
+              <div className="ha ha6 mt-8 flex flex-wrap gap-3">
+                <Link to={cta.to} className="hov-lift group inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-zinc-950">
+                  {cta.label}
+                  <span className="transition-transform duration-300 group-hover:translate-x-0.5">→</span>
+                </Link>
+                <Link to={sec.to} className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-7 py-3.5 text-sm font-medium text-zinc-300 backdrop-blur-sm transition-colors hover:bg-white/10 hover:text-white">
+                  {sec.label}
+                </Link>
               </div>
             </div>
-
-            <div className="grid gap-6 xl:grid-cols-[minmax(0,1.05fr)_220px]">
-              <div className="relative min-h-[500px]">
-                <div className="absolute left-3 top-16 h-[76%] w-[76%] rounded-[2.25rem] border border-white/8 bg-[linear-gradient(180deg,rgba(93,144,255,0.32)_0%,rgba(10,14,30,0.96)_78%)] shadow-[0_32px_60px_rgba(0,0,0,0.38)] -rotate-[8deg]" />
-                <div className="absolute bottom-8 right-2 h-[72%] w-[64%] rounded-[2.25rem] border border-white/8 bg-[linear-gradient(180deg,rgba(126,196,255,0.24)_0%,rgba(18,29,62,0.96)_72%)] shadow-[0_28px_56px_rgba(0,0,0,0.34)] rotate-[7deg]" />
-
-                <article className="relative z-10 flex min-h-[500px] flex-col justify-between overflow-hidden rounded-[2.75rem] border border-white/10 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.2),transparent_24%),linear-gradient(180deg,rgba(93,148,218,0.35)_0%,rgba(23,35,71,0.92)_42%,rgba(8,12,24,0.98)_100%)] p-6 shadow-[0_36px_80px_rgba(0,0,0,0.45)] backdrop-blur-xl sm:p-7">
-                  <div className="pointer-events-none absolute inset-0">
-                    <div className="absolute -left-8 top-12 h-32 w-32 rounded-full border border-white/10 bg-white/8 blur-xl" />
-                    <div className="absolute right-10 top-20 h-40 w-40 rounded-full bg-sky-200/12 blur-2xl" />
-                    <div className="absolute bottom-0 left-1/2 h-56 w-56 -translate-x-1/2 rounded-full bg-cyan-100/10 blur-3xl" />
-                    <div className="absolute inset-x-12 bottom-20 h-px bg-white/20" />
-                  </div>
-
-                  <div className="relative space-y-3">
-                    <p className="text-sm text-zinc-200/90">
-                      Daily Cosmic Briefing
-                    </p>
-                    <div className="space-y-2">
-                      <h2 className="max-w-md text-3xl font-medium tracking-[-0.05em] text-white sm:text-4xl">
-                        Step inside the orbit of discoveries happening now.
-                      </h2>
-                      <p className="max-w-lg text-sm leading-6 text-zinc-300 sm:text-base">
-                        A cinematic entry point for NASA imagery, mission
-                        updates, asteroid watchlists, and your personal notes.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="relative space-y-5">
-                    <div className="grid gap-3 text-sm text-zinc-200 sm:grid-cols-3">
-                      <div className="rounded-2xl border border-white/10 bg-black/18 px-4 py-3 backdrop-blur-sm">
-                        <p className="text-xs uppercase tracking-[0.22em] text-zinc-400">
-                          Today
-                        </p>
-                        <p className="mt-2 font-medium">APOD spotlight</p>
-                      </div>
-                      <div className="rounded-2xl border border-white/10 bg-black/18 px-4 py-3 backdrop-blur-sm">
-                        <p className="text-xs uppercase tracking-[0.22em] text-zinc-400">
-                          Live
-                        </p>
-                        <p className="mt-2 font-medium">Launch pulse</p>
-                      </div>
-                      <div className="rounded-2xl border border-white/10 bg-black/18 px-4 py-3 backdrop-blur-sm">
-                        <p className="text-xs uppercase tracking-[0.22em] text-zinc-400">
-                          Personal
-                        </p>
-                        <p className="mt-2 font-medium">Journal vault</p>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col gap-3 sm:flex-row">
-                      <Link
-                        to={loggedIn.to}
-                        className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-zinc-950 transition-transform duration-300 hover:-translate-y-0.5"
-                      >
-                        {loggedIn.label}
-                      </Link>
-                      <Link
-                        to={guest.to}
-                        className="inline-flex items-center justify-center rounded-full border border-white/14 bg-white/6 px-6 py-3 text-sm font-medium text-zinc-100 backdrop-blur-sm transition-colors hover:bg-white/10"
-                      >
-                        {guest.label}
-                      </Link>
-                    </div>
-                  </div>
-                </article>
-              </div>
-
-              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
-                <div className="rounded-[2rem] border border-white/10 bg-white/6 p-5 shadow-[0_24px_48px_rgba(0,0,0,0.26)] backdrop-blur-xl">
-                  <p className="text-xs uppercase tracking-[0.24em] text-zinc-400">
-                    Core systems
-                  </p>
-                  <h3 className="mt-4 text-2xl font-medium tracking-[-0.04em] text-white">
-                    Discover
-                  </h3>
-                  <p className="mt-2 text-sm leading-6 text-zinc-300">
-                    Navigate launches, rockets, crew profiles, and far-reaching
-                    astronomy events in one place.
-                  </p>
-                </div>
-
-                <div className="rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(125,211,252,0.16)_0%,rgba(10,14,28,0.92)_100%)] p-5 shadow-[0_24px_48px_rgba(0,0,0,0.26)]">
-                  <p className="text-xs uppercase tracking-[0.24em] text-zinc-400">
-                    Personal orbit
-                  </p>
-                  <h3 className="mt-4 text-2xl font-medium tracking-[-0.04em] text-white">
-                    Capture
-                  </h3>
-                  <p className="mt-2 text-sm leading-6 text-zinc-300">
-                    Save thoughts, mission highlights, and visual references to
-                    build your own trail through the cosmos.
-                  </p>
-                </div>
-              </div>
+            {/* mockup col */}
+            <div className="ha ha5 lg:self-start lg:mt-8">
+              <DashMockup
+                globalUpcoming={liveData.globalUpcoming}
+                news={liveData.news}
+                asteroids={liveData.asteroids}
+                loading={liveData.loading}
+              />
             </div>
           </div>
 
-          <aside className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-4">
-                {snapshotPanels.slice(0, 3).map((panel) => (
-                  <article
-                    key={panel.title}
-                    className={`relative overflow-hidden rounded-[2rem] border border-white/10 shadow-[0_24px_48px_rgba(0,0,0,0.28)] ${panel.className}`}
-                  >
-                    <div className="pointer-events-none absolute inset-0 opacity-70">
-                      <div className="absolute left-4 top-4 h-1.5 w-1.5 rounded-full bg-white/80" />
-                      <div className="absolute right-6 top-10 h-1 w-1 rounded-full bg-white/50" />
-                      <div className="absolute left-1/2 top-1/3 h-1 w-1 rounded-full bg-white/60" />
-                    </div>
-                    <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
-                      <p className="text-sm font-medium text-white">
-                        {panel.title}
-                      </p>
-                      <p className="mt-1 max-w-[11rem] text-xs leading-5 text-zinc-300">
-                        {panel.copy}
-                      </p>
-                    </div>
-                  </article>
-                ))}
-              </div>
+          {/* scroll cue */}
+          <div className="absolute bottom-8 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2">
+            <span className="text-[9px] uppercase tracking-[0.3em] text-zinc-700">Scroll</span>
+            <div className="si h-6 w-px rounded-full bg-gradient-to-b from-zinc-600 to-transparent" />
+          </div>
+        </section>
 
-              <div className="space-y-4 pt-6">
-                {snapshotPanels.slice(3).map((panel) => (
-                  <article
-                    key={panel.title}
-                    className={`relative overflow-hidden rounded-[2rem] border border-white/10 shadow-[0_24px_48px_rgba(0,0,0,0.28)] ${panel.className}`}
-                  >
-                    <div className="pointer-events-none absolute inset-0 opacity-70">
-                      <div className="absolute left-5 top-5 h-1.5 w-1.5 rounded-full bg-white/80" />
-                      <div className="absolute right-4 top-14 h-1 w-1 rounded-full bg-white/50" />
-                      <div className="absolute left-1/3 top-1/2 h-1 w-1 rounded-full bg-white/60" />
-                    </div>
-                    <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
-                      <p className="text-sm font-medium text-white">
-                        {panel.title}
-                      </p>
-                      <p className="mt-1 max-w-[11rem] text-xs leading-5 text-zinc-300">
-                        {panel.copy}
-                      </p>
-                    </div>
-                  </article>
-                ))}
-              </div>
+        {/* ── MARQUEE ──────────────────────────────────── */}
+        <div className="overflow-hidden border-y border-white/5 bg-white/2 py-3">
+          <div className="mqr">
+            {[...MQ_WORDS,...MQ_WORDS].map((w,i) => (
+              <span key={i} className={`text-[10px] uppercase tracking-[0.28em] ${w==="·"?"text-zinc-700":"text-zinc-600"}`}>{w}</span>
+            ))}
+          </div>
+        </div>
+
+        {/* ── FEATURES ─────────────────────────────────── */}
+        <section className="relative px-6 py-28 md:px-10 lg:px-16 xl:px-20">
+          <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+            <div className="fl1 absolute -right-48 top-0 h-[500px] w-[500px] rounded-full bg-zinc-600/5 blur-[120px]" />
+            <div className="fl2 absolute -left-40 bottom-0 h-[400px] w-[400px] rounded-full bg-cyan-500/4 blur-[100px]" />
+          </div>
+          <div className="relative mx-auto max-w-7xl">
+            <div className="rv mb-16">
+              <p className="text-[10px] uppercase tracking-[0.32em] text-zinc-700">What's inside</p>
+              <h2 className="mt-3 font-light tracking-[-0.05em] text-white" style={{fontSize:"clamp(2.2rem,5vw,4.5rem)"}}>
+                Everything the cosmos<br /><span className="text-zinc-600">has to offer.</span>
+              </h2>
             </div>
 
-            <article className="relative overflow-hidden rounded-[2.5rem] border border-white/10 bg-[linear-gradient(180deg,#171b37_0%,#101428_100%)] px-6 py-8 shadow-[0_30px_60px_rgba(0,0,0,0.34)]">
-              <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-[radial-gradient(circle_at_top,rgba(148,163,184,0.22),transparent_65%)]" />
-              <div className="relative space-y-4 text-center">
-                <h2 className="text-3xl font-medium leading-tight tracking-[-0.05em] text-white">
-                  Welcome to
-                  <br />
-                  Cosmovoid
-                </h2>
-                <p className="mx-auto max-w-xs text-sm leading-6 text-zinc-300">
-                  Start with today&apos;s sky, dive into active missions, and
-                  keep your own record of what pulled you deeper into space.
-                </p>
-                <Link
-                  to={loggedIn.to}
-                  className="mx-auto inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-zinc-950 transition-transform duration-300 hover:-translate-y-0.5"
-                >
-                  {loggedIn.label}
-                </Link>
-              </div>
-            </article>
-          </aside>
+            <div className="space-y-0">
+              {FEATS.map((f,i) => (
+                <div key={f.n}>
+                  <div className="feat-line" />
+                  <Link to={f.to} className={`group grid gap-10 py-14 lg:grid-cols-2 lg:items-center ${f.flip?"":"lg:direction-normal"}`}>
+                    <div className={`space-y-5 ${f.flip?"lg:order-2":""}`}>
+                      <div className="flex items-center gap-4">
+                        <span className="font-mono text-5xl font-bold text-white/6 leading-none">{f.n}</span>
+                        <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[9px] uppercase tracking-[0.28em] text-zinc-500">{f.tag}</span>
+                      </div>
+                      <h3 className="text-3xl font-light tracking-[-0.04em] text-white lg:text-4xl">{f.h}</h3>
+                      <p className="max-w-lg text-sm leading-7 text-zinc-500">{f.p}</p>
+                      <span className="inline-flex items-center gap-2 text-sm font-medium text-zinc-400 transition-colors duration-300 group-hover:text-white">
+                        Explore {f.tag.split(" ")[0].toLowerCase()}
+                        <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
+                      </span>
+                    </div>
+                    <div className={`${f.flip?"lg:order-1":""}`}>
+                      {i===0 && (
+                        <div className="hov-lift rounded-2xl border border-white/8 bg-zinc-950 p-6 shadow-[0_20px_50px_rgba(0,0,0,.5)]">
+                          <div className="flex items-center gap-2 mb-5">
+                            <span className="gp h-2 w-2 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.8)]" />
+                            <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-cyan-400">Upcoming Launches</span>
+                          </div>
+                          {liveData.loading ? (
+                            [0,1,2].map(k => <div key={k} className="mb-3 h-14 animate-pulse rounded-xl bg-white/4" />)
+                          ) : liveData.globalUpcoming.length ? liveData.globalUpcoming.slice(0,3).map((l) => {
+                            const d = new Date(l.net);
+                            const label = isNaN(d) ? "TBD" : d.toLocaleDateString("en-IN", { day:"numeric", month:"short", year:"numeric" });
+                            const agencyAbbr = l.launch_service_provider?.abbrev || "—";
+                            return (
+                              <div key={l.id} className="mb-3 rounded-xl border border-white/6 bg-white/3 px-4 py-3">
+                                <div className="flex items-center justify-between mb-1.5 gap-2">
+                                  <span className="text-sm font-medium text-white truncate">{l.name}</span>
+                                  <span className="font-mono text-xs text-cyan-300 shrink-0">{label}</span>
+                                </div>
+                                <div className="flex justify-between items-center mt-1">
+                                  <p className="text-[10px] text-zinc-500 truncate pr-2">{l.pad?.name || "TBD"}</p>
+                                  <span className="text-[9px] uppercase tracking-widest text-zinc-600 shrink-0">{agencyAbbr}</span>
+                                </div>
+                              </div>
+                            );
+                          }) : <p className="text-xs text-zinc-600">No upcoming launches found</p>}
+                        </div>
+                      )}
+                      {i===1 && (
+                        <div className="hov-lift space-y-3">
+                          {liveData.loading ? (
+                            <div className="h-48 animate-pulse rounded-2xl bg-white/4" />
+                          ) : liveData.apod ? (
+                            <>
+                              {liveData.apod.media_type === "image" ? (
+                                <div className="overflow-hidden rounded-2xl border border-white/8">
+                                  <img src={liveData.apod.url} alt={liveData.apod.title} className="h-52 w-full object-cover" />
+                                  <div className="p-3">
+                                    <p className="text-xs font-medium text-white">{liveData.apod.title}</p>
+                                    <p className="text-[10px] text-zinc-600">{liveData.apod.copyright ? `© ${liveData.apod.copyright}` : "NASA / Public Domain"} · Today</p>
+                                  </div>
+                                </div>
+                              ) : liveData.apod.media_type === "video" ? (
+                                <div className="overflow-hidden rounded-2xl border border-white/8">
+                                  {liveData.apod.url.endsWith(".mp4") ? (
+                                    <video src={liveData.apod.url} className="h-52 w-full object-cover bg-black" controls autoPlay muted loop playsInline />
+                                  ) : (
+                                    <iframe src={liveData.apod.url} title={liveData.apod.title} className="h-52 w-full object-cover" allowFullScreen />
+                                  )}
+                                  <div className="p-3">
+                                    <p className="text-xs font-medium text-white">{liveData.apod.title}</p>
+                                    <p className="text-[10px] text-zinc-600">Video · Today</p>
+                                  </div>
+                                </div>
+                              ) : (
+                                <div className="overflow-hidden rounded-2xl border border-white/8 bg-zinc-900 p-4">
+                                  <p className="text-xs font-medium text-white">{liveData.apod.title}</p>
+                                  <p className="text-[10px] text-zinc-600 mt-1">Today's APOD · {liveData.apod.media_type}</p>
+                                </div>
+                              )}
+                              <div className="grid grid-cols-2 gap-2">
+                                {["Launches","Crew","Asteroids","News"].map(label => (
+                                  <div key={label} className="rounded-xl border border-white/6 bg-zinc-950 p-3">
+                                    <p className="text-xs font-medium text-white">{label}</p>
+                                    <p className="text-[10px] text-zinc-600">Explore →</p>
+                                  </div>
+                                ))}
+                              </div>
+                            </>
+                          ) : (
+                            <div className="rounded-2xl border border-white/8 bg-zinc-950 p-4">
+                              <p className="text-xs text-zinc-600">APOD unavailable</p>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      {i===2 && (
+                        <div className="hov-lift space-y-3">
+                          {liveData.loading ? (
+                            [0,1,2].map(k => <div key={k} className="h-20 animate-pulse rounded-2xl bg-white/4" />)
+                          ) : user && liveData.journalEntries.length ? (
+                            liveData.journalEntries.slice(0,3).map((e) => (
+                              <div key={e._id} className="rounded-2xl border border-white/8 bg-zinc-950 p-4 shadow-[0_8px_24px_rgba(0,0,0,.4)]">
+                                <div className="flex items-center justify-between gap-2 mb-2">
+                                  <p className="text-sm font-semibold text-white leading-tight truncate">{e.title}</p>
+                                  {e.mood && <span className="shrink-0 rounded-full border border-white/10 px-2 py-0.5 text-[9px] text-zinc-500">{e.mood}</span>}
+                                </div>
+                                <p className="text-xs leading-5 text-zinc-600 line-clamp-2">{e.content}</p>
+                              </div>
+                            ))
+                          ) : (
+                            <>
+                              {[["Witnessed Starship IFT-6 today","reflective","Incredible footage of the booster catch..."],["Pillars of Creation — APOD","curious","The Webb image dropped today. I've been staring at it for an hour..."],["First journal entry","excited","Starting this log to keep track of every launch I follow..."]].map(([title,mood,body]) => (
+                                <div key={title} className="rounded-2xl border border-white/8 bg-zinc-950 p-4 shadow-[0_8px_24px_rgba(0,0,0,.4)]">
+                                  <div className="flex items-center justify-between gap-2 mb-2">
+                                    <p className="text-sm font-semibold text-white leading-tight">{title}</p>
+                                    <span className="shrink-0 rounded-full border border-white/10 px-2 py-0.5 text-[9px] text-zinc-500">{mood}</span>
+                                  </div>
+                                  <p className="text-xs leading-5 text-zinc-600 line-clamp-2">{body}</p>
+                                </div>
+                              ))}
+                              {!user && <p className="text-center text-[10px] text-zinc-700 pt-1">Sign in to see your own entries</p>}
+                            </>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </Link>
+                </div>
+              ))}
+              <div className="feat-line" />
+            </div>
+          </div>
         </section>
+
+        {/* ── STATS ────────────────────────────────────── */}
+        <section className="border-y border-white/6 px-6 py-20 md:px-10 lg:px-16 xl:px-20">
+          <div className="mx-auto max-w-7xl grid grid-cols-2 gap-8 lg:grid-cols-4">
+            {[
+              [liveData.loading ? "…" : liveData.globalLaunchCount > 0 ? `${liveData.globalLaunchCount}` : "Live", "Upcoming global missions"],
+              [liveData.loading ? "…" : liveData.apod?.title ? "Daily" : "Daily", "NASA APOD imagery"],
+              [liveData.loading ? "…" : liveData.asteroids.length > 0 ? `${liveData.asteroids.length}` : "Live", "Near-Earth objects today"],
+              [liveData.loading ? "…" : user ? (liveData.journalEntries.length > 0 ? `${liveData.journalEntries.length}` : "0") : "Private", "Your mission journal"],
+            ].map(([v,l],i) => (
+              <div key={l} className={`rv d${i+1} text-center`}>
+                <p className="text-5xl font-light tracking-[-0.06em] text-white lg:text-6xl">{v}</p>
+                <p className="mt-3 text-xs uppercase tracking-[0.26em] text-zinc-600">{l}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ── FINAL CTA ────────────────────────────────── */}
+        <section className="relative overflow-hidden px-6 py-36 md:px-10 lg:px-16 xl:px-20">
+          <div className="dot-bg absolute inset-0 opacity-40" />
+          <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+            <div className="fl1 absolute left-1/2 top-0 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-cyan-500/7 blur-[140px]" />
+          </div>
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-300/15 to-transparent" />
+
+          <div className="relative mx-auto max-w-3xl text-center">
+            <div className="rv">
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/4 px-4 py-2 text-[9px] uppercase tracking-[0.3em] text-zinc-600 backdrop-blur-sm">
+                <span className="gp h-1.5 w-1.5 rounded-full bg-cyan-300 shadow-[0_0_8px_rgba(103,232,249,0.8)]" />
+                Ready for launch?
+              </span>
+            </div>
+            <h2 className="rv d1 mt-8 font-light tracking-[-0.06em] text-white" style={{fontSize:"clamp(2.8rem,7vw,7rem)",lineHeight:1}}>
+              Your orbit<br />starts here.
+            </h2>
+            <p className="rv d2 mx-auto mt-6 max-w-md text-base leading-7 text-zinc-500">
+              Join Cosmovoid — a private, distraction-free window into space. Free forever.
+            </p>
+            <div className="rv d3 mt-10 flex flex-wrap items-center justify-center gap-4">
+              <Link to={cta.to} className="hov-lift group inline-flex items-center gap-2 rounded-full bg-white px-9 py-4 text-sm font-semibold text-zinc-950">
+                {cta.label}
+                <span className="transition-transform duration-300 group-hover:translate-x-0.5">→</span>
+              </Link>
+              <Link to="/explore" className="inline-flex items-center rounded-full border border-white/10 bg-white/4 px-9 py-4 text-sm font-medium text-zinc-400 backdrop-blur-sm transition-all hover:bg-white/8 hover:text-white">
+                Explore first
+              </Link>
+            </div>
+            {!user && (
+              <p className="rv d4 mt-8 text-xs text-zinc-700">
+                Have an account?{" "}
+                <Link to="/login" className="text-cyan-400 transition-colors hover:text-white">Sign in →</Link>
+              </p>
+            )}
+          </div>
+        </section>
+
       </main>
     </>
   );
-};
-
-export default Home;
+}

@@ -33,7 +33,7 @@ const About = () => {
     <main className="relative min-h-screen overflow-x-hidden px-6 pb-16 pt-10 md:px-10 lg:px-14 xl:px-20">
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute left-[-12%] top-20 h-80 w-80 rounded-full bg-cyan-500/10 blur-3xl" />
-        <div className="absolute right-[-10%] top-8 h-96 w-96 rounded-full bg-violet-500/10 blur-3xl" />
+        <div className="absolute right-[-10%] top-8 h-96 w-96 rounded-full bg-zinc-600/8 blur-3xl" />
         <div className="absolute bottom-20 left-1/3 h-72 w-72 rounded-full bg-emerald-300/7 blur-3xl" />
       </div>
 

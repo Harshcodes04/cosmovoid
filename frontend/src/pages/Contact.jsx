@@ -51,7 +51,7 @@ const Contact = () => {
     <main className="relative min-h-screen overflow-x-hidden px-6 pb-16 pt-10 md:px-10 lg:px-14 xl:px-20">
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute -left-20 top-16 h-80 w-80 rounded-full bg-sky-500/10 blur-3xl" />
-        <div className="absolute -right-16 top-24 h-96 w-96 rounded-full bg-fuchsia-500/9 blur-3xl" />
+        <div className="absolute -right-16 top-24 h-96 w-96 rounded-full bg-zinc-600/7 blur-3xl" />
       </div>
 
       <section className="relative mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.9fr_1.1fr]">

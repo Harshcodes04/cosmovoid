@@ -33,7 +33,6 @@ const cols = [
       { label: "Dashboard", to: "/dashboard" },
       { label: "Journal", to: "/journal" },
       { label: "New entry", to: "/journal/new" },
-      { label: "Search", to: "/search" },
       { label: "Explore", to: "/explore" },
       { label: "Contact", to: "/contact" },
     ],
@@ -41,13 +40,13 @@ const cols = [
 ];
 
 const Footer = () => (
-  <footer className="relative overflow-hidden border-t border-white/7 bg-gradient-to-b from-transparent to-[#06040e]/98 backdrop-blur-md">
+  <footer className="relative overflow-hidden border-t border-white/7 bg-gradient-to-b from-transparent to-[#080808]/98 backdrop-blur-md">
     {/* top shimmer line */}
     <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-300/35 to-transparent" />
 
     {/* ambient glows */}
     <div className="cosmos-star pointer-events-none absolute -bottom-10 left-[10%] h-48 w-72 rounded-full bg-cyan-400/4 blur-3xl" />
-    <div className="cosmos-star pointer-events-none absolute -bottom-5 right-[15%] h-44 w-64 rounded-full bg-violet-400/5 blur-3xl [animation-delay:3s]" />
+    <div className="cosmos-star pointer-events-none absolute -bottom-5 right-[15%] h-44 w-64 rounded-full bg-zinc-500/5 blur-3xl [animation-delay:3s]" />
 
     <div className="mx-auto max-w-7xl px-6 pb-8 pt-14 md:px-10 xl:px-20">
       {/* top grid: brand + columns */}
@@ -101,7 +100,9 @@ const Footer = () => (
         <p className="text-[11px] tracking-wide text-zinc-700">
           © {year} Cosmovoid &middot; Data from SpaceX API, NASA APOD &amp;
           Spaceflight News API &middot;{" "}
-          <span className="text-zinc-600">Built with ♥ for space explorers</span>
+          <span className="text-zinc-600">
+            Built with ♥ for space explorers
+          </span>
         </p>
 
         <div className="flex items-center gap-5">

@@ -1,29 +1,18 @@
 const nasaService = require("../services/nasa.service");
 const spacexService = require("../services/spacex.service");
+const launchLibraryService = require("../services/launchLibrary.service");
 const newsservice = require("../services/news.service");
 const asyncHandler = require("../utils/asyncHandler");
+const astronomyService = require("../services/astronomy.service");
+
 
 exports.getApod = asyncHandler(async (req, res, next) => {
   const apodData = await nasaService.getApod();
   res.json(apodData);
 });
+
 exports.getLatestLaunch = asyncHandler(async (req, res, next) => {
   const data = await spacexService.getLatestLaunch();
-  res.json(data);
-});
-exports.getLaunchById = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  const data = await spacexService.getLaunchById(id);
-  res.json(data);
-});
-
-exports.getUpcomingLaunches = asyncHandler(async (req, res, next) => {
-  const data = await spacexService.getUpcomingLaunches();
-  res.json(data);
-});
-
-exports.getPastLaunches = asyncHandler(async (req, res, next) => {
-  const data = await spacexService.getPastLaunches();
   res.json(data);
 });
 
@@ -46,6 +35,33 @@ exports.getCrew = asyncHandler(async (req, res, next) => {
 exports.getCrewById = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
   const data = await spacexService.getCrewById(id);
+  res.json(data);
+});
+
+exports.getGlobalUpcomingLaunches = asyncHandler(async (req, res, next) => {
+  const data = await launchLibraryService.getUpcomingLaunches(req.query);
+  res.json(data);
+});
+
+exports.getGlobalPreviousLaunches = asyncHandler(async (req, res, next) => {
+  const data = await launchLibraryService.getPreviousLaunches(req.query);
+  res.json(data);
+});
+
+exports.getGlobalLaunchById = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+  const data = await launchLibraryService.getLaunchById(id);
+  res.json(data);
+});
+
+exports.getAstronauts = asyncHandler(async (req, res, next) => {
+  const data = await launchLibraryService.getAstronauts(req.query);
+  res.json(data);
+});
+
+exports.getAstronautById = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+  const data = await launchLibraryService.getAstronautById(id);
   res.json(data);
 });
 
@@ -87,8 +103,6 @@ exports.getEarthEvents = asyncHandler(async (req, res) => {
   const data = await nasaService.getEarthEvents();
   res.json(data);
 });
-
-const astronomyService = require("../services/astronomy.service");
 
 exports.getAstronomyEvents = asyncHandler(async (req, res) => {
   const data = await astronomyService.getAstronomyEvents();

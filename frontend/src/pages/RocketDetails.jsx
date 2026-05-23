@@ -38,11 +38,11 @@ const ImageCarousel = ({ images = [], name = "" }) => {
 
   const prev = useCallback(
     () => setCurrent((c) => (c - 1 + images.length) % images.length),
-    [images.length],
+    [images.length]
   );
   const next = useCallback(
     () => setCurrent((c) => (c + 1) % images.length),
-    [images.length],
+    [images.length]
   );
 
   if (!images.length) {
@@ -81,18 +81,8 @@ const ImageCarousel = ({ images = [], name = "" }) => {
             aria-label="Previous image"
             className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full border border-white/15 bg-black/40 p-2.5 text-white backdrop-blur-md transition-colors hover:bg-black/60"
           >
-            <svg
-              className="h-4 w-4"
-              viewBox="0 0 16 16"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path
-                d="M10 3L5 8l5 5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
+            <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M10 3L5 8l5 5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
           <button
@@ -100,18 +90,8 @@ const ImageCarousel = ({ images = [], name = "" }) => {
             aria-label="Next image"
             className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full border border-white/15 bg-black/40 p-2.5 text-white backdrop-blur-md transition-colors hover:bg-black/60"
           >
-            <svg
-              className="h-4 w-4"
-              viewBox="0 0 16 16"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path
-                d="M6 3l5 5-5 5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
+            <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M6 3l5 5-5 5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
           {/* dots */}
@@ -136,18 +116,14 @@ const ImageCarousel = ({ images = [], name = "" }) => {
 /* ── stat card ── */
 const StatCard = ({ label, value, sub, accent = "violet" }) => {
   const accents = {
-    violet: "border-zinc-400/15 bg-zinc-400/5",
+    violet: "border-violet-400/15 bg-violet-400/5",
     cyan: "border-cyan-400/15 bg-cyan-400/5",
     amber: "border-amber-400/15 bg-amber-400/5",
     emerald: "border-emerald-400/15 bg-emerald-400/5",
   };
   return (
-    <div
-      className={`rounded-2xl border p-5 backdrop-blur-sm ${accents[accent] || accents.violet}`}
-    >
-      <p className="text-[10px] uppercase tracking-[0.24em] text-zinc-500">
-        {label}
-      </p>
+    <div className={`rounded-2xl border p-5 backdrop-blur-sm ${accents[accent] || accents.violet}`}>
+      <p className="text-[10px] uppercase tracking-[0.24em] text-zinc-500">{label}</p>
       <p className="mt-2 text-2xl font-semibold text-white">{value}</p>
       {sub && <p className="mt-1 text-xs text-zinc-500">{sub}</p>}
     </div>
@@ -158,9 +134,7 @@ const StatCard = ({ label, value, sub, accent = "violet" }) => {
 const SpecRow = ({ label, value }) => (
   <div className="flex items-start justify-between gap-4 border-b border-white/6 py-3 last:border-b-0">
     <span className="text-sm text-zinc-500">{label}</span>
-    <span className="text-right text-sm font-medium text-zinc-200">
-      {value}
-    </span>
+    <span className="text-right text-sm font-medium text-zinc-200">{value}</span>
   </div>
 );
 
@@ -189,7 +163,7 @@ const RocketDetails = () => {
         setRocket(res.data);
       } catch (err) {
         setError(
-          err?.response?.data?.error || "Could not load rocket details.",
+          err?.response?.data?.error || "Could not load rocket details."
         );
       } finally {
         setLoading(false);
@@ -198,44 +172,34 @@ const RocketDetails = () => {
     load();
   }, [id]);
 
-  if (loading)
-    return (
-      <main className="relative min-h-screen">
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute -left-28 top-8 h-[28rem] w-[28rem] rounded-full bg-zinc-600/8 blur-3xl" />
-        </div>
-        <SkeletonDetail />
-      </main>
-    );
+  if (loading) return (
+    <main className="relative min-h-screen">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute -left-28 top-8 h-[28rem] w-[28rem] rounded-full bg-violet-600/10 blur-3xl" />
+      </div>
+      <SkeletonDetail />
+    </main>
+  );
 
-  if (error)
-    return (
-      <main className="flex min-h-screen items-center justify-center px-6 text-center">
-        <div className="space-y-5">
-          <p className="text-sm text-zinc-400">{error}</p>
-          <Link
-            to="/rockets"
-            className="inline-flex items-center gap-2 rounded-full border border-white/10 px-5 py-2.5 text-sm text-zinc-300 transition-colors hover:bg-white/8 hover:text-white"
-          >
-            ← Back to Fleet
-          </Link>
-        </div>
-      </main>
-    );
+  if (error) return (
+    <main className="flex min-h-screen items-center justify-center px-6 text-center">
+      <div className="space-y-5">
+        <p className="text-sm text-zinc-400">{error}</p>
+        <Link
+          to="/rockets"
+          className="inline-flex items-center gap-2 rounded-full border border-white/10 px-5 py-2.5 text-sm text-zinc-300 transition-colors hover:bg-white/8 hover:text-white"
+        >
+          ← Back to Fleet
+        </Link>
+      </div>
+    </main>
+  );
 
   if (!rocket) return null;
 
   const statusCfg = rocket.active
-    ? {
-        label: "Active",
-        dot: "bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.9)]",
-        text: "text-emerald-300",
-      }
-    : {
-        label: "Retired",
-        dot: "bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.9)]",
-        text: "text-amber-300",
-      };
+    ? { label: "Active", dot: "bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.9)]", text: "text-emerald-300" }
+    : { label: "Retired", dot: "bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.9)]", text: "text-amber-300" };
 
   const leoPayload = rocket.payload_weights?.find((p) => p.id === "leo");
   const gtoPayload = rocket.payload_weights?.find((p) => p.id === "gto");
@@ -243,13 +207,10 @@ const RocketDetails = () => {
   return (
     <main className="relative min-h-screen overflow-hidden pb-24 pt-10">
       {/* ambient glows */}
-      <div
-        className="pointer-events-none absolute inset-0 overflow-hidden"
-        aria-hidden
-      >
-        <div className="absolute -left-28 top-8 h-[28rem] w-[28rem] rounded-full bg-zinc-600/8 blur-3xl" />
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+        <div className="absolute -left-28 top-8 h-[28rem] w-[28rem] rounded-full bg-violet-600/10 blur-3xl" />
         <div className="absolute right-[-8rem] top-32 h-[32rem] w-[32rem] rounded-full bg-cyan-500/6 blur-3xl" />
-        <div className="absolute bottom-20 left-1/3 h-64 w-64 rounded-full bg-zinc-700/5 blur-3xl" />
+        <div className="absolute bottom-20 left-1/3 h-64 w-64 rounded-full bg-fuchsia-500/6 blur-3xl" />
       </div>
 
       <div className="relative mx-auto max-w-7xl px-5 md:px-10 lg:px-14 xl:px-20">
@@ -258,18 +219,8 @@ const RocketDetails = () => {
           to="/rockets"
           className="inline-flex items-center gap-2 text-sm text-zinc-500 transition-colors hover:text-zinc-300"
         >
-          <svg
-            className="h-3.5 w-3.5"
-            viewBox="0 0 16 16"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
-            <path
-              d="M10 3L5 8l5 5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
+          <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M10 3L5 8l5 5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
           SpaceX Fleet
         </Link>
@@ -281,16 +232,13 @@ const RocketDetails = () => {
               <h1 className="text-4xl font-light tracking-tight text-white sm:text-5xl">
                 {rocket.name}
               </h1>
-              <span
-                className={`inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-black/30 px-3 py-1.5 text-xs font-medium backdrop-blur-md ${statusCfg.text}`}
-              >
+              <span className={`inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-black/30 px-3 py-1.5 text-xs font-medium backdrop-blur-md ${statusCfg.text}`}>
                 <span className={`h-1.5 w-1.5 rounded-full ${statusCfg.dot}`} />
                 {statusCfg.label}
               </span>
             </div>
             <p className="mt-2 text-sm text-zinc-500">
-              {rocket.company} · First flight {rocket.first_flight || "unknown"}{" "}
-              · {rocket.country}
+              {rocket.company} · First flight {rocket.first_flight || "unknown"} · {rocket.country}
             </p>
           </div>
           {rocket.wikipedia && (
@@ -301,18 +249,8 @@ const RocketDetails = () => {
               className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-5 py-2.5 text-sm text-zinc-300 backdrop-blur-sm transition-colors hover:bg-white/10 hover:text-white"
             >
               Wikipedia
-              <svg
-                className="h-3.5 w-3.5"
-                viewBox="0 0 16 16"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path
-                  d="M6 3h7v7M13 3L3 13"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
+              <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M6 3h7v7M13 3L3 13" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </a>
           )}
@@ -344,21 +282,13 @@ const RocketDetails = () => {
           />
           <StatCard
             label="Mass"
-            value={
-              rocket.mass?.kg
-                ? fmt(Math.round(rocket.mass.kg / 1000), " t")
-                : "—"
-            }
+            value={rocket.mass?.kg ? fmt(Math.round(rocket.mass.kg / 1000), " t") : "—"}
             sub={rocket.mass?.lb ? fmt(rocket.mass.lb, " lb") : undefined}
             accent="amber"
           />
           <StatCard
             label="Success Rate"
-            value={
-              rocket.success_rate_pct != null
-                ? `${rocket.success_rate_pct}%`
-                : "—"
-            }
+            value={rocket.success_rate_pct != null ? `${rocket.success_rate_pct}%` : "—"}
             sub={`${rocket.stages ?? "—"} stage vehicle`}
             accent="emerald"
           />
@@ -371,58 +301,30 @@ const RocketDetails = () => {
             {/* engine specs */}
             {rocket.engines && (
               <div className="rounded-3xl border border-white/10 bg-zinc-950/60 p-6 backdrop-blur-xl">
-                <h2 className="mb-5 text-lg font-semibold text-white">
-                  Engine Specifications
-                </h2>
+                <h2 className="mb-5 text-lg font-semibold text-white">Engine Specifications</h2>
                 <div className="grid grid-cols-2 gap-x-8">
-                  <SpecRow
-                    label="Engine type"
-                    value={`${rocket.engines.type ?? "—"} ${rocket.engines.version ?? ""}`.trim()}
-                  />
-                  <SpecRow
-                    label="Layout"
-                    value={rocket.engines.layout ?? "—"}
-                  />
-                  <SpecRow
-                    label="Engines (1st stage)"
-                    value={fmt(rocket.engines.number)}
-                  />
-                  <SpecRow
-                    label="Propellants"
-                    value={
-                      [rocket.engines.propellant_1, rocket.engines.propellant_2]
-                        .filter(Boolean)
-                        .join(" / ") || "—"
-                    }
-                  />
-                  <SpecRow
-                    label="Thrust (sea level)"
-                    value={
-                      rocket.engines.thrust_sea_level
-                        ? `${fmt(rocket.engines.thrust_sea_level.kN, " kN")} / ${fmt(rocket.engines.thrust_sea_level.lbf, " lbf")}`
-                        : "—"
-                    }
-                  />
-                  <SpecRow
-                    label="Thrust (vacuum)"
-                    value={
-                      rocket.engines.thrust_vacuum
-                        ? `${fmt(rocket.engines.thrust_vacuum.kN, " kN")} / ${fmt(rocket.engines.thrust_vacuum.lbf, " lbf")}`
-                        : "—"
-                    }
-                  />
-                  <SpecRow
-                    label="Thrust-to-weight"
-                    value={fmt(rocket.engines.thrust_to_weight)}
-                  />
-                  <SpecRow
-                    label="Specific impulse (vac)"
-                    value={
-                      rocket.engines.isp?.vacuum
-                        ? `${rocket.engines.isp.vacuum} s`
-                        : "—"
-                    }
-                  />
+                  <SpecRow label="Engine type" value={`${rocket.engines.type ?? "—"} ${rocket.engines.version ?? ""}`.trim()} />
+                  <SpecRow label="Layout" value={rocket.engines.layout ?? "—"} />
+                  <SpecRow label="Engines (1st stage)" value={fmt(rocket.engines.number)} />
+                  <SpecRow label="Propellants" value={
+                    [rocket.engines.propellant_1, rocket.engines.propellant_2]
+                      .filter(Boolean)
+                      .join(" / ") || "—"
+                  } />
+                  <SpecRow label="Thrust (sea level)" value={
+                    rocket.engines.thrust_sea_level
+                      ? `${fmt(rocket.engines.thrust_sea_level.kN, " kN")} / ${fmt(rocket.engines.thrust_sea_level.lbf, " lbf")}`
+                      : "—"
+                  } />
+                  <SpecRow label="Thrust (vacuum)" value={
+                    rocket.engines.thrust_vacuum
+                      ? `${fmt(rocket.engines.thrust_vacuum.kN, " kN")} / ${fmt(rocket.engines.thrust_vacuum.lbf, " lbf")}`
+                      : "—"
+                  } />
+                  <SpecRow label="Thrust-to-weight" value={fmt(rocket.engines.thrust_to_weight)} />
+                  <SpecRow label="Specific impulse (vac)" value={
+                    rocket.engines.isp?.vacuum ? `${rocket.engines.isp.vacuum} s` : "—"
+                  } />
                 </div>
               </div>
             )}
@@ -430,46 +332,22 @@ const RocketDetails = () => {
             {/* first stage */}
             {rocket.first_stage && (
               <div className="rounded-3xl border border-white/10 bg-zinc-950/60 p-6 backdrop-blur-xl">
-                <h2 className="mb-5 text-lg font-semibold text-white">
-                  First Stage
-                </h2>
+                <h2 className="mb-5 text-lg font-semibold text-white">First Stage</h2>
                 <div className="grid grid-cols-2 gap-x-8">
-                  <SpecRow
-                    label="Reusable"
-                    value={fmtBool(rocket.first_stage.reusable)}
-                  />
-                  <SpecRow
-                    label="Engines"
-                    value={fmt(rocket.first_stage.engines)}
-                  />
-                  <SpecRow
-                    label="Fuel (tonnes)"
-                    value={fmt(rocket.first_stage.fuel_amount_tons, " t")}
-                  />
-                  <SpecRow
-                    label="Burn time"
-                    value={
-                      rocket.first_stage.burn_time_sec
-                        ? `${rocket.first_stage.burn_time_sec} s`
-                        : "—"
-                    }
-                  />
-                  <SpecRow
-                    label="Thrust (sea level)"
-                    value={
-                      rocket.first_stage.thrust_sea_level
-                        ? `${fmt(rocket.first_stage.thrust_sea_level.kN, " kN")}`
-                        : "—"
-                    }
-                  />
-                  <SpecRow
-                    label="Thrust (vacuum)"
-                    value={
-                      rocket.first_stage.thrust_vacuum
-                        ? `${fmt(rocket.first_stage.thrust_vacuum.kN, " kN")}`
-                        : "—"
-                    }
-                  />
+                  <SpecRow label="Reusable" value={fmtBool(rocket.first_stage.reusable)} />
+                  <SpecRow label="Engines" value={fmt(rocket.first_stage.engines)} />
+                  <SpecRow label="Fuel (tonnes)" value={fmt(rocket.first_stage.fuel_amount_tons, " t")} />
+                  <SpecRow label="Burn time" value={rocket.first_stage.burn_time_sec ? `${rocket.first_stage.burn_time_sec} s` : "—"} />
+                  <SpecRow label="Thrust (sea level)" value={
+                    rocket.first_stage.thrust_sea_level
+                      ? `${fmt(rocket.first_stage.thrust_sea_level.kN, " kN")}`
+                      : "—"
+                  } />
+                  <SpecRow label="Thrust (vacuum)" value={
+                    rocket.first_stage.thrust_vacuum
+                      ? `${fmt(rocket.first_stage.thrust_vacuum.kN, " kN")}`
+                      : "—"
+                  } />
                 </div>
               </div>
             )}
@@ -477,43 +355,19 @@ const RocketDetails = () => {
             {/* second stage */}
             {rocket.second_stage && (
               <div className="rounded-3xl border border-white/10 bg-zinc-950/60 p-6 backdrop-blur-xl">
-                <h2 className="mb-5 text-lg font-semibold text-white">
-                  Second Stage
-                </h2>
+                <h2 className="mb-5 text-lg font-semibold text-white">Second Stage</h2>
                 <div className="grid grid-cols-2 gap-x-8">
-                  <SpecRow
-                    label="Reusable"
-                    value={fmtBool(rocket.second_stage.reusable)}
-                  />
-                  <SpecRow
-                    label="Engines"
-                    value={fmt(rocket.second_stage.engines)}
-                  />
-                  <SpecRow
-                    label="Fuel (tonnes)"
-                    value={fmt(rocket.second_stage.fuel_amount_tons, " t")}
-                  />
-                  <SpecRow
-                    label="Burn time"
-                    value={
-                      rocket.second_stage.burn_time_sec
-                        ? `${rocket.second_stage.burn_time_sec} s`
-                        : "—"
-                    }
-                  />
-                  <SpecRow
-                    label="Thrust"
-                    value={
-                      rocket.second_stage.thrust
-                        ? `${fmt(rocket.second_stage.thrust.kN, " kN")}`
-                        : "—"
-                    }
-                  />
+                  <SpecRow label="Reusable" value={fmtBool(rocket.second_stage.reusable)} />
+                  <SpecRow label="Engines" value={fmt(rocket.second_stage.engines)} />
+                  <SpecRow label="Fuel (tonnes)" value={fmt(rocket.second_stage.fuel_amount_tons, " t")} />
+                  <SpecRow label="Burn time" value={rocket.second_stage.burn_time_sec ? `${rocket.second_stage.burn_time_sec} s` : "—"} />
+                  <SpecRow label="Thrust" value={
+                    rocket.second_stage.thrust
+                      ? `${fmt(rocket.second_stage.thrust.kN, " kN")}`
+                      : "—"
+                  } />
                   {rocket.second_stage.payloads?.option_1 && (
-                    <SpecRow
-                      label="Fairing option"
-                      value={rocket.second_stage.payloads.option_1}
-                    />
+                    <SpecRow label="Fairing option" value={rocket.second_stage.payloads.option_1} />
                   )}
                 </div>
               </div>
@@ -525,9 +379,7 @@ const RocketDetails = () => {
             {/* payload weights */}
             {rocket.payload_weights?.length > 0 && (
               <div className="rounded-3xl border border-white/10 bg-zinc-950/60 p-6 backdrop-blur-xl">
-                <h2 className="mb-5 text-lg font-semibold text-white">
-                  Payload Capacity
-                </h2>
+                <h2 className="mb-5 text-lg font-semibold text-white">Payload Capacity</h2>
                 <div className="space-y-0">
                   {rocket.payload_weights.map((pw) => (
                     <div
@@ -536,12 +388,8 @@ const RocketDetails = () => {
                     >
                       <span className="text-sm text-zinc-400">{pw.name}</span>
                       <div className="text-right">
-                        <p className="text-sm font-semibold text-white">
-                          {fmt(pw.kg, " kg")}
-                        </p>
-                        <p className="text-xs text-zinc-600">
-                          {fmt(pw.lb, " lb")}
-                        </p>
+                        <p className="text-sm font-semibold text-white">{fmt(pw.kg, " kg")}</p>
+                        <p className="text-xs text-zinc-600">{fmt(pw.lb, " lb")}</p>
                       </div>
                     </div>
                   ))}
@@ -552,25 +400,15 @@ const RocketDetails = () => {
             {/* landing legs */}
             {rocket.landing_legs && (
               <div className="rounded-3xl border border-white/10 bg-zinc-950/60 p-6 backdrop-blur-xl">
-                <h2 className="mb-5 text-lg font-semibold text-white">
-                  Landing Legs
-                </h2>
-                <SpecRow
-                  label="Number of legs"
-                  value={fmt(rocket.landing_legs.number)}
-                />
-                <SpecRow
-                  label="Material"
-                  value={rocket.landing_legs.material || "—"}
-                />
+                <h2 className="mb-5 text-lg font-semibold text-white">Landing Legs</h2>
+                <SpecRow label="Number of legs" value={fmt(rocket.landing_legs.number)} />
+                <SpecRow label="Material" value={rocket.landing_legs.material || "—"} />
               </div>
             )}
 
             {/* cost & booster */}
             <div className="rounded-3xl border border-white/10 bg-zinc-950/60 p-6 backdrop-blur-xl">
-              <h2 className="mb-5 text-lg font-semibold text-white">
-                Mission Economics
-              </h2>
+              <h2 className="mb-5 text-lg font-semibold text-white">Mission Economics</h2>
               <SpecRow
                 label="Cost per launch"
                 value={
@@ -582,25 +420,17 @@ const RocketDetails = () => {
               <SpecRow label="Boosters" value={fmt(rocket.boosters)} />
               <SpecRow label="Stages" value={fmt(rocket.stages)} />
               {leoPayload && (
-                <SpecRow
-                  label="LEO payload"
-                  value={fmt(leoPayload.kg, " kg")}
-                />
+                <SpecRow label="LEO payload" value={fmt(leoPayload.kg, " kg")} />
               )}
               {gtoPayload && (
-                <SpecRow
-                  label="GTO payload"
-                  value={fmt(gtoPayload.kg, " kg")}
-                />
+                <SpecRow label="GTO payload" value={fmt(gtoPayload.kg, " kg")} />
               )}
             </div>
 
             {/* thumbnail strip */}
             {(rocket.flickr_images?.length ?? 0) > 1 && (
               <div className="rounded-3xl border border-white/10 bg-zinc-950/60 p-4 backdrop-blur-xl">
-                <p className="mb-3 text-xs uppercase tracking-[0.22em] text-zinc-600">
-                  Gallery
-                </p>
+                <p className="mb-3 text-xs uppercase tracking-[0.22em] text-zinc-600">Gallery</p>
                 <div className="flex gap-2 overflow-x-auto pb-1">
                   {rocket.flickr_images.map((src, i) => (
                     <img
@@ -623,18 +453,8 @@ const RocketDetails = () => {
             to="/rockets"
             className="inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/5 px-6 py-3 text-sm font-medium text-zinc-200 backdrop-blur-sm transition-colors hover:bg-white/10 hover:text-white"
           >
-            <svg
-              className="h-3.5 w-3.5"
-              viewBox="0 0 16 16"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path
-                d="M10 3L5 8l5 5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
+            <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M10 3L5 8l5 5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
             Back to Fleet
           </Link>

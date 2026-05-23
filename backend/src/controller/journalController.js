@@ -25,7 +25,7 @@ exports.getJournalEntryById = asyncHandler(async (req, res, next) => {
 });
 
 exports.createJournalEntry = asyncHandler(async (req, res, next) => {
-  const { title, content, mood, tags, linkedApod } = req.body;
+  const { title, content, mood, tags, observationLocation } = req.body;
   if (!title || !content) {
     return res.status(400).json({ error: "Title and content are required" });
   }
@@ -35,13 +35,13 @@ exports.createJournalEntry = asyncHandler(async (req, res, next) => {
     content,
     mood,
     tags,
-    linkedApod,
+    observationLocation,
   });
   await newEntry.save();
   res.status(201).json({ entry: newEntry });
 });
 exports.updateJournalEntry = asyncHandler(async (req, res, next) => {
-  const { title, content, mood, tags, linkedApod } = req.body;
+  const { title, content, mood, tags, observationLocation } = req.body;
   const updateEntry = await journalEntry.findOne({ _id: req.params.id });
   if (!updateEntry) {
     return res.status(404).json({ message: "Journal entry not found" });
@@ -53,7 +53,8 @@ exports.updateJournalEntry = asyncHandler(async (req, res, next) => {
   updateEntry.content = content || updateEntry.content;
   updateEntry.mood = mood || updateEntry.mood;
   updateEntry.tags = tags || updateEntry.tags;
-  updateEntry.linkedApod = linkedApod || updateEntry.linkedApod;
+  updateEntry.observationLocation =
+    observationLocation || updateEntry.observationLocation;
   updateEntry.updatedAt = Date.now();
 
   await updateEntry.save();

@@ -2,7 +2,7 @@
 
 <br/>
 
-# ✦ COSMOVOID
+#  COSMOVOID
 
 **Your private observatory for everything beyond Earth.**
 

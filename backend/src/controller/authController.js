@@ -1,8 +1,11 @@
 const { check, validationResult } = require("express-validator");
 const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
 const asyncHandler = require("../utils/asyncHandler");
+const { sendOTPEmail, sendPasswordResetEmail } = require("../utils/mailer");
+const { saveOTP, verifyOTP } = require("../utils/otpStore");
 
 exports.postSignup = [
   check("username")
@@ -45,9 +48,12 @@ exports.postSignup = [
     });
 
     if (existingUser) {
-      return res
-        .status(400)
-        .json({ message: "Username or email already exists" });
+      if (existingUser.email === email) {
+        return res.status(409).json({ message: "Email already registered" });
+      }
+      if (existingUser.username === username) {
+        return res.status(409).json({ message: "Username already taken" });
+      }
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
@@ -134,3 +140,100 @@ exports.getMe = async (req, res, next) => {
   }
   res.json({ user: req.user });
 };
+
+// Send a 6-digit OTP to the given email (pre-signup step)
+exports.sendOTP = asyncHandler(async (req, res) => {
+  const { email, username } = req.body;
+  if (!email) return res.status(400).json({ message: "Email is required" });
+
+  const query = username ? { $or: [{ email }, { username }] } : { email };
+  const existingUser = await User.findOne(query);
+  if (existingUser) {
+    if (existingUser.email === email) {
+      return res.status(409).json({ message: "Email already registered" });
+    }
+    if (username && existingUser.username === username) {
+      return res.status(409).json({ message: "Username already taken" });
+    }
+  }
+
+  const otp = crypto.randomInt(100000, 999999).toString();
+  await saveOTP(email, otp);
+  await sendOTPEmail(email, otp);
+
+  res.json({ message: "OTP sent" });
+});
+
+// Verify OTP — does NOT create the user, just confirms the code is valid
+exports.verifyOTPHandler = asyncHandler(async (req, res) => {
+  const { email, otp } = req.body;
+  if (!email || !otp) return res.status(400).json({ message: "Email and OTP are required" });
+
+  const result = await verifyOTP(email, otp);
+  if (!result.valid) return res.status(400).json({ message: result.reason });
+
+  res.json({ message: "OTP verified" });
+});
+
+// Send a password-reset OTP to the given email
+exports.forgotPassword = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ message: "Email is required" });
+
+  const user = await User.findOne({ email });
+  // Always return 200 so we don't leak whether an email is registered
+  if (!user) return res.json({ message: "If that email exists, a reset code has been sent" });
+
+  const otp = crypto.randomInt(100000, 999999).toString();
+  await saveOTP(`reset:${email}`, otp);          // separate namespace from signup OTPs
+  await sendPasswordResetEmail(email, otp);
+
+  res.json({ message: "If that email exists, a reset code has been sent" });
+});
+
+// Verify reset OTP + update password
+exports.resetPassword = asyncHandler(async (req, res) => {
+  const { email, otp, newPassword } = req.body;
+  if (!email || !otp || !newPassword)
+    return res.status(400).json({ message: "Email, OTP and new password are required" });
+  if (newPassword.length < 6)
+    return res.status(400).json({ message: "Password must be at least 6 characters" });
+
+  const result = await verifyOTP(`reset:${email}`, otp);
+  if (!result.valid) return res.status(400).json({ message: result.reason });
+
+  const hashed = await bcrypt.hash(newPassword, 12);
+  await User.findOneAndUpdate({ email }, { password: hashed });
+
+  res.json({ message: "Password updated successfully" });
+});
+
+exports.deleteAccount = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  const JournalEntry = require("../models/journalEntry");
+
+  await JournalEntry.deleteMany({ userId });
+  await User.findByIdAndDelete(userId);
+
+  res.clearCookie("token", {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+  });
+
+  res.json({ message: "Account deleted" });
+});
+
+exports.updateProfile = asyncHandler(async (req, res) => {
+  const { bio } = req.body;
+  if (typeof bio !== "string")
+    return res.status(400).json({ message: "Invalid bio" });
+
+  const updated = await User.findByIdAndUpdate(
+    req.user._id,
+    { bio: bio.trim().slice(0, 300) },
+    { new: true, select: "-password" }
+  );
+
+  res.json({ user: updated });
+});

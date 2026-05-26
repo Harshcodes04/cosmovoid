@@ -37,15 +37,22 @@ const Login = () => {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-[#111111] via-[#0a0a0a] to-[#050505] text-white flex flex-col">
-      <div className="p-6">
-        <h1 className="text-xl tracking-widest font-semibold text-white/90">
-          Cosmovoid
-        </h1>
+    <main className="relative min-h-screen overflow-hidden bg-[#080808] text-white flex flex-col">
+      {/* ambient glows */}
+      <div className="pointer-events-none absolute -top-32 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-cyan-500/[0.07] blur-[120px]" />
+      <div className="pointer-events-none absolute bottom-0 right-0 h-80 w-80 rounded-full bg-violet-500/[0.05] blur-[100px]" />
+
+      {/* top bar */}
+      <div className="relative z-10 p-6">
+        <Link to="/" className="inline-flex items-center gap-0.5">
+          <span className="text-lg font-bold tracking-[0.24em] text-white">COSMO</span>
+          <span className="text-lg font-bold tracking-[0.24em] text-cyan-300">VOID</span>
+        </Link>
       </div>
-      <div className="flex flex-1 items-center justify-center px-4">
-        <div className="w-full max-w-lg bg-white/5 border border-white/10 rounded-2xl p-8 shadow-[0_0_60px_rgba(0,0,0,0.5)] backdrop-blur-md">
-          <div className="max-w-md mx-auto space-y-6">
+
+      {/* card */}
+      <div className="relative z-10 flex flex-1 items-center justify-center px-4 pb-12">
+        <div className="w-full max-w-md rounded-2xl border border-white/10 bg-white/[0.04] p-8 shadow-[0_0_80px_rgba(0,0,0,0.6)] backdrop-blur-xl space-y-6">
             <div className="text-center">
               <h2 className="text-3xl font-semibold text-white">
                 Welcome back
@@ -86,6 +93,11 @@ const Login = () => {
                   Access Key
                 </span>
               </div>
+              <div className="flex justify-end">
+                <Link to="/forgot-password" className="text-xs text-white/40 hover:text-cyan-400 transition-colors">
+                  Forgot password?
+                </Link>
+              </div>
               <button
                 type="submit"
                 disabled={submitting}
@@ -100,7 +112,6 @@ const Login = () => {
                 Create your logbook
               </Link>
             </p>
-          </div>
         </div>
       </div>
     </main>

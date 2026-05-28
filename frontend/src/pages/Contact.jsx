@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { FaEnvelope, FaGithub, FaHeadset, FaPaperPlane } from "react-icons/fa";
+import api from "../api/axios";
 
 const contactCards = [
   {
     Icon: FaEnvelope,
     label: "Email",
-    title: "cosmovoid@gmail.com",
+    title: "space.cosmovoid@gmail.com",
     copy: "For feature ideas, feedback, and data-source notes.",
   },
   {
@@ -34,17 +35,31 @@ const initialForm = {
 const Contact = () => {
   const [form, setForm] = useState(initialForm);
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
 
   const handleChange = (event) => {
     const { name, value } = event.target;
     setForm((current) => ({ ...current, [name]: value }));
     setSent(false);
+    setError("");
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    setSent(true);
-    setForm(initialForm);
+    setSending(true);
+    setError("");
+    try {
+      await api.post("/contact", form);
+      setSent(true);
+      setForm(initialForm);
+    } catch (err) {
+      setError(
+        err.response?.data?.message || "Failed to send. Please try again.",
+      );
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -172,14 +187,20 @@ const Contact = () => {
           <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <button
               type="submit"
-              className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-zinc-950 transition-transform duration-300 hover:-translate-y-0.5"
+              disabled={sending}
+              className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-zinc-950 transition-transform duration-300 hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed"
             >
               <FaPaperPlane className="size-4" aria-hidden="true" />
-              Send signal
+              {sending ? "Transmitting…" : "Send signal"}
             </button>
             {sent && (
               <p className="rounded-full border border-cyan-300/20 bg-cyan-300/8 px-4 py-2 text-xs text-cyan-200">
-                Signal queued. Thanks for reaching out.
+                ✓ Signal received. We'll get back to you.
+              </p>
+            )}
+            {error && (
+              <p className="rounded-full border border-red-400/20 bg-red-400/10 px-4 py-2 text-xs text-red-300">
+                {error}
               </p>
             )}
           </div>

@@ -21,3 +21,12 @@ export const getGlobalLaunchById = (id) =>
 export const getAstronauts = (params = {}) =>
   api.get("/space/astronauts", { params });
 export const getAstronautById = (id) => api.get(`/space/astronauts/${id}`);
+export const searchNasaMedia = (query, mediaType = "image", page = 1) =>
+  api.get("/space/media/search", { params: { query, mediaType, page } });
+
+export const getSkyEvents = () => api.get("/space/events/sky");
+
+export const sendOtp       = (email, username)      => api.post("/auth/send-otp",       { email, username });
+export const verifyOtp     = (email, otp)           => api.post("/auth/verify-otp",      { email, otp });
+export const forgotPassword = (email)               => api.post("/auth/forgot-password", { email });
+export const resetPassword  = (email, otp, newPassword) => api.post("/auth/reset-password", { email, otp, newPassword });

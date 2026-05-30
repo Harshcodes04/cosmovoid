@@ -72,13 +72,16 @@ exports.postSignup = [
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
+    const userResponse = newUser.toObject();
+    delete userResponse.password;
+
     return res.status(201).json({
       message: "User created",
-      user: { id: newUser._id, username, email },
+      user: userResponse,
     });
   }),
 ];
@@ -114,13 +117,16 @@ exports.postLogin = asyncHandler(async (req, res, next) => {
   res.cookie("token", token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 
+  const userResponse = user.toObject();
+  delete userResponse.password;
+
   return res.json({
     message: "Login successful",
-    user: { id: user._id, username: user.username, email: user.email },
+    user: userResponse,
   });
 });
 

@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getRockets } from "../api/space";
 
-/* ── helpers ── */
 const fmt = (n, unit = "") =>
   n != null ? `${Number(n).toLocaleString()}${unit}` : "—";
 
@@ -22,7 +21,6 @@ const statusConfig = {
 const getStatus = (active) =>
   active ? statusConfig.active : statusConfig.inactive;
 
-/* ── sub-components ── */
 const SkeletonCard = () => (
   <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-sm">
     <div className="h-56 animate-pulse bg-white/8" />
@@ -153,7 +151,6 @@ const RocketCard = ({ rocket, index }) => {
   );
 };
 
-/* ── main page ── */
 const Rockets = () => {
   const [rockets, setRockets] = useState([]);
   const [loading, setLoading] = useState(true);

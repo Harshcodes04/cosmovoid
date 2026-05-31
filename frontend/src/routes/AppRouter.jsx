@@ -18,15 +18,15 @@ import Rockets from "../pages/Rockets";
 import RocketDetails from "../pages/RocketDetails";
 import Crew from "../pages/Crew";
 import CrewDetails from "../pages/CrewDetails";
-import Launchpads from "../pages/Launchpads";
-import Landpads from "../pages/Landpads";
-import Roadster from "../pages/Roadster";
 import Asteroids from "../pages/Asteroids";
 import News from "../pages/News";
 import Events from "../pages/Events";
 import About from "../pages/About";
 import Contact from "../pages/Contact";
+import Terms from "../pages/Terms";
 import NotFound from "../pages/NotFound";
+import ForgotPassword from "../pages/ForgotPassword";
+import Profile from "../pages/Profile";
 
 const AppRouter = () => {
   return (
@@ -34,6 +34,7 @@ const AppRouter = () => {
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route element={<ExploreLayout />}>
         <Route path="/explore" element={<Explore />} />
         <Route path="/launches" element={<Launches />} />
@@ -42,9 +43,6 @@ const AppRouter = () => {
         <Route path="/rockets/:id" element={<RocketDetails />} />
         <Route path="/crew" element={<Crew />} />
         <Route path="/crew/:id" element={<CrewDetails />} />
-        <Route path="/launchpads" element={<Launchpads />} />
-        <Route path="/landpads" element={<Landpads />} />
-        <Route path="/roadster" element={<Roadster />} />
         <Route path="/asteroids" element={<Asteroids />} />
         <Route path="/news" element={<News />} />
         <Route path="/events" element={<Events />} />
@@ -52,6 +50,7 @@ const AppRouter = () => {
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/terms" element={<Terms />} />
       </Route>
       <Route
         path="/dashboard"
@@ -90,6 +89,14 @@ const AppRouter = () => {
         element={
           <ProtectedRoute>
             <JournalDetails />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <Profile />
           </ProtectedRoute>
         }
       />

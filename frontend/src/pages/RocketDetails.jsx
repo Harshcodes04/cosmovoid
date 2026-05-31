@@ -1,8 +1,8 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import { getRocketById } from "../api/space";
+import axios from "axios";
 
-/* ── helpers ── */
 const fmt = (n, unit = "") =>
   n != null && n !== "" ? `${Number(n).toLocaleString()}${unit}` : "—";
 
@@ -15,7 +15,6 @@ const fmtBool = (v) =>
     <span className="text-zinc-500">—</span>
   );
 
-/* ── skeleton ── */
 const SkeletonDetail = () => (
   <div className="mx-auto max-w-7xl space-y-8 px-5 pb-24 pt-10 md:px-10 lg:px-14 xl:px-20">
     <div className="h-6 w-32 animate-pulse rounded-full bg-white/8" />
@@ -30,56 +29,118 @@ const SkeletonDetail = () => (
   </div>
 );
 
-/* ── image carousel ── */
-const ImageCarousel = ({ images = [], name = "" }) => {
-  const [current, setCurrent] = useState(0);
-  const [loaded, setLoaded] = useState({});
-  const [failed, setFailed] = useState({});
+const MediaCarousel = ({ images = [], videos = [], name = "" }) => {
+  // Build a unified media list: images first, then videos
+  const items = [
+    ...images.map((src) => ({ type: "image", src })),
+    ...videos.map((v)  => ({ type: "video", youtubeId: v.youtubeId, thumb: v.thumb, title: v.title })),
+  ];
+
+  const [current, setCurrent]   = useState(0);
+  const [loaded,  setLoaded]    = useState({});
+  const [failed,  setFailed]    = useState({});
+  const [playing, setPlaying]   = useState(false);
+  const iframeRef               = useRef(null);
 
   const prev = useCallback(
-    () => setCurrent((c) => (c - 1 + images.length) % images.length),
-    [images.length]
+    () => { setCurrent((c) => (c - 1 + items.length) % items.length); setPlaying(false); },
+    [items.length],
   );
   const next = useCallback(
-    () => setCurrent((c) => (c + 1) % images.length),
-    [images.length]
+    () => { setCurrent((c) => (c + 1) % items.length); setPlaying(false); },
+    [items.length],
   );
 
-  if (!images.length) {
+  // Reset play state when slide changes
+  useEffect(() => { setPlaying(false); }, [current]);
+
+  if (!items.length) {
     return (
       <div className="flex h-[420px] items-center justify-center rounded-3xl border border-white/10 bg-zinc-950/60 text-zinc-600">
-        No imagery available
+        No media available
       </div>
     );
   }
 
+  const item = items[current];
+
   return (
     <div className="relative h-[420px] overflow-hidden rounded-3xl border border-white/10 bg-zinc-950">
-      {!loaded[current] && !failed[current] && (
-        <div className="absolute inset-0 animate-pulse bg-[linear-gradient(135deg,rgba(8,12,24,1)_0%,rgba(30,36,70,0.95)_52%,rgba(6,8,18,1)_100%)]" />
-      )}
-      {images.map((src, i) => (
-        <img
-          key={src}
-          src={src}
-          alt={`${name} — ${i + 1}`}
-          onLoad={() => setLoaded((p) => ({ ...p, [i]: true }))}
-          onError={() => setFailed((p) => ({ ...p, [i]: true }))}
-          className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-700 ${
-            i === current ? "opacity-100" : "opacity-0 pointer-events-none"
-          }`}
+      {item.type === "image" ? (
+        <>
+          {!loaded[current] && !failed[current] && (
+            <div className="absolute inset-0 animate-pulse bg-[linear-gradient(135deg,rgba(8,12,24,1)_0%,rgba(30,36,70,0.95)_52%,rgba(6,8,18,1)_100%)]" />
+          )}
+          <img
+            key={item.src}
+            src={item.src}
+            alt={`${name} — ${current + 1}`}
+            onLoad={() => setLoaded((p) => ({ ...p, [current]: true }))}
+            onError={() => setFailed((p) => ({ ...p, [current]: true }))}
+            className={`h-full w-full object-cover object-center transition-opacity duration-700 ${
+              loaded[current] ? "opacity-100" : "opacity-0"
+            }`}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/80 via-transparent to-transparent" />
+        </>
+      ) : playing ? (
+        // Active embed
+        <iframe
+          ref={iframeRef}
+          key={item.youtubeId}
+          src={`https://www.youtube.com/embed/${item.youtubeId}?autoplay=1&rel=0`}
+          title={item.title || name}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          className="absolute inset-0 h-full w-full border-0"
         />
-      ))}
-      {/* gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/80 via-transparent to-transparent" />
+      ) : (
+        // Video thumbnail with play overlay
+        <div
+          className="absolute inset-0 cursor-pointer"
+          onClick={() => setPlaying(true)}
+          role="button"
+          aria-label="Play video"
+        >
+          {item.thumb ? (
+            <img
+              src={item.thumb}
+              alt={item.title || name}
+              className="h-full w-full object-cover object-center"
+            />
+          ) : (
+            <div className="h-full w-full bg-zinc-900" />
+          )}
+          {/* dark overlay + play button */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/40">
+            <div className="flex size-16 items-center justify-center rounded-full border border-white/20 bg-black/60 text-white backdrop-blur transition-transform duration-200 hover:scale-110">
+              <svg viewBox="0 0 24 24" fill="currentColor" className="size-7 translate-x-0.5">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </div>
+            {item.title && (
+              <p className="max-w-xs text-center text-sm font-medium text-white/80 px-4 line-clamp-2">
+                {item.title}
+              </p>
+            )}
+          </div>
+          {/* video badge */}
+          <span className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full border border-red-400/30 bg-red-500/20 px-3 py-1 text-xs font-medium text-red-200 backdrop-blur">
+            <svg viewBox="0 0 16 16" fill="currentColor" className="size-3">
+              <path d="M6 4l6 4-6 4V4z" />
+            </svg>
+            Video
+          </span>
+        </div>
+      )}
 
-      {/* controls */}
-      {images.length > 1 && (
+      {/* nav arrows */}
+      {items.length > 1 && (
         <>
           <button
             onClick={prev}
-            aria-label="Previous image"
-            className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full border border-white/15 bg-black/40 p-2.5 text-white backdrop-blur-md transition-colors hover:bg-black/60"
+            aria-label="Previous"
+            className="absolute left-4 top-1/2 z-10 -translate-y-1/2 rounded-full border border-white/15 bg-black/40 p-2.5 text-white backdrop-blur-md transition-colors hover:bg-black/60"
           >
             <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M10 3L5 8l5 5" strokeLinecap="round" strokeLinejoin="round" />
@@ -87,22 +148,27 @@ const ImageCarousel = ({ images = [], name = "" }) => {
           </button>
           <button
             onClick={next}
-            aria-label="Next image"
-            className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full border border-white/15 bg-black/40 p-2.5 text-white backdrop-blur-md transition-colors hover:bg-black/60"
+            aria-label="Next"
+            className="absolute right-4 top-1/2 z-10 -translate-y-1/2 rounded-full border border-white/15 bg-black/40 p-2.5 text-white backdrop-blur-md transition-colors hover:bg-black/60"
           >
             <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M6 3l5 5-5 5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
-          {/* dots */}
-          <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-1.5">
-            {images.map((_, i) => (
+
+          {/* dot strip */}
+          <div className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1.5">
+            {items.map((itm, i) => (
               <button
                 key={i}
-                onClick={() => setCurrent(i)}
-                aria-label={`Image ${i + 1}`}
-                className={`h-1.5 rounded-full transition-all duration-300 ${
-                  i === current ? "w-6 bg-white" : "w-1.5 bg-white/40"
+                onClick={() => { setCurrent(i); setPlaying(false); }}
+                aria-label={`Slide ${i + 1}`}
+                className={`rounded-full transition-all duration-300 ${
+                  i === current
+                    ? "w-6 h-1.5 bg-white"
+                    : itm.type === 'video'
+                    ? "w-1.5 h-1.5 bg-red-400/70"
+                    : "w-1.5 h-1.5 bg-white/40"
                 }`}
               />
             ))}
@@ -113,7 +179,6 @@ const ImageCarousel = ({ images = [], name = "" }) => {
   );
 };
 
-/* ── stat card ── */
 const StatCard = ({ label, value, sub, accent = "violet" }) => {
   const accents = {
     violet: "border-violet-400/15 bg-violet-400/5",
@@ -130,7 +195,6 @@ const StatCard = ({ label, value, sub, accent = "violet" }) => {
   );
 };
 
-/* ── spec row ── */
 const SpecRow = ({ label, value }) => (
   <div className="flex items-start justify-between gap-4 border-b border-white/6 py-3 last:border-b-0">
     <span className="text-sm text-zinc-500">{label}</span>
@@ -138,7 +202,6 @@ const SpecRow = ({ label, value }) => (
   </div>
 );
 
-/* ── section heading ── */
 const SectionHeading = ({ children }) => (
   <h2 className="mb-5 flex items-center gap-3 text-lg font-semibold text-white">
     <span className="h-px flex-1 bg-white/8" />
@@ -147,12 +210,12 @@ const SectionHeading = ({ children }) => (
   </h2>
 );
 
-/* ── main component ── */
 const RocketDetails = () => {
   const { id } = useParams();
-  const [rocket, setRocket] = useState(null);
+  const [rocket,  setRocket]  = useState(null);
+  const [videos,  setVideos]  = useState([]);   // { youtubeId, thumb, title }[]
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [error,   setError]   = useState("");
 
   useEffect(() => {
     const load = async () => {
@@ -161,6 +224,32 @@ const RocketDetails = () => {
       try {
         const res = await getRocketById(id);
         setRocket(res.data);
+
+        // Fetch past launches for this rocket to extract YouTube video IDs
+        try {
+          const launchRes = await axios.post(
+            `https://api.spacexdata.com/v4/launches/query`,
+            {
+              query: { rocket: id, upcoming: false },
+              options: {
+                select: { name: 1, links: 1 },
+                sort:   { date_unix: -1 },
+                limit:  8,
+              },
+            },
+          );
+          const docs = launchRes.data?.docs || [];
+          const extracted = docs
+            .filter((l) => l.links?.youtube_id)
+            .map((l) => ({
+              youtubeId: l.links.youtube_id,
+              title: l.name,
+              thumb: `https://img.youtube.com/vi/${l.links.youtube_id}/hqdefault.jpg`,
+            }));
+          setVideos(extracted);
+        } catch {
+          // videos are optional — silently ignore failures
+        }
       } catch (err) {
         setError(
           err?.response?.data?.error || "Could not load rocket details."
@@ -256,8 +345,12 @@ const RocketDetails = () => {
           )}
         </div>
 
-        {/* hero image carousel */}
-        <ImageCarousel images={rocket.flickr_images || []} name={rocket.name} />
+        {/* hero media carousel — images + launch videos */}
+        <MediaCarousel
+          images={rocket.flickr_images || []}
+          videos={videos}
+          name={rocket.name}
+        />
 
         {/* description */}
         {rocket.description && (

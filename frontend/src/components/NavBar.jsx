@@ -2,7 +2,9 @@ import { useState } from "react";
 import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import { motion, useScroll, useMotionValueEvent, AnimatePresence } from "framer-motion";
-import { FaAngleDown } from "react-icons/fa";
+import { FaAngleDown, FaRocket, FaImages, FaNewspaper, FaUserAstronaut, FaInfoCircle, FaEnvelope } from "react-icons/fa";
+import { GiAsteroid, GiMoonOrbit } from "react-icons/gi";
+import { MdEvent } from "react-icons/md";
 
 const mainLinks = [
   { label: "Home", to: "/" },
@@ -11,17 +13,17 @@ const mainLinks = [
 ];
 
 const exploreLinks = [
-  { label: "Launches", to: "/launches" },
-  { label: "Crew", to: "/crew" },
-  { label: "Rockets", to: "/rockets" },
-  { label: "Gallery", to: "/gallery" },
-  { label: "Asteroids", to: "/asteroids" },
+  { label: "Launches",  to: "/launches",  Icon: FaRocket },
+  { label: "Rockets",   to: "/rockets",   Icon: GiMoonOrbit },
+  { label: "Crew",      to: "/crew",       Icon: FaUserAstronaut },
+  { label: "Gallery",   to: "/gallery",   Icon: FaImages },
+  { label: "Asteroids", to: "/asteroids", Icon: GiAsteroid },
+  { label: "Events",    to: "/events",    Icon: MdEvent },
+  { label: "News",      to: "/news",      Icon: FaNewspaper },
 ];
 
-const moreLinks = [
-  { label: "News", to: "/news" },
-  { label: "Events", to: "/events" },
-  { label: "About", to: "/about" },
+const extraLinks = [
+  { label: "About",   to: "/about" },
   { label: "Contact", to: "/contact" },
 ];
 
@@ -52,10 +54,10 @@ const NavItem = ({ to, label, pathname }) => {
 
 const DropdownItem = ({ label, links, pathname }) => {
   const [open, setOpen] = useState(false);
-  const isActive = links.some(l => pathname === l.to || pathname.startsWith(l.to + '/'));
+  const isActive = links.some(l => pathname === l.to || pathname.startsWith(l.to + '/')) || pathname === '/explore';
 
   return (
-    <div 
+    <div
       className="relative px-2 py-1.5"
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
@@ -64,8 +66,7 @@ const DropdownItem = ({ label, links, pathname }) => {
         {label}
         <FaAngleDown className={`transition-transform duration-200 ${open ? "rotate-180 text-white" : "text-zinc-500"}`} size={12} />
       </button>
-      
-      {/* Dropdown Menu */}
+
       <AnimatePresence>
         {open && (
           <motion.div
@@ -73,18 +74,35 @@ const DropdownItem = ({ label, links, pathname }) => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
             transition={{ duration: 0.15 }}
-            className="absolute top-full left-1/2 -translate-x-1/2 pt-4 min-w-[160px]"
+            className="absolute top-full left-1/2 -translate-x-1/2 pt-4 min-w-[200px]"
           >
-            <div className="flex flex-col gap-1 rounded-2xl border border-white/10 bg-zinc-950/90 p-2 shadow-[0_20px_40px_rgba(0,0,0,0.5)] backdrop-blur-2xl">
+            <div className="flex flex-col gap-0.5 rounded-2xl border border-white/10 bg-zinc-950/95 p-2 shadow-[0_20px_40px_rgba(0,0,0,0.5)] backdrop-blur-2xl">
               {links.map(l => (
                 <Link
                   key={l.to}
                   to={l.to}
-                  className={`px-3 py-2 rounded-xl text-sm transition-colors ${pathname === l.to ? "bg-white/10 text-white" : "text-zinc-400 hover:bg-white/5 hover:text-white"}`}
+                  className={`flex items-center gap-3 px-3 py-2 rounded-xl text-sm transition-colors ${
+                    pathname === l.to ? "bg-white/10 text-white" : "text-zinc-400 hover:bg-white/5 hover:text-white"
+                  }`}
                 >
+                  {l.Icon && (
+                    <span className="flex size-6 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-white/90">
+                      <l.Icon size={11} />
+                    </span>
+                  )}
                   {l.label}
                 </Link>
               ))}
+              {/* See all link */}
+              <div className="mt-1 border-t border-white/8 pt-1">
+                <Link
+                  to="/explore"
+                  className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white"
+                >
+                  See all sections
+                  <span>→</span>
+                </Link>
+              </div>
             </div>
           </motion.div>
         )}
@@ -148,11 +166,16 @@ const Navbar = () => {
           {/* Logo */}
           <Link
             to="/"
-            className="flex items-center gap-2 text-lg font-semibold tracking-[0.24em] text-zinc-50 outline-none"
+            className="group flex items-center gap-0.5 outline-none"
             onClick={closeMenu}
           >
-            COSMOVOID
-            <span className="h-1.5 w-1.5 rounded-full bg-cyan-300 shadow-[0_0_10px_rgba(103,232,249,0.9)] animate-pulse" />
+            <span className="text-lg font-bold tracking-[0.24em] text-white transition-opacity group-hover:opacity-80">
+              COSMO
+            </span>
+            <span className="text-lg font-bold tracking-[0.24em] text-cyan-300 transition-opacity group-hover:opacity-80">
+              VOID
+            </span>
+            <span className="ml-2 h-1.5 w-1.5 rounded-full bg-cyan-300 shadow-[0_0_10px_rgba(103,232,249,0.9)] animate-pulse" />
           </Link>
 
           {/* Desktop Links */}
@@ -162,19 +185,25 @@ const Navbar = () => {
             ))}
             <div className="mx-2 h-4 w-px bg-white/10" />
             <DropdownItem label="Explore" links={exploreLinks} pathname={pathname} />
-            <DropdownItem label="More" links={moreLinks} pathname={pathname} />
+            <div className="mx-2 h-4 w-px bg-white/10" />
+            {extraLinks.map((item) => (
+              <NavItem key={item.to} to={item.to} label={item.label} pathname={pathname} />
+            ))}
           </div>
 
           {/* Auth Section */}
           <div className="hidden md:flex items-center gap-3">
             {user ? (
               <>
-                <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 pl-2 pr-4 py-1.5">
+                <Link
+                  to="/profile"
+                  className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 pl-2 pr-4 py-1.5 transition-colors hover:border-white/20 hover:bg-white/10"
+                >
                   <div className="flex size-6 items-center justify-center rounded-full bg-linear-to-tr from-cyan-500 to-blue-500 text-[10px] font-bold text-white">
                     {user.username.charAt(0).toUpperCase()}
                   </div>
                   <span className="text-sm text-zinc-100">{user.username}</span>
-                </div>
+                </Link>
                 <button
                   type="button"
                   onClick={handleLogout}
@@ -232,24 +261,26 @@ const Navbar = () => {
                   {item.label}
                 </NavLink>
               ))}
+              {extraLinks.map((item) => (
+                <NavLink key={item.to} to={item.to} className={mobileNavLinkClass} onClick={closeMenu}>
+                  {item.label}
+                </NavLink>
+              ))}
             </div>
 
             <div className="flex flex-col gap-1 mb-6">
               <span className="mb-2 text-[10px] font-bold uppercase tracking-widest text-zinc-500">Explore</span>
               {exploreLinks.map((item) => (
                 <NavLink key={item.to} to={item.to} className={mobileNavLinkClass} onClick={closeMenu}>
-                  {item.label}
+                  <span className="flex items-center gap-2.5">
+                    {item.Icon && <item.Icon size={13} className="text-white/80" />}
+                    {item.label}
+                  </span>
                 </NavLink>
               ))}
-            </div>
-
-            <div className="flex flex-col gap-1 mb-6">
-              <span className="mb-2 text-[10px] font-bold uppercase tracking-widest text-zinc-500">More</span>
-              {moreLinks.map((item) => (
-                <NavLink key={item.to} to={item.to} className={mobileNavLinkClass} onClick={closeMenu}>
-                  {item.label}
-                </NavLink>
-              ))}
+              <NavLink to="/explore" className={mobileNavLinkClass} onClick={closeMenu}>
+                <span className="text-zinc-300">See all sections →</span>
+              </NavLink>
             </div>
 
             <div className="mt-auto pt-4 border-t border-white/10">
@@ -258,6 +289,13 @@ const Navbar = () => {
                   <div className="rounded-xl bg-white/5 px-4 py-3 text-sm text-zinc-300">
                     Signed in as <strong className="text-white">{user.username}</strong>
                   </div>
+                  <Link
+                    to="/profile"
+                    onClick={closeMenu}
+                    className="w-full rounded-xl border border-white/10 bg-transparent px-5 py-3 text-center text-sm font-medium text-zinc-300 transition-colors hover:bg-white/5 hover:text-white"
+                  >
+                    View profile
+                  </Link>
                   <button
                     type="button"
                     onClick={handleLogout}

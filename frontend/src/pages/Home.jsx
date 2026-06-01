@@ -2,7 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../components/NavBar";
 import { useAuth } from "../context/useAuth";
-import { getApod, getAsteroids, getGlobalUpcomingLaunches, getNews } from "../api/space";
+import { getApod, getAsteroids, getGlobalUpcomingLaunches, getNews, getJournalEntries } from "../api/space";
+import { FaRocket, FaImages, FaUserAstronaut, FaNewspaper, FaEnvelope, FaInfoCircle } from "react-icons/fa";
+import { GiAsteroid, GiMoonOrbit } from "react-icons/gi";
+import { MdEvent } from "react-icons/md";
 
 const CSS = `
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -37,6 +40,18 @@ const FEATS = [
   { n:"01", tag:"LAUNCH INTELLIGENCE", h:"Track every mission, live.", p:"SpaceX launches past and future — live countdowns, payload specs, booster landings, and full mission briefs the moment they drop.", to:"/launches", flip:false },
   { n:"02", tag:"NASA IMAGERY", h:"A new universe, every single day.", p:"NASA's Astronomy Picture of the Day in full fidelity. Galaxies, nebulae, solar events, and deep field shots curated into your personal gallery.", to:"/gallery", flip:true },
   { n:"03", tag:"PERSONAL JOURNAL", h:"Your own cosmic archive.", p:"Write private mission logs, attach them to launches or APOD images, tag them by mood, and build a trail of everything that pulled you deeper into space.", to:"/journal", flip:false },
+];
+
+const EXPLORE_SECTIONS = [
+  { Icon: FaRocket,        label: "Launches",  to: "/launches",  color: "from-cyan-500/15 to-blue-600/5",      border: "border-cyan-400/15",   text: "text-cyan-300" },
+  { Icon: GiMoonOrbit,    label: "Rockets",   to: "/rockets",   color: "from-violet-500/15 to-purple-700/5", border: "border-violet-400/15", text: "text-violet-300" },
+  { Icon: FaUserAstronaut,label: "Crew",      to: "/crew",      color: "from-emerald-500/15 to-teal-700/5", border: "border-emerald-400/15",text: "text-emerald-300" },
+  { Icon: FaImages,        label: "Gallery",   to: "/gallery",   color: "from-pink-500/15 to-rose-700/5",    border: "border-pink-400/15",   text: "text-pink-300" },
+  { Icon: GiAsteroid,     label: "Asteroids", to: "/asteroids", color: "from-orange-500/15 to-amber-700/5", border: "border-orange-400/15", text: "text-orange-300" },
+  { Icon: MdEvent,        label: "Events",    to: "/events",    color: "from-sky-500/15 to-indigo-700/5",   border: "border-sky-400/15",    text: "text-sky-300" },
+  { Icon: FaNewspaper,    label: "News",      to: "/news",      color: "from-yellow-500/15 to-lime-700/5",  border: "border-yellow-400/15", text: "text-yellow-300" },
+  { Icon: FaInfoCircle,   label: "About",     to: "/about",     color: "from-zinc-500/15 to-slate-700/5",   border: "border-zinc-400/15",   text: "text-zinc-300" },
+  { Icon: FaEnvelope,     label: "Contact",   to: "/contact",   color: "from-fuchsia-500/15 to-purple-700/5",border: "border-fuchsia-400/15",text: "text-fuchsia-300" },
 ];
 
 function DashMockup({ globalUpcoming, news, asteroids, loading }) {
@@ -130,7 +145,7 @@ export default function Home() {
       return p.near_earth_objects[d] || [];
     };
     const imports = [getApod(), getAsteroids(), getGlobalUpcomingLaunches(5), getNews()];
-    if (user) imports.push(import("../api/space").then(m => m.getJournalEntries()));
+    if (user) imports.push(getJournalEntries());
     (async () => {
       const [apodR, astR, globalR, newsR, jR] = await Promise.allSettled(imports);
       if (!live) return;
@@ -191,7 +206,6 @@ export default function Home() {
       <header><Navbar /></header>
       <main className="hm">
 
-        {/* ── HERO ─────────────────────────────────────── */}
         <section className="relative min-h-screen overflow-hidden">
           <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
           <div className="dot-bg absolute inset-0 opacity-60" />
@@ -201,7 +215,7 @@ export default function Home() {
             <div className="fl2 absolute -right-48 top-1/3 h-[500px] w-[500px] rounded-full bg-zinc-500/8 blur-[130px]" />
           </div>
 
-          <div className="relative z-10 mx-auto grid max-w-7xl gap-10 px-6 pt-28 pb-24 md:px-10 lg:grid-cols-2 lg:items-start lg:gap-20 lg:px-16 xl:px-20">
+          <div className="relative z-10 mx-auto grid max-w-7xl gap-8 px-4 pt-20 pb-16 sm:px-6 md:px-10 lg:grid-cols-2 lg:items-start lg:gap-20 lg:px-16 xl:px-20 lg:pt-28">
             {/* text col */}
             <div>
               <div className="ha ha1">
@@ -216,7 +230,7 @@ export default function Home() {
                 <span className="ha ha4 block">for space.</span>
               </h1>
               <p className="ha ha5 mt-12 max-w-lg text-base leading-7 text-zinc-500 sm:text-lg">
-                SpaceX launches, NASA imagery, asteroid alerts, and space news — live, in one focused dark interface. Plus a private journal for your cosmic notes.
+                Live SpaceX launch tracking, high-fidelity NASA imagery, real-time asteroid alerts, and the latest cosmic news. Plus, a private journal to document your journey through the universe.
               </p>
               <div className="ha ha6 mt-8 flex flex-wrap gap-3">
                 <Link to={cta.to} className="hov-lift group inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-zinc-950">
@@ -246,7 +260,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── MARQUEE ──────────────────────────────────── */}
         <div className="overflow-hidden border-y border-white/5 bg-white/2 py-3">
           <div className="mqr">
             {[...MQ_WORDS,...MQ_WORDS].map((w,i) => (
@@ -255,16 +268,15 @@ export default function Home() {
           </div>
         </div>
 
-        {/* ── FEATURES ─────────────────────────────────── */}
         <section className="relative px-6 py-28 md:px-10 lg:px-16 xl:px-20">
           <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
             <div className="fl1 absolute -right-48 top-0 h-[500px] w-[500px] rounded-full bg-zinc-600/5 blur-[120px]" />
             <div className="fl2 absolute -left-40 bottom-0 h-[400px] w-[400px] rounded-full bg-cyan-500/4 blur-[100px]" />
           </div>
           <div className="relative mx-auto max-w-7xl">
-            <div className="rv mb-16">
+            <div className="rv mb-10 sm:mb-16">
               <p className="text-[10px] uppercase tracking-[0.32em] text-zinc-700">What's inside</p>
-              <h2 className="mt-3 font-light tracking-[-0.05em] text-white" style={{fontSize:"clamp(2.2rem,5vw,4.5rem)"}}>
+              <h2 className="mt-3 font-light tracking-[-0.05em] text-white" style={{fontSize:"clamp(1.8rem,5vw,4.5rem)"}}>
                 Everything the cosmos<br /><span className="text-zinc-600">has to offer.</span>
               </h2>
             </div>
@@ -273,18 +285,18 @@ export default function Home() {
               {FEATS.map((f,i) => (
                 <div key={f.n}>
                   <div className="feat-line" />
-                  <Link to={f.to} className={`group grid gap-10 py-14 lg:grid-cols-2 lg:items-center ${f.flip?"":"lg:direction-normal"}`}>
-                    <div className={`space-y-5 ${f.flip?"lg:order-2":""}`}>
+                  <div className={`group grid gap-6 py-10 sm:py-14 lg:grid-cols-2 lg:items-center`}>
+                    <div className={`space-y-4 sm:space-y-5 ${f.flip?"lg:order-2":""}`}>
                       <div className="flex items-center gap-4">
                         <span className="font-mono text-5xl font-bold text-white/6 leading-none">{f.n}</span>
                         <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[9px] uppercase tracking-[0.28em] text-zinc-500">{f.tag}</span>
                       </div>
                       <h3 className="text-3xl font-light tracking-[-0.04em] text-white lg:text-4xl">{f.h}</h3>
                       <p className="max-w-lg text-sm leading-7 text-zinc-500">{f.p}</p>
-                      <span className="inline-flex items-center gap-2 text-sm font-medium text-zinc-400 transition-colors duration-300 group-hover:text-white">
+                      <Link to={f.to} className="inline-flex items-center gap-2 text-sm font-medium text-zinc-400 transition-colors duration-300 hover:text-white">
                         Explore {f.tag.split(" ")[0].toLowerCase()}
                         <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
-                      </span>
+                      </Link>
                     </div>
                     <div className={`${f.flip?"lg:order-1":""}`}>
                       {i===0 && (
@@ -347,11 +359,11 @@ export default function Home() {
                                 </div>
                               )}
                               <div className="grid grid-cols-2 gap-2">
-                                {["Launches","Crew","Asteroids","News"].map(label => (
-                                  <div key={label} className="rounded-xl border border-white/6 bg-zinc-950 p-3">
+                                {[["Launches","/launches"],["Crew","/crew"],["Asteroids","/asteroids"],["News","/news"]].map(([label, to]) => (
+                                  <Link key={label} to={to} className="rounded-xl border border-white/6 bg-zinc-950 p-3 transition-colors hover:border-white/12 hover:bg-white/5">
                                     <p className="text-xs font-medium text-white">{label}</p>
                                     <p className="text-[10px] text-zinc-600">Explore →</p>
-                                  </div>
+                                  </Link>
                                 ))}
                               </div>
                             </>
@@ -393,7 +405,7 @@ export default function Home() {
                         </div>
                       )}
                     </div>
-                  </Link>
+                  </div>
                 </div>
               ))}
               <div className="feat-line" />
@@ -401,9 +413,45 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── STATS ────────────────────────────────────── */}
-        <section className="border-y border-white/6 px-6 py-20 md:px-10 lg:px-16 xl:px-20">
-          <div className="mx-auto max-w-7xl grid grid-cols-2 gap-8 lg:grid-cols-4">
+        <section className="relative px-4 py-16 sm:px-6 sm:py-20 md:px-10 md:py-24 lg:px-16 xl:px-20">
+          <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+            <div className="fl2 absolute -left-40 top-0 h-[400px] w-[400px] rounded-full bg-violet-500/4 blur-[100px]" />
+          </div>
+          <div className="relative mx-auto max-w-7xl">
+            <div className="rv mb-8 sm:mb-12 flex items-end justify-between gap-4">
+              <div>
+                <p className="text-[10px] uppercase tracking-[0.32em] text-zinc-700">All sections</p>
+                <h2 className="mt-2 sm:mt-3 font-light tracking-[-0.05em] text-white" style={{fontSize:"clamp(1.5rem,4vw,3.5rem)"}}>
+                  Every corner of
+                  <span className="text-zinc-600"> the platform.</span>
+                </h2>
+              </div>
+              <Link to="/explore" className="shrink-0 rounded-full border border-white/10 bg-white/4 px-5 py-2.5 text-sm text-zinc-400 transition-colors hover:bg-white/8 hover:text-white">
+                Full directory →
+              </Link>
+            </div>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-6">
+              {EXPLORE_SECTIONS.map((s) => (
+                  <Link
+                  key={s.to}
+                  to={s.to}
+                  className={`rv group flex flex-col gap-3 rounded-2xl border bg-gradient-to-br p-4 transition-all duration-300 hover:-translate-y-0.5 ${s.color} ${s.border}`}
+                >
+                  <span className={`flex size-9 items-center justify-center rounded-xl border bg-black/20 ${s.border} ${s.text}`}>
+                    <s.Icon size={14} />
+                  </span>
+                  <div>
+                    <p className="text-sm font-medium text-white">{s.label}</p>
+                    <p className={`text-[10px] mt-0.5 transition-colors group-hover:opacity-100 opacity-60 ${s.text}`}>Open →</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="relative px-4 py-16 sm:px-6 sm:py-20 md:px-10 lg:px-16 xl:px-20">
+          <div className="mx-auto max-w-7xl grid grid-cols-2 gap-6 sm:gap-8 lg:grid-cols-4">
             {[
               [liveData.loading ? "…" : liveData.globalLaunchCount > 0 ? `${liveData.globalLaunchCount}` : "Live", "Upcoming global missions"],
               [liveData.loading ? "…" : liveData.apod?.title ? "Daily" : "Daily", "NASA APOD imagery"],
@@ -411,15 +459,14 @@ export default function Home() {
               [liveData.loading ? "…" : user ? (liveData.journalEntries.length > 0 ? `${liveData.journalEntries.length}` : "0") : "Private", "Your mission journal"],
             ].map(([v,l],i) => (
               <div key={l} className={`rv d${i+1} text-center`}>
-                <p className="text-5xl font-light tracking-[-0.06em] text-white lg:text-6xl">{v}</p>
-                <p className="mt-3 text-xs uppercase tracking-[0.26em] text-zinc-600">{l}</p>
+                <p className="text-4xl font-light tracking-[-0.06em] text-white sm:text-5xl lg:text-6xl">{v}</p>
+                <p className="mt-2 text-[10px] uppercase tracking-[0.22em] text-zinc-600 sm:mt-3 sm:tracking-[0.26em]">{l}</p>
               </div>
             ))}
           </div>
         </section>
 
-        {/* ── FINAL CTA ────────────────────────────────── */}
-        <section className="relative overflow-hidden px-6 py-36 md:px-10 lg:px-16 xl:px-20">
+        <section className="relative px-4 py-16 sm:px-6 sm:py-20 md:px-10 md:py-24 lg:px-16 xl:px-20">
           <div className="dot-bg absolute inset-0 opacity-40" />
           <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
             <div className="fl1 absolute left-1/2 top-0 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-cyan-500/7 blur-[140px]" />

@@ -10,8 +10,10 @@ import {
   getGlobalUpcomingLaunches,
   getGlobalPreviousLaunches,
 } from "../api/space";
+import { MdRocketLaunch, MdEvent } from "react-icons/md";
+import { GiRocketFlight, GiAsteroid } from "react-icons/gi";
+import { FaUserAstronaut, FaImages, FaNewspaper } from "react-icons/fa";
 
-/* ── helpers ───────────────────────────────────────────────── */
 const fmt = (v, extra = {}) =>
   v
     ? new Intl.DateTimeFormat("en-IN", {
@@ -38,25 +40,14 @@ const neos = (p) => {
 };
 
 const quickLinks = [
-  {
-    label: "Launches",
-    to: "/launches",
-    icon: "🚀",
-    copy: "Track active missions",
-  },
-  {
-    label: "Rockets",
-    to: "/rockets",
-    icon: "🛸",
-    copy: "Explore rocket specs",
-  },
-  { label: "Crew", to: "/crew", icon: "👨‍🚀", copy: "Meet people in orbit" },
-  { label: "Gallery", to: "/gallery", icon: "🌌", copy: "Browse NASA visuals" },
-  { label: "News", to: "/news", icon: "📡", copy: "Space headlines today" },
-  { label: "Events", to: "/events", icon: "🛰️", copy: "Cosmic events feed" },
+  { Icon: MdRocketLaunch, label: "Launches",  to: "/launches",  color: "from-cyan-500/15 to-blue-700/5",    border: "border-cyan-400/15",   text: "text-cyan-300" },
+  { Icon: GiRocketFlight, label: "Rockets",   to: "/rockets",   color: "from-emerald-500/15 to-green-700/5",border: "border-emerald-400/15",text: "text-emerald-300" },
+  { Icon: FaUserAstronaut,label: "Crew",      to: "/crew",      color: "from-violet-500/15 to-purple-700/5",border: "border-violet-400/15", text: "text-violet-300" },
+  { Icon: FaImages,       label: "Gallery",   to: "/gallery",   color: "from-rose-500/15 to-red-700/5",     border: "border-rose-400/15",   text: "text-rose-300" },
+  { Icon: FaNewspaper,    label: "News",      to: "/news",      color: "from-yellow-500/15 to-lime-700/5",  border: "border-yellow-400/15", text: "text-yellow-300" },
+  { Icon: MdEvent,        label: "Events",    to: "/events",    color: "from-sky-500/15 to-indigo-700/5",   border: "border-sky-400/15",    text: "text-sky-300" },
 ];
 
-/* ── reusable card shell ───────────────────────────────────── */
 const Card = ({ children, className = "", style = {} }) => (
   <div
     style={style}
@@ -91,7 +82,6 @@ const SectionHead = ({ label, title, to, linkLabel = "See all" }) => (
   </div>
 );
 
-/* ── loading skeleton ──────────────────────────────────────── */
 const Skeleton = ({ h = "h-20" }) => (
   <div className={`${h} rounded-2xl bg-white/4 animate-pulse`} />
 );
@@ -157,22 +147,21 @@ const Dashboard = () => {
   const apodText = snap.apod?.explanation || "";
   const apodLong = apodText.length > 200;
 
-  /* ── right sidebar ─────────────────────────────────────────── */
   const renderSidebar = () => (
     <div className="space-y-5">
       {/* Pilot */}
-      <Card className="bg-gradient-to-b from-cyan-400/10 to-transparent p-5">
+      <Card className="bg-gradient-to-b from-white/10 to-transparent p-5">
         <Label>Pilot profile</Label>
         <div className="mt-3 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-cyan-300/15 border border-cyan-300/20 text-cyan-200 text-lg font-semibold select-none">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 border border-white/20 text-zinc-200 text-lg font-semibold select-none">
             {name[0].toUpperCase()}
           </div>
           <div>
             <p className="text-sm font-semibold text-white">{name}</p>
             <p className="text-[11px] text-zinc-500 mt-0.5">Mission ready</p>
           </div>
-          <span className="ml-auto flex items-center gap-1.5 text-[10px] uppercase tracking-[0.2em] text-cyan-300">
-            <span className="h-1.5 w-1.5 rounded-full bg-cyan-300 shadow-[0_0_8px_rgba(103,232,249,0.9)]" />
+          <span className="ml-auto flex items-center gap-1.5 text-[10px] uppercase tracking-[0.2em] text-zinc-300">
+            <span className="h-1.5 w-1.5 rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.9)]" />
             Online
           </span>
         </div>
@@ -205,7 +194,7 @@ const Dashboard = () => {
               <Link
                 key={e._id}
                 to={`/journal/${e._id}`}
-                className="block rounded-xl border border-white/8 bg-black/20 p-3.5 hover:border-cyan-300/20 hover:bg-white/5 transition-colors"
+                className="block rounded-xl border border-white/8 bg-black/20 p-3.5 hover:border-white/20 hover:bg-white/5 transition-colors"
               >
                 <div className="flex items-center justify-between gap-2">
                   <p className="text-sm font-medium text-white leading-tight">
@@ -246,6 +235,32 @@ const Dashboard = () => {
           </Link>
         </div>
       </Card>
+
+      {/* QUICK NAV */}
+      <Card className="dash-animate bg-zinc-950/70 p-5">
+        <SectionHead
+          label="Jump points"
+          title="Explore"
+          to="/explore"
+          linkLabel="See all"
+        />
+        <div className="grid gap-3 grid-cols-2">
+          {quickLinks.map((s) => (
+            <Link
+              key={s.to}
+              to={s.to}
+              className={`rv group flex flex-col items-center justify-center gap-3 rounded-2xl border bg-gradient-to-br p-4 transition-all duration-300 hover:-translate-y-0.5 aspect-square ${s.color} ${s.border}`}
+            >
+              <span className={`flex size-9 items-center justify-center rounded-xl border bg-black/20 ${s.border} ${s.text}`}>
+                <s.Icon size={14} />
+              </span>
+              <div className="text-center">
+                <p className="text-xs font-medium text-white">{s.label}</p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </Card>
     </div>
   );
 
@@ -271,27 +286,26 @@ const Dashboard = () => {
       <main className="relative min-h-screen overflow-x-hidden px-5 pb-16 pt-8 md:px-10 lg:px-14 xl:px-20">
         {/* nebula bg */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="cosmos-nebula absolute -left-20 top-10 h-96 w-96 rounded-full bg-cyan-500/10 blur-3xl" />
+          <div className="cosmos-nebula absolute -left-20 top-10 h-96 w-96 rounded-full bg-white/10 blur-3xl" />
           <div className="cosmos-drift absolute -right-20 top-32 h-[28rem] w-[28rem] rounded-full bg-zinc-600/8 blur-3xl" />
           <div className="absolute bottom-20 left-1/3 h-72 w-72 rounded-full bg-zinc-700/5 blur-3xl" />
         </div>
 
         <div className="relative mx-auto grid max-w-7xl gap-6 xl:grid-cols-[1fr_340px]">
-          {/* ── MAIN COLUMN ─────────────────────────────────────── */}
           <div className="space-y-6">
             {/* HERO */}
             <Card className="dash-animate overflow-hidden bg-gradient-to-br from-[#0d1b3e] via-[#0a1228] to-[#060a18] p-7 sm:p-9">
               <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-300/30 to-transparent" />
               <div className="flex flex-col gap-7 sm:flex-row sm:items-end sm:justify-between">
                 <div className="space-y-3">
-                  <span className="inline-flex items-center gap-2 rounded-full border border-cyan-300/20 bg-cyan-300/8 px-3.5 py-1.5 text-[10px] uppercase tracking-[0.28em] text-cyan-200">
-                    <span className="h-1.5 w-1.5 rounded-full bg-cyan-300 shadow-[0_0_8px_rgba(103,232,249,1)]" />
+                  <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/8 px-3.5 py-1.5 text-[10px] uppercase tracking-[0.28em] text-zinc-200">
+                    <span className="h-1.5 w-1.5 rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,1)]" />
                     Personal Mission Control
                   </span>
                   <h1 className="text-4xl font-light tracking-[-0.06em] text-white sm:text-5xl">
                     Welcome back,
                     <br />
-                    <span className="font-semibold bg-gradient-to-r from-white to-cyan-200 bg-clip-text text-transparent">
+                    <span className="font-semibold bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">
                       {name}
                     </span>
                   </h1>
@@ -328,7 +342,7 @@ const Dashboard = () => {
                   {
                     label: "Headlines live",
                     value: snap.news.length,
-                    color: "text-cyan-300",
+                    color: "text-zinc-300",
                   },
                   {
                     label: "NEOs tracked",
@@ -425,7 +439,7 @@ const Dashboard = () => {
                   {apodLong && (
                     <button
                       onClick={() => setApodExpanded((x) => !x)}
-                      className="text-xs font-medium text-cyan-300 hover:text-white transition-colors"
+                      className="text-xs font-medium text-zinc-300 hover:text-white transition-colors"
                     >
                       {apodExpanded ? "Show less ↑" : "Read more ↓"}
                     </button>
@@ -471,10 +485,10 @@ const Dashboard = () => {
                 </div>
 
                 {/* Next */}
-                <div className="rounded-2xl border border-cyan-300/15 bg-cyan-300/6 p-4 space-y-2">
+                <div className="rounded-2xl border border-white/10 bg-white/6 p-4 space-y-2">
                   <div className="flex items-center gap-2">
                     <Label>Next launch</Label>
-                    <span className="h-1.5 w-1.5 rounded-full bg-cyan-300 shadow-[0_0_8px_rgba(103,232,249,0.9)]" />
+                    <span className="h-1.5 w-1.5 rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.9)]" />
                   </div>
                   {loading ? (
                     <Skeleton h="h-14" />
@@ -483,7 +497,7 @@ const Dashboard = () => {
                       <p className="text-base font-semibold text-white">
                         {snap.nextLaunch?.name || "Watching for window…"}
                       </p>
-                      <p className="text-xs text-cyan-300/80">
+                      <p className="text-xs text-zinc-300/80">
                         {fmt(snap.nextLaunch?.net, {
                           hour: "numeric",
                           minute: "2-digit",
@@ -535,7 +549,7 @@ const Dashboard = () => {
                           href={s.url}
                           target="_blank"
                           rel="noreferrer"
-                          className="text-[11px] font-medium text-cyan-300 hover:text-white transition-colors"
+                          className="text-[11px] font-medium text-zinc-300 hover:text-white transition-colors"
                         >
                           Read source ↗
                         </a>
@@ -604,38 +618,8 @@ const Dashboard = () => {
               </Card>
             </div>
 
-            {/* QUICK NAV */}
-            <Card className="dash-animate bg-zinc-950/70 p-5">
-              <SectionHead
-                label="Jump points"
-                title="Explore Cosmovoid"
-                to="/explore"
-                linkLabel="Explore all"
-              />
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {quickLinks.map((q) => (
-                  <Link
-                    key={q.to}
-                    to={q.to}
-                    className="ql-card group rounded-2xl border border-white/8 bg-black/20 p-4 hover:border-cyan-300/20 hover:bg-white/5"
-                  >
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className="text-xl">{q.icon}</span>
-                      <p className="text-sm font-semibold text-white">
-                        {q.label}
-                      </p>
-                    </div>
-                    <p className="text-xs text-zinc-500 leading-5">{q.copy}</p>
-                    <p className="mt-2 text-[11px] font-medium text-cyan-300 group-hover:text-white transition-colors">
-                      Open →
-                    </p>
-                  </Link>
-                ))}
-              </div>
-            </Card>
           </div>
 
-          {/* ── SIDEBAR ─────────────────────────────────────────── */}
           <aside className="hidden xl:block">
             <div className="sticky top-24">
               {renderSidebar()}

@@ -2,23 +2,23 @@
 
 <br/>
 
-#  COSMOVOID
+# COSMOVOID
 
 **Your private observatory for everything beyond Earth.**
 
 <br/>
 
-[![Node](https://img.shields.io/badge/Node.js-18+-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org)
-[![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev)
-[![MongoDB](https://img.shields.io/badge/MongoDB-Mongoose_9-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://mongodb.com)
-[![Express](https://img.shields.io/badge/Express-5-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com)
-[![Vite](https://img.shields.io/badge/Vite-8-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev)
+[![Node](https://img.shields.io/badge/Node.js_18+-000000?style=for-the-badge&logo=nodedotjs&logoColor=339933)](https://nodejs.org)
+[![React](https://img.shields.io/badge/React_19-000000?style=for-the-badge&logo=react&logoColor=61DAFB)](https://react.dev)
+[![MongoDB](https://img.shields.io/badge/MongoDB-000000?style=for-the-badge&logo=mongodb&logoColor=47A248)](https://mongoosejs.com)
+[![Express](https://img.shields.io/badge/Express_5-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com)
+[![Vite](https://img.shields.io/badge/Vite_8-000000?style=for-the-badge&logo=vite&logoColor=646CFF)](https://vitejs.dev)
 
 <br/>
 
-> *Space is vast. Information about it shouldn't be.*
+> _Space is vast. Information about it shouldn't be._
 > Cosmovoid pulls live launches, NASA imagery, asteroid alerts,
-> space news, and your personal mission log into one dark, focused interface.
+> space news, and your personal mission log into one focused interface.
 
 <br/>
 
@@ -28,52 +28,110 @@
 
 <br/>
 
+## ❓ Why Cosmovoid?
+
+<br/>
+
+Space exploration data is notoriously fragmented. To stay updated, enthusiasts often juggle multiple platforms: one for launch schedules, another for NASA's daily images, a separate application for near-Earth object tracking, and disparate news aggregators for space-related updates.
+
+**Cosmovoid** was built to solve this fragmentation by providing a unified, centralized command center for space enthusiasts, educators, and the casually curious.
+
+By aggregating high-quality data from multiple reliable sources (like NASA, Spaceflight News, and the Launch Library), Cosmovoid offers a seamless, distraction-free environment. It strips away the noise, focusing purely on what matters: the cosmos. The application isn't just a dashboard; it's designed to be a personal observatory, complete with an auth-gated mission journal where users can log their celestial observations in a secure, private space.
+
+<br/>
+
+---
+
+<br/>
+
+## 📸 Interface & Visuals
+
+<br/>
+
+<div align="center">
+  <table style="width:100%">
+    <tr>
+      <td align="center" width="50%">
+        <b>Home / Landing Page</b><br/>
+        <img src="./assets/home_page.png" alt="Home Page" width="100%"/>
+      </td>
+      <td align="center" width="50%">
+        <b>Mission Control Dashboard</b><br/>
+        <img src="./assets/dashboard.png" alt="Mission Control Dashboard" width="100%"/>
+      </td>
+    </tr>
+    <tr>
+      <td align="center" width="50%">
+        <b>NASA Deep Space Images</b><br/>
+        <img src="./assets/gallary.gif" alt="NASA Deep Space Images" width="100%"/>
+      </td>
+      <td align="center" width="50%">
+        <b>Asteroid Watch & NeoWs</b><br/>
+        <img src="./assets/asteroid.png" alt="Asteroid Watch" width="100%"/>
+      </td>
+    </tr>
+    <tr>
+      <td align="center" width="50%">
+        <b>Rocket & Launch Library</b><br/>
+        <img src="./assets/rockets.png" alt="Rocket Library" width="100%"/>
+      </td>
+      <td align="center" width="50%">
+        <b>Personal Mission Journal</b><br/>
+        <img src="./assets/journal.png" alt="Mission Journal" width="100%"/>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<br/>
+
+---
+
+<br/>
+
 ## ✦ Features
 
 <br/>
 
-<table>
-  <tr>
-    <td width="50%">
-      <h3>🚀 Launch Tracking</h3>
-      <p>Upcoming &amp; past launches from every major agency — SpaceX, NASA, ESA, Roscosmos, ISRO — with full mission detail pages.</p>
-    </td>
-    <td width="50%">
-      <h3>🌌 NASA APOD</h3>
-      <p>Today's Astronomy Picture of the Day, delivered fresh every 24 hours. Galaxies, nebulae, solar flares — whatever the universe served up.</p>
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <h3>☄️ Asteroid Watch</h3>
-      <p>Near-Earth objects making close approaches today, with size, miss distance, and hazard status.</p>
-    </td>
-    <td>
-      <h3>📡 Space News</h3>
-      <p>Headlines from across the industry, aggregated and linked back to primary sources.</p>
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <h3>👨‍🚀 Crew Explorer</h3>
-      <p>Active astronauts ranked by time in space, with detailed bios and mission histories.</p>
-    </td>
-    <td>
-      <h3>🛸 Rocket Library</h3>
-      <p>Rocket configurations from multiple agencies with full specs and mission context.</p>
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <h3>🗒️ Mission Journal</h3>
-      <p>Private, auth-gated journal for logging observations — mood tags, custom labels, full edit/delete support.</p>
-    </td>
-    <td>
-      <h3>🖥️ Mission Control</h3>
-      <p>Your personalized command deck. All live feeds, one screen.</p>
-    </td>
-  </tr>
-</table>
+### 🚀 Launch Tracking
+
+Track upcoming and past orbital launches from every major space agency (SpaceX, NASA, ESA, Roscosmos, ISRO). View detailed mission profiles, rocket specifications, payloads, and launch pad data.
+
+### 🌌 NASA APOD & Deep Space Image Library
+
+Start your day with the **Astronomy Picture of the Day**, delivered fresh every 24 hours. Dive deeper into the cosmos by actively searching the vast NASA Image Library for high-resolution photos of galaxies, nebulae, and historical spaceflights.
+
+### ☄️ Asteroid Watch
+
+Monitor near-Earth objects (NEOs) making close approaches to Earth today. Get real-time metrics including estimated diameter, relative velocity, exact miss distance, and potential hazard classifications.
+
+### 📡 Space News
+
+Stay updated with the latest headlines and breakthroughs from across the space industry. News is aggregated in real-time and linked directly back to primary sources and publications.
+
+### 👨‍🚀 Crew Explorer
+
+Discover the humans exploring the cosmos. View active and historical astronauts ranked by their time in space, complete with detailed biographies, associated agencies, and full mission histories.
+
+### 🛸 Rocket Library
+
+Explore a comprehensive database of rocket configurations from multiple agencies. View intricate hardware specs, thrust capabilities, orbital capacities, and historical success rates.
+
+### 🗒️ Mission Journal
+
+A private, auth-gated space journal for logging your personal observations. Tag your entries with mood indicators, organize them with custom labels, and maintain a secure digital log of the night sky.
+
+### 🖥️ Mission Control
+
+Your personalized, dark-themed command deck. Get a bird's-eye view of all live feeds, recent news, upcoming events, and quick jump-points across the app—all on a single screen.
+
+### 📅 Cosmic Events Tracker
+
+Never miss a meteor shower again. A curated, interactive calendar of upcoming astronomical phenomena, including eclipses, planetary oppositions, solstices, and meteor showers.
+
+### 🔐 Robust Account Security
+
+Your data is locked down. The platform features fully secure JWT-based accounts with `HttpOnly` cookie storage, OTP-based password resets, safe profile management, and strict API rate-limiting to prevent abuse.
 
 <br/>
 
@@ -82,6 +140,29 @@
 <br/>
 
 ## ⚙️ Architecture
+
+<br/>
+
+```mermaid
+graph TD
+    Client["Client Browser<br/>React 19, Vite, Tailwind"] -->|"HTTPS"| API_Gateway["Node.js + Express Backend"]
+
+    subgraph "Backend Layer"
+        API_Gateway --> Auth["Auth Services<br/>JWT, OTP"]
+        API_Gateway --> Space["Space Services<br/>Data Aggregation"]
+        API_Gateway --> Journal["Journal Services<br/>Private Logs"]
+    end
+
+    Auth -->|"Read/Write"| DB[("MongoDB")]
+    Journal -->|"Read/Write"| DB
+
+    subgraph "Data & Caching Layer"
+        Space -->|"Cache Miss"| ExternalAPIs["External APIs<br/>NASA, Launch Library, News"]
+        ExternalAPIs --> SWR_Cache["Stale-While-Revalidate<br/>Cache Manager"]
+        SWR_Cache -->|"Persist"| DB
+        Space -->|"Cache Hit"| DB
+    end
+```
 
 <br/>
 
@@ -131,14 +212,14 @@ Sessions are signed tokens stored in `HttpOnly` cookies, keeping them out of Jav
 
 <br/>
 
-| Layer | Technologies |
-|:---|:---|
+| Layer        | Technologies                                                      |
+| :----------- | :---------------------------------------------------------------- |
 | **Frontend** | React 19 · React Router 7 · Tailwind CSS 4 · Framer Motion · Vite |
-| **Backend** | Node.js · Express 5 |
-| **Database** | MongoDB · Mongoose 9 |
-| **Auth** | JWT · bcryptjs · HttpOnly Cookies |
-| **Security** | Helmet · CORS · express-rate-limit · express-validator |
-| **APIs** | Launch Library 2 · NASA APOD · NASA NeoWs · Spaceflight News |
+| **Backend**  | Node.js · Express 5                                               |
+| **Database** | MongoDB · Mongoose 9                                              |
+| **Auth**     | JWT · bcryptjs · HttpOnly Cookies                                 |
+| **Security** | Helmet · CORS · express-rate-limit · express-validator            |
+| **APIs**     | Launch Library 2 · NASA APOD · NASA NeoWs · Spaceflight News      |
 
 <br/>
 
@@ -178,49 +259,60 @@ cosmovoid/
 
 <br/>
 
-## 🚦 Getting Started
+## 🚀 Getting Started
 
 <br/>
 
-**Prerequisites**
-- Node.js ≥ 18
-- MongoDB running locally, or an Atlas connection string
-- A free [NASA API key](https://api.nasa.gov/) *(optional — falls back to `DEMO_KEY`)*
+### Prerequisites
 
-<br/>
+- **Node.js** (v18 or higher)
+- **MongoDB** (Local instance or MongoDB Atlas cluster)
 
-**1 · Clone & enter**
+### 1. Clone the Repository
+
 ```bash
-git clone <repo-url>
+git clone https://github.com/your-username/cosmovoid.git
 cd cosmovoid
 ```
 
-**2 · Configure the backend**
+### 2. Install Dependencies
+
+You need to install dependencies for both the frontend and backend.
+
+```bash
+# Install backend dependencies
+cd backend
+npm install
+
+# Install frontend dependencies
+cd ../frontend
+npm install
+```
+
+### 3. Environment Variables
+
+Create a `.env` file in the `backend` directory based on the `.env.example`.
+Check the **Environment Variables** section below for the required fields.
+
+### 4. Start the Application
+
+Run both servers simultaneously.
+
+**Backend Server:**
+
 ```bash
 cd backend
-cp .env.example .env
+npm start
+# Server runs on http://localhost:5500 by default
 ```
 
-```env
-PORT            = 5000
-FRONTEND_PORT   = 5173
-MONGO_URI       = mongodb://127.0.0.1:27017/cosmovoid
-JWT_SECRET      = replace-with-something-strong
-NASA_API_KEY    = your-key-here
-```
+**Frontend Dev Server:**
 
-**3 · Start the backend**
 ```bash
-npm install && npm start
+cd frontend
+npm run dev
+# Frontend runs on http://localhost:5173 by default
 ```
-
-**4 · Start the frontend**
-```bash
-cd ../frontend
-npm install && npm run dev
-```
-
-Open `http://localhost:5173` — you're in orbit. 🛰️
 
 <br/>
 
@@ -236,12 +328,18 @@ Open `http://localhost:5173` — you're in orbit. 🛰️
 <summary><b>Auth &nbsp;—&nbsp; <code>/api/auth</code></b></summary>
 <br/>
 
-| Method | Endpoint | Description |
-|:---:|:---|:---|
-| `POST` | `/signup` | Create an account |
-| `POST` | `/login` | Log in *(rate-limited)* |
-| `POST` | `/logout` | Clear session cookie |
-| `GET` | `/me` | Get the current user |
+|  Method  | Endpoint           | Description                                     |
+| :------: | :----------------- | :---------------------------------------------- |
+|  `POST`  | `/signup`          | Create an account                               |
+|  `POST`  | `/login`           | Log in _(rate-limited)_                         |
+|  `POST`  | `/logout`          | Clear session cookie                            |
+|  `GET`   | `/me`              | Get the current user                            |
+|  `POST`  | `/send-otp`        | Send an OTP for password reset _(rate-limited)_ |
+|  `POST`  | `/verify-otp`      | Verify the password reset OTP                   |
+|  `POST`  | `/forgot-password` | Send a password reset link                      |
+|  `POST`  | `/reset-password`  | Reset the user's password                       |
+| `PATCH`  | `/profile`         | Update the user's profile                       |
+| `DELETE` | `/account`         | Delete the user's account                       |
 
 <br/>
 </details>
@@ -250,18 +348,25 @@ Open `http://localhost:5173` — you're in orbit. 🛰️
 <summary><b>Space &nbsp;—&nbsp; <code>/api/space</code></b></summary>
 <br/>
 
-| Method | Endpoint | Description |
-|:---:|:---|:---|
-| `GET` | `/apod` | Today's NASA APOD |
-| `GET` | `/asteroids` | Near-Earth objects |
-| `GET` | `/launches/upcoming` | Upcoming global launches |
-| `GET` | `/launches/previous` | Past global launches |
-| `GET` | `/launches/:id` | Launch detail |
-| `GET` | `/astronauts` | Astronaut list |
-| `GET` | `/astronauts/:id` | Astronaut detail |
-| `GET` | `/news` | Space news feed |
-| `GET` | `/rockets` | Rocket list |
-| `GET` | `/rockets/:id` | Rocket detail |
+| Method | Endpoint                    | Description               |
+| :----: | :-------------------------- | :------------------------ |
+| `GET`  | `/apod`                     | Today's NASA APOD         |
+| `GET`  | `/asteroids`                | Near-Earth objects        |
+| `GET`  | `/global/launches/upcoming` | Upcoming global launches  |
+| `GET`  | `/global/launches/previous` | Past global launches      |
+| `GET`  | `/global/launches/:id`      | Launch detail             |
+| `GET`  | `/astronauts`               | Astronaut list            |
+| `GET`  | `/astronauts/:id`           | Astronaut detail          |
+| `GET`  | `/crew`                     | Active crew members       |
+| `GET`  | `/crew/:id`                 | Crew detail               |
+| `GET`  | `/news`                     | Space news feed           |
+| `GET`  | `/rockets`                  | Rocket list               |
+| `GET`  | `/rockets/:id`              | Rocket detail             |
+| `GET`  | `/events/earth`             | NASA EONET events         |
+| `GET`  | `/events/astronomy`         | External astronomy events |
+| `GET`  | `/events/sky`               | Local curated sky events  |
+| `GET`  | `/astronomy/token`          | Get astronomy API token   |
+| `GET`  | `/media/search`             | Search NASA Image Library |
 
 <br/>
 </details>
@@ -270,13 +375,13 @@ Open `http://localhost:5173` — you're in orbit. 🛰️
 <summary><b>Journal &nbsp;—&nbsp; <code>/api/journal</code> &nbsp;🔒 auth required</b></summary>
 <br/>
 
-| Method | Endpoint | Description |
-|:---:|:---|:---|
-| `GET` | `/` | All entries for current user |
-| `POST` | `/` | Create a new entry |
-| `GET` | `/:id` | Single entry |
-| `PUT` | `/:id` | Edit an entry |
-| `DELETE` | `/:id` | Delete an entry |
+|  Method  | Endpoint | Description                  |
+| :------: | :------- | :--------------------------- |
+|  `GET`   | `/`      | All entries for current user |
+|  `POST`  | `/`      | Create a new entry           |
+|  `GET`   | `/:id`   | Single entry                 |
+|  `PUT`   | `/:id`   | Edit an entry                |
+| `DELETE` | `/:id`   | Delete an entry              |
 
 <br/>
 </details>
@@ -291,13 +396,17 @@ Open `http://localhost:5173` — you're in orbit. 🛰️
 
 <br/>
 
-| Variable | Required | Notes |
-|:---|:---:|:---|
-| `PORT` | ✅ | Backend port — default `5000` |
-| `FRONTEND_PORT` | ✅ | Vite dev port, used to configure CORS |
-| `MONGO_URI` | ✅ | MongoDB connection string |
-| `JWT_SECRET` | ✅ | Should be long and randomly generated |
-| `NASA_API_KEY` | ➖ | Falls back to `DEMO_KEY` if omitted |
+| Variable               | Required | Notes                                 |
+| :--------------------- | :------: | :------------------------------------ |
+| `PORT`                 |    ✅    | Backend port — default `5500`         |
+| `MONGO_URI`            |    ✅    | MongoDB connection string             |
+| `JWT_SECRET`           |    ✅    | Should be long and randomly generated |
+| `NASA_API_KEY`         |    ➖    | Falls back to `DEMO_KEY` if omitted   |
+| `FRONTEND_URL`         |    ✅    | Vite dev port, used to configure CORS |
+| `EMAIL_USER`           |    ➖    | SMTP user for sending OTPs            |
+| `EMAIL_PASS`           |    ➖    | SMTP pass for sending OTPs            |
+| `ASTRONOMY_API_ID`     |    ➖    | Astronomy API credentials             |
+| `ASTRONOMY_API_SECRET` |    ➖    | Astronomy API credentials             |
 
 <br/>
 
@@ -309,15 +418,15 @@ Open `http://localhost:5173` — you're in orbit. 🛰️
 
 <br/>
 
-| Status | Feature | Description |
-|:---:|:---|:---|
-| ⬜ | **Live Launch Countdown** | Real-time countdown timer on launch pages |
-| ⬜ | **APOD Gallery Archive** | Browse past APOD entries by date or keyword |
-| ⬜ | **Earth Events Map** | NASA EONET — wildfires, storms, volcanic activity |
-| ⬜ | **ISS Live Tracker** | Real-time ISS position on a world map |
-| ⬜ | **Notification System** | Alerts for bookmarked upcoming launches |
-| ⬜ | **Dark/Light Theme Toggle** | User-selectable theme, persisted to account |
-| ⬜ | **Journal Export** | Download entries as PDF or markdown |
+| Status | Feature                     | Description                                       |
+| :----: | :-------------------------- | :------------------------------------------------ |
+|   ⬜   | **Live Launch Countdown**   | Real-time countdown timer on launch pages         |
+|   ⬜   | **APOD Gallery Archive**    | Browse past APOD entries by date or keyword       |
+|   ⬜   | **Earth Events Map**        | NASA EONET — wildfires, storms, volcanic activity |
+|   ⬜   | **ISS Live Tracker**        | Real-time ISS position on a world map             |
+|   ⬜   | **Notification System**     | Alerts for bookmarked upcoming launches           |
+|   ⬜   | **Dark/Light Theme Toggle** | User-selectable theme, persisted to account       |
+|   ⬜   | **Journal Export**          | Download entries as PDF or markdown               |
 
 <br/>
 
@@ -327,6 +436,6 @@ Open `http://localhost:5173` — you're in orbit. 🛰️
 
 <div align="center">
 
-*Built in the dark. Pointed at the stars.*
+_Built in the dark. Pointed at the stars._
 
 </div>

@@ -118,7 +118,7 @@ const JournalCreate = () => {
                   className="w-full rounded-2xl border border-white/12 bg-black/20 px-4 py-3 text-sm text-white outline-none transition-colors focus:border-cyan-300/40"
                 >
                   {moodOptions.map((mood) => (
-                    <option key={mood} value={mood}>
+                    <option key={mood} value={mood} className="bg-zinc-900 text-white">
                       {mood}
                     </option>
                   ))}

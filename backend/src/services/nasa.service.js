@@ -42,15 +42,15 @@ exports.getAsteroids = () => {
   });
 };
 
-exports.searchNasaMedia = (query, mediaType = "image") =>
+exports.searchNasaMedia = (query, mediaType = "image", page = 1) =>
   getOrRefresh({
-    key: `nasa-media:${query}:${mediaType}`,
+    key: `nasa-media:${query}:${mediaType}:page${page}`,
     source: "nasa-images",
     ttlMs: DAY,
     staleMs: 30 * DAY,
     fetcher: async () => {
       const response = await axios.get("https://images-api.nasa.gov/search", {
-        params: { q: query, media_type: mediaType },
+        params: { q: query, media_type: mediaType, page },
       });
       return response.data;
     },

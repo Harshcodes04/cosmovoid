@@ -17,12 +17,16 @@ const loginLimiter = rateLimit({ windowMs: 10 * 60 * 1000, max: 20 });
 app.set("trust proxy", 1);
 
 app.use(compression());
+const allowedOrigins = process.env.FRONTEND_URL 
+  ? process.env.FRONTEND_URL.split(',').map(url => url.trim())
+  : [
+      'http://localhost:5173',                 // local dev
+      'https://cosmovoid.vercel.app',          // vercel default
+      'https://cosmovoid.is-a.dev',            // custom domain
+    ];
+
 app.use(cors({
-  origin: [
-    'http://localhost:5173',                 // local dev
-    'https://cosmovoid.vercel.app',          // vercel default
-    'https://cosmovoid.is-a.dev',            // custom domain
-  ],
+  origin: allowedOrigins,
   credentials: true,
 }));
 app.use(helmet());

@@ -38,6 +38,12 @@ app.use("/api/auth", authRouter);
 app.use("/api/space", spaceRouter);
 app.use("/api/journal", journalRouter);
 app.post("/api/contact", contactController.sendContact);
+
+// Health check endpoint for UptimeRobot
+app.get("/", (req, res) => {
+  res.status(200).send("Cosmovoid API is alive and kicking!");
+});
+
 app.use((err, req, res, next) => {
   const status = err.status || 500;
   const message = err.message || "Internal Server Error";

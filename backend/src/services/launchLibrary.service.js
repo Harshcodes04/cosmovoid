@@ -1,92 +1,162 @@
 const axios = require("axios");
-const cache = require("../utils/cache");
-const ll2 = axios.create({
-  // Dev: lldev.thespacedevs.com (higher rate limits for development)
-  // Prod: ll.thespacedevs.com
-  baseURL: process.env.NODE_ENV === "production"
-    ? "https://ll.thespacedevs.com/2.2.0"
-    : "https://lldev.thespacedevs.com/2.2.0",
-  timeout: 15000,
+const {
+  findCachedListItem,
+  getOrRefresh,
+} = require("../utils/staleCache");
+
+const MINUTE = 60 * 1000;
+const HOUR = 60 * MINUTE;
+const DAY = 24 * HOUR;
+
+const launchLibraryAPI = axios.create({
+  baseURL: "https://ll.thespacedevs.com/2.3.0",
+  timeout: 10000,
+  headers: {
+    "User-Agent": "Cosmovoid/1.0",
+  },
 });
 
-exports.getUpcomingGlobalLaunches = async (limit = 20) => {
-  const key = `ll2-upcoming-${limit}`;
-  const cached = await cache.get(key);    
-  if (cached) return cached;
+launchLibraryAPI.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status) {
+      error.status = error.response.status;
+    }
+    if (error.response?.data?.detail) {
+      error.message = error.response.data.detail;
+    }
+    throw error;
+  },
+);
+
+const clampLimit = (limit, fallback = 20) => {
+  const parsed = Number.parseInt(limit, 10);
+  if (!Number.isFinite(parsed)) return fallback;
+  return Math.min(Math.max(parsed, 1), 100);
+};
+
+const cacheKey = (scope, params = {}) =>
+  `${scope}:${JSON.stringify(Object.entries(params).sort())}`;
+
+const fetchWithCache = ({ key, ttlMs, staleMs, fetcher }) =>
+  getOrRefresh({
+    key,
+    source: "launch-library",
+    ttlMs,
+    staleMs,
+    fetcher,
+  });
+
+const fetchList = async (endpoint, params, keyScope, ttlMs, staleMs) => {
+  const key = cacheKey(keyScope, params);
+  return fetchWithCache({
+    key,
+    ttlMs,
+    staleMs,
+    fetcher: async () => {
+      const response = await launchLibraryAPI.get(endpoint, { params });
+      return response.data;
+    },
+  });
+};
+
+exports.getUpcomingLaunches = async (query = {}) => {
+  const params = {
+    ...query,
+    format: "json",
+    hide_recent_previous: query.hide_recent_previous ?? true,
+    limit: clampLimit(query.limit, 20),
+    ordering: query.ordering || "net",
+  };
+
+  return fetchList(
+    "/launches/upcoming/",
+    params,
+    "ll-upcoming-launches",
+    10 * MINUTE,
+    7 * DAY,
+  );
+};
+
+exports.getPreviousLaunches = async (query = {}) => {
+  const params = {
+    ...query,
+    format: "json",
+    limit: clampLimit(query.limit, 20),
+    ordering: query.ordering || "-net",
+  };
+
+  return fetchList(
+    "/launches/previous/",
+    params,
+    "ll-previous-launches",
+    6 * HOUR,
+    30 * DAY,
+  );
+};
+
+exports.getLaunchById = async (id) => {
+  const key = `ll-launch:${id}`;
   try {
-    const { data } = await ll2.get("/launch/upcoming/", {
-      params: { limit, ordering: "net", format: "json" },
+    return await fetchWithCache({
+      key,
+      ttlMs: 24 * HOUR,
+      staleMs: 90 * DAY,
+      fetcher: async () => {
+        const response = await launchLibraryAPI.get(`/launches/${id}/`, {
+          params: { format: "json" },
+        });
+        return response.data;
+      },
     });
-    cache.set(key, data, 30 * 60 * 1000); // 30 min
-    return data;
-  } catch (err) {
-    const stale = await cache.getStale(key);
-    if (stale) return stale;
-    throw new Error("Failed to fetch global upcoming launches: " + err.message);
+  } catch (error) {
+    const cachedLaunch =
+      (await findCachedListItem({ keyPrefix: "ll-upcoming-launches:", id })) ||
+      (await findCachedListItem({ keyPrefix: "ll-previous-launches:", id }));
+
+    if (cachedLaunch) return cachedLaunch;
+    throw error;
   }
 };
 
-exports.getPreviousGlobalLaunches = async (limit = 20) => {
-  const key = `ll2-previous-${limit}`;
-  const cached = await cache.get(key);
-  if (cached) return cached;
-  try {
-    const { data } = await ll2.get("/launch/previous/", {
-      params: { limit, ordering: "-net", format: "json" },
-    });
-    cache.set(key, data, 60 * 60 * 1000);
-    return data;
-  } catch (err) {
-    const stale = await cache.getStale(key);
-    if (stale) return stale;
-    throw new Error("Failed to fetch global previous launches: " + err.message);
-  }
-};
+exports.getAstronauts = async (query = {}) => {
+  const params = {
+    ...query,
+    format: "json",
+    limit: clampLimit(query.limit, 40),
+    ordering: query.ordering || "-time_in_space",
+  };
 
-exports.getGlobalLaunchById = async (id) => {
-  const key = `ll2-launch-${id}`;
-  const cached = await cache.get(key);
-  if (cached) return cached;
-  try {
-    const { data } = await ll2.get(`/launch/${id}/`, { params: { format: "json" } });
-    cache.set(key, data, 60 * 60 * 1000);
-    return data;
-  } catch (err) {
-    const stale = await cache.getStale(key);
-    if (stale) return stale;
-    throw new Error("Failed to fetch global launch: " + err.message);
-  }
-};
-
-exports.getAstronauts = async (limit = 25, filters = {}) => {
-  const paramStr = JSON.stringify({ limit, ...filters });
-  const key = `ll2-astronauts-${paramStr}`;
-  const cached = await cache.get(key);
-  if (cached) return cached;
-  try {
-    const { data } = await ll2.get("/astronaut/", {
-      params: { limit, ordering: "-last_flight", format: "json", ...filters },
-    });
-    cache.set(key, data, 60 * 60 * 1000);
-    return data;
-  } catch (err) {
-    const stale = await cache.getStale(key);
-    if (stale) return stale;
-    throw new Error("Failed to fetch astronauts: " + err.message);
-  }
+  return fetchList(
+    "/astronauts/",
+    params,
+    "ll-astronauts",
+    24 * HOUR,
+    30 * DAY,
+  );
 };
 
 exports.getAstronautById = async (id) => {
-  const key = `ll2-astronaut-${id}`;
-  const cached = await cache.get(key);
-  if (cached) return cached;
+  const key = `ll-astronaut:${id}`;
   try {
-    const { data } = await ll2.get(`/astronaut/${id}/`, { params: { format: "json" } });
-    cache.set(key, data, 24 * 60 * 60 * 1000);
-    return data;
-  } catch (err) {
-    const stale = await cache.getStale(key);
-    if (stale) return stale;
-    throw new Error("Failed to fetch astronaut: " + err.message);
+    return await fetchWithCache({
+      key,
+      ttlMs: 7 * DAY,
+      staleMs: 90 * DAY,
+      fetcher: async () => {
+        const response = await launchLibraryAPI.get(`/astronauts/${id}/`, {
+          params: { format: "json" },
+        });
+        return response.data;
+      },
+    });
+  } catch (error) {
+    const cachedAstronaut = await findCachedListItem({
+      keyPrefix: "ll-astronauts:",
+      id,
+    });
+
+    if (cachedAstronaut) return cachedAstronaut;
+    throw error;
   }
 };

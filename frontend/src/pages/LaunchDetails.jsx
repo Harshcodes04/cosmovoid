@@ -64,7 +64,6 @@ const getLaunchImage = (launch) => {
   return launch.image.image_url || launch.image.thumbnail_url || "";
 };
 
-/* ── Stat tile ────────────────────────────────────────────── */
 const Stat = ({ label, value, mono = false }) =>
   value ? (
     <div className="rounded-2xl border border-white/8 bg-white/3 p-4">
@@ -79,7 +78,6 @@ const Stat = ({ label, value, mono = false }) =>
     </div>
   ) : null;
 
-/* ── Section heading ──────────────────────────────────────── */
 const Section = ({ title, children }) => (
   <div>
     <h2 className="mb-4 text-[10px] uppercase tracking-[0.28em] text-zinc-600">
@@ -89,7 +87,6 @@ const Section = ({ title, children }) => (
   </div>
 );
 
-/* ── Skeleton ─────────────────────────────────────────────── */
 const Skeleton = () => (
   <div className="animate-pulse space-y-6">
     <div className="h-72 rounded-3xl bg-white/5 sm:h-96" />

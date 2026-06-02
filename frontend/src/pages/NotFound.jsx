@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-/* ─── Live starfield canvas ─────────────────────────────────── */
 function StarCanvas() {
   const canvasRef = useRef(null);
 
@@ -103,7 +102,6 @@ function StarCanvas() {
   );
 }
 
-/* ─── Floating lost spacecraft SVG ──────────────────────────── */
 function LostCraft() {
   return (
     <div
@@ -192,7 +190,6 @@ function LostCraft() {
   );
 }
 
-/* ─── Signal dots (SOS animation) ───────────────────────────── */
 function SignalDots() {
   return (
     <div style={{ display: "flex", gap: "8px", alignItems: "center", justifyContent: "center", marginBottom: "1.5rem" }}>
@@ -214,7 +211,6 @@ function SignalDots() {
   );
 }
 
-/* ─── Orbiting debris ring ───────────────────────────────────── */
 function OrbitRing() {
   return (
     <div
@@ -249,7 +245,6 @@ function OrbitRing() {
   );
 }
 
-/* ─── Counter-orbit ring ─────────────────────────────────────── */
 function OrbitRingOuter() {
   return (
     <div
@@ -283,7 +278,6 @@ function OrbitRingOuter() {
   );
 }
 
-/* ─── Main 404 page ──────────────────────────────────────────── */
 const NotFound = () => {
   const navigate = useNavigate();
   const [countdown, setCountdown] = useState(15);

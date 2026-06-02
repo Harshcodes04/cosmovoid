@@ -5,7 +5,6 @@ import {
   getGlobalPreviousLaunches,
 } from "../api/space";
 
-/* ─── Status config ──────────────────────────────────────── */
 const STATUS_MAP = {
   1: {
     label: "Go",
@@ -61,7 +60,6 @@ const AGENCIES = [
 ];
 const getStatus = (id) => STATUS_MAP[id] || STATUS_MAP[2];
 
-/* ─── Helpers ────────────────────────────────────────────── */
 const fmtDate = (iso) => {
   if (!iso) return "TBD";
   return new Date(iso).toLocaleDateString("en-IN", {
@@ -74,7 +72,6 @@ const fmtDate = (iso) => {
 };
 const trim = (s, n) => (s && s.length > n ? s.slice(0, n) + "…" : s || "—");
 
-/* ─── Skeleton ───────────────────────────────────────────── */
 const getLaunchImage = (launch) => {
   if (!launch?.image) return "";
   if (typeof launch.image === "string") return launch.image;
@@ -96,7 +93,6 @@ const Skeleton = () => (
   </div>
 );
 
-/* ─── Launch Card ────────────────────────────────────────── */
 const LaunchCard = ({ launch }) => {
   const [imgFailed, setImgFailed] = useState(false);
   const st = getStatus(launch.status?.id);
@@ -203,7 +199,6 @@ const LaunchCard = ({ launch }) => {
   );
 };
 
-/* ─── Main Page ──────────────────────────────────────────── */
 export default function Launches() {
   const [tab, setTab] = useState("upcoming");
   const [agency, setAgency] = useState("All");

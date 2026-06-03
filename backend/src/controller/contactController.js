@@ -1,13 +1,13 @@
 const asyncHandler = require("../utils/asyncHandler");
-const transporter  = require("../utils/mailer").transporter;
+const { sendMailViaBrevoAPI } = require("../utils/mailer");
 
 exports.sendContact = asyncHandler(async (req, res) => {
   const { name, email, subject, message } = req.body;
   if (!name || !email || !subject || !message)
     return res.status(400).json({ message: "All fields are required" });
 
-  await transporter.sendMail({
-    from: `"Cosmovoid Contact" <${process.env.SENDER_EMAIL || "space.cosmovoid@gmail.com"}>`,
+  await sendMailViaBrevoAPI({
+    fromName: "Cosmovoid Contact",
     to: process.env.SENDER_EMAIL || "space.cosmovoid@gmail.com",
     replyTo: email,
     subject: `[Contact] ${subject}`,

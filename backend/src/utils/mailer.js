@@ -1,20 +1,36 @@
-const nodemailer = require("nodemailer");
+const axios = require("axios");
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || "smtp-relay.brevo.com",
-  port: process.env.SMTP_PORT || 2525,
-  secure: Number(process.env.SMTP_PORT) === 465, // true for 465, false for other ports
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
+exports.sendMailViaBrevoAPI = async (options) => {
+  const payload = {
+    sender: { 
+      email: process.env.SENDER_EMAIL || "space.cosmovoid@gmail.com", 
+      name: options.fromName || "Cosmovoid" 
+    },
+    to: [{ email: options.to }],
+    subject: options.subject,
+    htmlContent: options.html,
+  };
+  
+  if (options.replyTo) {
+    payload.replyTo = { email: options.replyTo };
+  }
 
-exports.transporter = transporter; // shared with contactController
+  try {
+    await axios.post("https://api.brevo.com/v3/smtp/email", payload, {
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "api-key": process.env.BREVO_API_KEY || process.env.EMAIL_PASS // fallback just in case
+      }
+    });
+  } catch (err) {
+    console.error("Brevo API Error:", err.response?.data || err.message);
+    throw new Error("Failed to send email via Brevo API");
+  }
+};
 
 exports.sendOTPEmail = async (to, otp) => {
-  await transporter.sendMail({
-    from: `"Cosmovoid" <${process.env.SENDER_EMAIL || "space.cosmovoid@gmail.com"}>`,
+  await exports.sendMailViaBrevoAPI({
     to,
     subject: "Your Cosmovoid verification code",
     html: `
@@ -29,8 +45,7 @@ exports.sendOTPEmail = async (to, otp) => {
 };
 
 exports.sendPasswordResetEmail = async (to, otp) => {
-  await transporter.sendMail({
-    from: `"Cosmovoid" <${process.env.SENDER_EMAIL || "space.cosmovoid@gmail.com"}>`,
+  await exports.sendMailViaBrevoAPI({
     to,
     subject: "Reset your Cosmovoid password",
     html: `

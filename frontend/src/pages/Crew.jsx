@@ -148,6 +148,11 @@ export default function Crew() {
     loading: true,
     error: null,
   });
+  const [visibleCount, setVisibleCount] = useState(12);
+
+  useEffect(() => {
+    setVisibleCount(12);
+  }, [filter]);
 
   useEffect(() => {
     let live = true;
@@ -253,11 +258,23 @@ export default function Crew() {
               </p>
             </div>
           ) : (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {visibleAstronauts.map((a) => (
-                <AstronautCard key={a.id} astronaut={a} />
-              ))}
-            </div>
+            <>
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                {visibleAstronauts.slice(0, visibleCount).map((a) => (
+                  <AstronautCard key={a.id} astronaut={a} />
+                ))}
+              </div>
+              {visibleCount < visibleAstronauts.length && (
+                <div className="mt-10 flex justify-center">
+                  <button
+                    onClick={() => setVisibleCount((prev) => prev + 12)}
+                    className="rounded-full border border-white/10 bg-white/5 px-8 py-2.5 text-xs font-medium uppercase tracking-widest text-zinc-300 transition-all hover:bg-white/10 hover:text-white hover:border-white/20"
+                  >
+                    Load More
+                  </button>
+                </div>
+              )}
+            </>
           )}
 
           <p className="mt-10 text-center text-[10px] text-zinc-800">

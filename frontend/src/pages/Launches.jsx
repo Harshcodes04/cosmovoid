@@ -208,6 +208,11 @@ export default function Launches() {
     loading: true,
     error: null,
   });
+  const [visibleCount, setVisibleCount] = useState(9);
+
+  useEffect(() => {
+    setVisibleCount(9);
+  }, [tab, agency]);
 
   useEffect(() => {
     let live = true;
@@ -354,11 +359,23 @@ export default function Launches() {
               </p>
             </div>
           ) : (
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {filtered.map((l) => (
-                <LaunchCard key={l.id} launch={l} />
-              ))}
-            </div>
+            <>
+              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                {filtered.slice(0, visibleCount).map((l) => (
+                  <LaunchCard key={l.id} launch={l} />
+                ))}
+              </div>
+              {visibleCount < filtered.length && (
+                <div className="mt-10 flex justify-center">
+                  <button
+                    onClick={() => setVisibleCount((prev) => prev + 9)}
+                    className="rounded-full border border-white/10 bg-white/5 px-8 py-2.5 text-xs font-medium uppercase tracking-widest text-zinc-300 transition-all hover:bg-white/10 hover:text-white hover:border-white/20"
+                  >
+                    Load More
+                  </button>
+                </div>
+              )}
+            </>
           )}
 
           {/* attribution */}

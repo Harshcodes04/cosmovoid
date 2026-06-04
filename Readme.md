@@ -6,6 +6,8 @@
 
 **Your private observatory for everything beyond Earth.**
 
+**[🚀 Live Site: cosmovoid.dev](https://cosmovoid.dev)**
+
 <br/>
 
 [![Node](https://img.shields.io/badge/Node.js_18+-000000?style=for-the-badge&logo=nodedotjs&logoColor=339933)](https://nodejs.org)
@@ -427,6 +429,30 @@ npm run dev
 |   ⬜   | **Notification System**     | Alerts for bookmarked upcoming launches           |
 |   ⬜   | **Dark/Light Theme Toggle** | User-selectable theme, persisted to account       |
 |   ⬜   | **Journal Export**          | Download entries as PDF or markdown               |
+
+<br/>
+
+---
+
+<br/>
+
+## 🐛 Feedback & Issues
+
+<br/>
+
+Cosmovoid is actively maintained. If you spot any anomalies, bugs, or have ideas for new features, please don't hesitate to **[open an issue on GitHub](https://github.com/Harshcodes04/cosmovoid/issues)**. Your feedback is crucial for keeping the observatory running smoothly!
+
+<br/>
+
+---
+
+<br/>
+
+## 📜 License
+
+<br/>
+
+This project is licensed under the [MIT License](LICENSE).
 
 <br/>
 

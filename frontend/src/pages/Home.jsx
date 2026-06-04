@@ -67,7 +67,7 @@ function DashMockup({ globalUpcoming, news, asteroids, loading }) {
         <span className="h-2.5 w-2.5 rounded-full bg-red-500/60" />
         <span className="h-2.5 w-2.5 rounded-full bg-amber-500/60" />
         <span className="h-2.5 w-2.5 rounded-full bg-emerald-500/60" />
-        <span className="ml-3 text-[10px] uppercase tracking-[0.3em] text-zinc-600">Mission Control</span>
+        <span className="ml-3 hidden sm:inline-block text-[10px] uppercase tracking-[0.3em] text-zinc-600">Mission Control</span>
         <span className="ml-auto flex items-center gap-1.5 text-[9px] text-cyan-400 uppercase tracking-widest">
           <span className="gp h-1.5 w-1.5 rounded-full bg-cyan-400" />Live
         </span>
@@ -81,10 +81,10 @@ function DashMockup({ globalUpcoming, news, asteroids, loading }) {
         ) : next2.length ? next2.map((l) => (
           <div key={l.id} className="mb-2.5 rounded-xl border border-white/6 bg-white/3 px-3.5 py-2.5">
             <div className="flex items-start justify-between gap-2">
-              <p className="text-xs font-semibold text-white leading-snug">{trim(l.name, 30)}</p>
+              <p className="text-xs font-semibold text-white leading-snug flex-1 min-w-0 break-words">{trim(l.name, 30)}</p>
               <span className="shrink-0 font-mono text-[10px] text-cyan-300">{fmtDate(l.net)}</span>
             </div>
-            <p className="mt-0.5 text-[10px] text-zinc-600">
+            <p className="mt-0.5 text-[10px] text-zinc-600 truncate">
               {l.launch_service_provider?.abbrev || l.launch_service_provider?.name || "—"}
               {l.rocket?.configuration?.name ? ` · ${trim(l.rocket.configuration.name, 20)}` : ""}
             </p>
@@ -170,7 +170,8 @@ export default function Home() {
     let raf, stars = [];
     const init = () => {
       c.width = c.offsetWidth; c.height = c.offsetHeight;
-      stars = Array.from({length:220}, () => ({
+      const starCount = window.innerWidth < 768 ? 80 : 220;
+      stars = Array.from({length:starCount}, () => ({
         x: Math.random()*c.width, y: Math.random()*c.height,
         r: Math.random()*1.1+0.2, o: Math.random()*.6+.1,
         d: (Math.random()>.5?1:-1)*.007,
@@ -187,8 +188,15 @@ export default function Home() {
       raf = requestAnimationFrame(tick);
     };
     tick();
-    window.addEventListener("resize",init);
-    return () => { cancelAnimationFrame(raf); window.removeEventListener("resize",init); };
+    let lastWidth = window.innerWidth;
+    const handleResize = () => {
+      if (window.innerWidth !== lastWidth) {
+        lastWidth = window.innerWidth;
+        init();
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    return () => { cancelAnimationFrame(raf); window.removeEventListener("resize", handleResize); };
   },[]);
 
   useEffect(() => {
@@ -232,12 +240,12 @@ export default function Home() {
               <p className="ha ha5 mt-12 max-w-lg text-base leading-7 text-zinc-500 sm:text-lg">
                 Live SpaceX launch tracking, high-fidelity NASA imagery, real-time asteroid alerts, and the latest cosmic news. Plus, a private journal to document your journey through the universe.
               </p>
-              <div className="ha ha6 mt-8 flex flex-wrap gap-3">
-                <Link to={cta.to} className="hov-lift group inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-zinc-950">
+              <div className="ha ha6 mt-8 flex flex-col sm:flex-row gap-3">
+                <Link to={cta.to} className="hov-lift group inline-flex justify-center items-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-zinc-950 w-full sm:w-auto">
                   {cta.label}
                   <span className="transition-transform duration-300 group-hover:translate-x-0.5">→</span>
                 </Link>
-                <Link to={sec.to} className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-7 py-3.5 text-sm font-medium text-zinc-300 backdrop-blur-sm transition-colors hover:bg-white/10 hover:text-white">
+                <Link to={sec.to} className="inline-flex justify-center items-center rounded-full border border-white/10 bg-white/5 px-7 py-3.5 text-sm font-medium text-zinc-300 backdrop-blur-sm transition-colors hover:bg-white/10 hover:text-white w-full sm:w-auto">
                   {sec.label}
                 </Link>
               </div>
@@ -314,11 +322,11 @@ export default function Home() {
                             return (
                               <div key={l.id} className="mb-3 rounded-xl border border-white/6 bg-white/3 px-4 py-3">
                                 <div className="flex items-center justify-between mb-1.5 gap-2">
-                                  <span className="text-sm font-medium text-white truncate">{l.name}</span>
+                                  <span className="text-sm font-medium text-white truncate flex-1 min-w-0">{l.name}</span>
                                   <span className="font-mono text-xs text-cyan-300 shrink-0">{label}</span>
                                 </div>
-                                <div className="flex justify-between items-center mt-1">
-                                  <p className="text-[10px] text-zinc-500 truncate pr-2">{l.pad?.name || "TBD"}</p>
+                                <div className="flex justify-between items-center mt-1 gap-2">
+                                  <p className="text-[10px] text-zinc-500 truncate flex-1 min-w-0">{l.pad?.name || "TBD"}</p>
                                   <span className="text-[9px] uppercase tracking-widest text-zinc-600 shrink-0">{agencyAbbr}</span>
                                 </div>
                               </div>
@@ -418,7 +426,7 @@ export default function Home() {
             <div className="fl2 absolute -left-40 top-0 h-[400px] w-[400px] rounded-full bg-violet-500/4 blur-[100px]" />
           </div>
           <div className="relative mx-auto max-w-7xl">
-            <div className="rv mb-8 sm:mb-12 flex items-end justify-between gap-4">
+            <div className="rv mb-8 sm:mb-12 flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4">
               <div>
                 <p className="text-[10px] uppercase tracking-[0.32em] text-zinc-700">All sections</p>
                 <h2 className="mt-2 sm:mt-3 font-light tracking-[-0.05em] text-white" style={{fontSize:"clamp(1.5rem,4vw,3.5rem)"}}>
@@ -426,7 +434,7 @@ export default function Home() {
                   <span className="text-zinc-600"> the platform.</span>
                 </h2>
               </div>
-              <Link to="/explore" className="shrink-0 rounded-full border border-white/10 bg-white/4 px-5 py-2.5 text-sm text-zinc-400 transition-colors hover:bg-white/8 hover:text-white">
+              <Link to="/explore" className="shrink-0 rounded-full border border-white/10 bg-white/4 px-5 py-2.5 text-sm text-zinc-400 transition-colors hover:bg-white/8 hover:text-white sm:mt-0 mt-2">
                 Full directory →
               </Link>
             </div>
@@ -486,12 +494,12 @@ export default function Home() {
             <p className="rv d2 mx-auto mt-6 max-w-md text-base leading-7 text-zinc-500">
               Join Cosmovoid — a private, distraction-free window into space. Free forever.
             </p>
-            <div className="rv d3 mt-10 flex flex-wrap items-center justify-center gap-4">
-              <Link to={cta.to} className="hov-lift group inline-flex items-center gap-2 rounded-full bg-white px-9 py-4 text-sm font-semibold text-zinc-950">
+            <div className="rv d3 mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link to={cta.to} className="hov-lift group inline-flex justify-center items-center gap-2 rounded-full bg-white px-9 py-4 text-sm font-semibold text-zinc-950 w-full sm:w-auto">
                 {cta.label}
                 <span className="transition-transform duration-300 group-hover:translate-x-0.5">→</span>
               </Link>
-              <Link to="/explore" className="inline-flex items-center rounded-full border border-white/10 bg-white/4 px-9 py-4 text-sm font-medium text-zinc-400 backdrop-blur-sm transition-all hover:bg-white/8 hover:text-white">
+              <Link to="/explore" className="inline-flex justify-center items-center rounded-full border border-white/10 bg-white/4 px-9 py-4 text-sm font-medium text-zinc-400 backdrop-blur-sm transition-all hover:bg-white/8 hover:text-white w-full sm:w-auto">
                 Explore first
               </Link>
             </div>

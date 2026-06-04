@@ -82,7 +82,7 @@ const JournalEdit = () => {
       <>
         <header><Navbar /></header>
         <main className="relative overflow-hidden px-6 pb-16 pt-8 md:px-10 lg:px-14 xl:px-20">
-          <div className="rounded-[2rem] border border-white/10 bg-white/6 p-6 text-sm text-zinc-300">
+          <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 text-sm text-zinc-300">
             Loading your journal entry...
           </div>
         </main>
@@ -98,12 +98,11 @@ const JournalEdit = () => {
 
       <main className="relative overflow-hidden px-6 pb-16 pt-8 md:px-10 lg:px-14 xl:px-20">
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute left-[4%] top-14 h-72 w-72 rounded-full bg-cyan-400/10 blur-3xl" />
-          <div className="absolute right-[8%] top-28 h-72 w-72 rounded-full bg-zinc-600/8 blur-3xl" />
+
         </div>
 
         <section className="relative mx-auto max-w-4xl space-y-8">
-          <div className="flex flex-col gap-5 rounded-[2rem] border border-white/10 bg-[linear-gradient(135deg,rgba(12,18,40,0.96)_0%,rgba(10,12,24,0.98)_100%)] p-6 shadow-[0_26px_56px_rgba(0,0,0,0.3)] sm:flex-row sm:items-end sm:justify-between sm:p-8">
+          <div className="flex flex-col gap-5 border-b border-white/10 pb-10 sm:flex-row sm:items-end sm:justify-between">
             <div className="space-y-3">
               <p className="text-xs uppercase tracking-[0.26em] text-zinc-400">
                 Edit journal entry
@@ -126,7 +125,7 @@ const JournalEdit = () => {
 
           <form
             onSubmit={handleSubmit}
-            className="space-y-6 rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.02)_100%)] p-6 shadow-[0_24px_50px_rgba(0,0,0,0.24)] sm:p-8"
+            className="space-y-6 rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-10"
           >
             <div className="grid gap-6 md:grid-cols-2">
               <label className="space-y-2">

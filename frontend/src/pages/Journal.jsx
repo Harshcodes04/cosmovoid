@@ -61,12 +61,11 @@ const Journal = () => {
 
       <main className="relative overflow-hidden px-6 pb-16 pt-8 md:px-10 lg:px-14 xl:px-20">
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute left-[-8%] top-20 h-72 w-72 rounded-full bg-cyan-400/10 blur-3xl" />
-          <div className="absolute right-[-8%] top-32 h-80 w-80 rounded-full bg-zinc-600/6 blur-3xl" />
+
         </div>
 
         <section className="relative mx-auto max-w-6xl space-y-8">
-          <div className="flex flex-col gap-5 rounded-[2rem] border border-white/10 bg-[linear-gradient(135deg,rgba(12,18,40,0.96)_0%,rgba(10,12,24,0.98)_100%)] p-6 shadow-[0_26px_56px_rgba(0,0,0,0.3)] sm:flex-row sm:items-end sm:justify-between sm:p-8">
+          <div className="flex flex-col gap-5 border-b border-white/10 pb-10 sm:flex-row sm:items-end sm:justify-between">
             <div className="space-y-3">
               <p className="text-xs uppercase tracking-[0.26em] text-zinc-400">
                 My journal
@@ -110,7 +109,7 @@ const Journal = () => {
           ) : null}
 
           {loading ? (
-            <div className="rounded-[2rem] border border-white/10 bg-white/6 p-6 text-sm text-zinc-300">
+            <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 text-sm text-zinc-300">
               Loading your journal entries...
             </div>
           ) : entries.length ? (
@@ -119,7 +118,7 @@ const Journal = () => {
                 <Link
                   key={entry._id}
                   to={`/journal/${entry._id}`}
-                  className="group rounded-[1.7rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.02)_100%)] p-5 shadow-[0_20px_40px_rgba(0,0,0,0.22)] transition-transform duration-300 hover:-translate-y-1"
+                  className="group rounded-2xl border border-white/10 bg-white/[0.02] p-6 transition-colors hover:border-white/20 hover:bg-white/[0.04]"
                 >
                   <div className="flex items-center justify-between gap-3">
                     <p className="text-xs uppercase tracking-[0.2em] text-zinc-500">
@@ -160,7 +159,7 @@ const Journal = () => {
               ))}
             </section>
           ) : (
-            <section className="rounded-[2rem] border border-dashed border-white/12 bg-white/4 p-8 text-center shadow-[0_20px_40px_rgba(0,0,0,0.18)]">
+            <section className="rounded-2xl border border-dashed border-white/10 bg-transparent p-12 text-center">
               <h2 className="text-2xl font-medium text-white">
                 No journal entries yet
               </h2>

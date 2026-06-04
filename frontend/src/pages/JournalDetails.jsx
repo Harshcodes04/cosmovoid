@@ -73,8 +73,7 @@ const JournalDetails = () => {
 
       <main className="relative overflow-hidden px-6 pb-16 pt-8 md:px-10 lg:px-14 xl:px-20">
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute left-[8%] top-20 h-72 w-72 rounded-full bg-cyan-400/10 blur-3xl" />
-          <div className="absolute right-[10%] top-24 h-72 w-72 rounded-full bg-zinc-600/6 blur-3xl" />
+
         </div>
 
         <section className="relative mx-auto max-w-4xl space-y-8">
@@ -107,15 +106,15 @@ const JournalDetails = () => {
           </div>
 
           {loading ? (
-            <div className="rounded-[2rem] border border-white/10 bg-white/6 p-6 text-sm text-zinc-300">
+            <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 text-sm text-zinc-300">
               Loading your journal entry...
             </div>
           ) : error ? (
-            <div className="rounded-[2rem] border border-amber-300/20 bg-amber-300/10 p-6 text-sm text-amber-100">
+            <div className="rounded-2xl border border-amber-300/20 bg-amber-300/10 p-6 text-sm text-amber-100">
               {error}
             </div>
           ) : entry ? (
-            <article className="rounded-[2rem] border border-white/10 bg-[linear-gradient(135deg,rgba(12,18,40,0.96)_0%,rgba(10,12,24,0.98)_100%)] p-6 shadow-[0_26px_56px_rgba(0,0,0,0.3)] sm:p-8">
+            <article className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-10">
               <div className="flex flex-wrap items-center gap-3 text-xs uppercase tracking-[0.22em] text-zinc-400">
                 <span>{formatDate(entry.createdAt)}</span>
                 {entry.mood ? (
@@ -149,7 +148,7 @@ const JournalDetails = () => {
               {`Location: ${entry.observationLocation}`}
             </article>
           ) : (
-            <div className="rounded-[2rem] border border-white/10 bg-white/6 p-6 text-sm text-zinc-300">
+            <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 text-sm text-zinc-300">
               Journal entry not found.
             </div>
           )}
@@ -157,7 +156,7 @@ const JournalDetails = () => {
 
         {showDeleteConfirm && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 backdrop-blur-sm">
-            <div className="w-full max-w-sm rounded-[2rem] border border-white/10 bg-[linear-gradient(135deg,rgba(12,18,40,0.96)_0%,rgba(10,12,24,0.98)_100%)] p-6 shadow-[0_26px_56px_rgba(0,0,0,0.3)]">
+            <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-[#080808] p-6">
               <h3 className="text-xl font-medium text-white">Delete Entry?</h3>
               <p className="mt-3 text-sm text-zinc-300">
                 Are you sure you want to delete this journal entry? This action cannot be undone.

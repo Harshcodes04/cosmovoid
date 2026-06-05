@@ -42,7 +42,9 @@ const SkeletonCard = () => (
 
 const StatBlock = ({ label, value }) => (
   <div className="rounded-2xl border border-white/8 bg-black/20 px-3 py-3 text-center backdrop-blur-sm">
-    <p className="text-[10px] uppercase tracking-[0.22em] text-zinc-500">{label}</p>
+    <p className="text-[10px] uppercase tracking-[0.22em] text-zinc-500">
+      {label}
+    </p>
     <p className="mt-1 text-sm font-semibold text-white">{value}</p>
   </div>
 );
@@ -65,7 +67,11 @@ const RocketCard = ({ rocket, index }) => {
           <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(8,12,24,0.98)_0%,rgba(30,36,70,0.95)_52%,rgba(6,8,18,0.98)_100%)]">
             <div className="absolute inset-0 animate-pulse bg-[linear-gradient(110deg,transparent_0%,rgba(255,255,255,0.05)_45%,transparent_70%)]" />
             <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-              <svg className="h-16 w-16 text-white/10" viewBox="0 0 24 24" fill="currentColor">
+              <svg
+                className="h-16 w-16 text-white/10"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z" />
                 <path d="M12 2L8 8h8L12 2z" />
               </svg>
@@ -89,7 +95,9 @@ const RocketCard = ({ rocket, index }) => {
 
         {/* status badge */}
         <div className="absolute left-4 top-4">
-          <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium backdrop-blur-md ${status.pill}`}>
+          <span
+            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium backdrop-blur-md ${status.pill}`}
+          >
             <span className={`h-1.5 w-1.5 rounded-full ${status.dot}`} />
             {status.label}
           </span>
@@ -127,12 +135,24 @@ const RocketCard = ({ rocket, index }) => {
 
         <div className="grid grid-cols-3 gap-2">
           <StatBlock label="Height" value={fmt(rocket.height?.meters, " m")} />
-          <StatBlock label="Mass" value={fmt(rocket.mass?.kg ? Math.round(rocket.mass.kg / 1000) : null, " t")} />
-          <StatBlock label="Payload LEO" value={
-            rocket.payload_weights?.find((p) => p.id === "leo")
-              ? fmt(rocket.payload_weights.find((p) => p.id === "leo").kg, " kg")
-              : "—"
-          } />
+          <StatBlock
+            label="Mass"
+            value={fmt(
+              rocket.mass?.kg ? Math.round(rocket.mass.kg / 1000) : null,
+              " t",
+            )}
+          />
+          <StatBlock
+            label="Payload LEO"
+            value={
+              rocket.payload_weights?.find((p) => p.id === "leo")
+                ? fmt(
+                    rocket.payload_weights.find((p) => p.id === "leo").kg,
+                    " kg",
+                  )
+                : "—"
+            }
+          />
         </div>
 
         <div className="mt-5 flex items-center justify-between">
@@ -141,8 +161,18 @@ const RocketCard = ({ rocket, index }) => {
           </span>
           <span className="inline-flex items-center gap-1.5 text-xs font-medium text-cyan-400 transition-colors group-hover:text-cyan-300">
             View specs
-            <svg className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M3 8h10M9 4l4 4-4 4" strokeLinecap="round" strokeLinejoin="round" />
+            <svg
+              className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5"
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path
+                d="M3 8h10M9 4l4 4-4 4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           </span>
         </div>
@@ -165,7 +195,8 @@ const Rockets = () => {
       setRockets(res.data || []);
     } catch (err) {
       setError(
-        err?.response?.data?.error || "Failed to load rocket data. Please try again."
+        err?.response?.data?.error ||
+          "Failed to load rocket data. Please try again.",
       );
     } finally {
       setLoading(false);
@@ -191,31 +222,25 @@ const Rockets = () => {
   return (
     <main className="relative min-h-screen overflow-hidden px-5 pb-20 pt-10 md:px-10 lg:px-14 xl:px-20">
       {/* ambient glows */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-        <div className="absolute -left-28 top-8 h-[28rem] w-[28rem] rounded-full bg-violet-600/12 blur-3xl" />
-        <div className="absolute right-[-8rem] top-24 h-[32rem] w-[32rem] rounded-full bg-cyan-500/8 blur-3xl" />
-        <div className="absolute bottom-10 left-1/3 h-72 w-72 rounded-full bg-fuchsia-500/8 blur-3xl" />
-      </div>
+      <div
+        className="pointer-events-none absolute inset-0 overflow-hidden"
+        aria-hidden
+      ></div>
 
       <section className="relative mx-auto max-w-7xl">
         {/* header */}
         <div className="mb-10 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
           <div className="space-y-5">
-            <span className="inline-flex items-center gap-2 rounded-full border border-violet-300/20 bg-violet-300/8 px-4 py-2 text-xs font-medium text-violet-200">
-              <span className="h-2 w-2 rounded-full bg-violet-400 shadow-[0_0_12px_rgba(167,139,250,0.9)]" />
-              SpaceX Fleet
-            </span>
             <div>
               <h1 className="text-4xl font-light leading-none tracking-[-0.04em] text-white sm:text-5xl lg:text-6xl">
                 The Rocket
                 <br />
-                <span className="bg-gradient-to-r from-violet-300 via-cyan-300 to-white bg-clip-text text-transparent">
-                  Catalogue
-                </span>
+                <span className="text-zinc-500">Catalogue</span>
               </h1>
               <p className="mt-4 max-w-xl text-sm leading-7 text-zinc-400 sm:text-base">
-                Every vehicle built to breach the atmosphere — from Falcon's first flights to the 
-                colossal ambition of Starship. Explore engine specs, payload capacity, and mission history.
+                Every vehicle built to breach the atmosphere — from Falcon's
+                first flights to the colossal ambition of Starship. Explore
+                engine specs, payload capacity, and mission history.
               </p>
             </div>
           </div>
@@ -224,7 +249,9 @@ const Rockets = () => {
           {!loading && rockets.length > 0 && (
             <div className="flex shrink-0 gap-3">
               <div className="rounded-2xl border border-white/10 bg-zinc-950/60 px-5 py-4 text-center backdrop-blur-xl">
-                <p className="text-2xl font-semibold text-white">{rockets.length}</p>
+                <p className="text-2xl font-semibold text-white">
+                  {rockets.length}
+                </p>
                 <p className="mt-1 text-xs text-zinc-500">Total</p>
               </div>
               <div className="rounded-2xl border border-emerald-400/20 bg-emerald-400/6 px-5 py-4 text-center backdrop-blur-xl">
@@ -281,7 +308,9 @@ const Rockets = () => {
         <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
           {loading ? (
             <>
-              {[0, 1, 2, 3].map((i) => <SkeletonCard key={i} />)}
+              {[0, 1, 2, 3].map((i) => (
+                <SkeletonCard key={i} />
+              ))}
             </>
           ) : filtered.length > 0 ? (
             filtered.map((rocket, i) => (

@@ -188,8 +188,7 @@ const ImageCard = ({ src, alt, className = "", loading = "lazy" }) => {
       {(!loaded || failed) && (
         <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-indigo-950/60 to-zinc-950">
           <div className="absolute inset-0 animate-pulse bg-white/[0.04]" />
-          <div className="absolute left-6 top-6 h-16 w-16 rounded-full border border-white/10 bg-white/5 blur-sm" />
-          <div className="absolute bottom-6 right-6 h-24 w-24 rounded-full bg-cyan-400/[0.07] blur-2xl" />
+
           {failed && (
             <div className="absolute inset-0 flex items-center justify-center">
               <span className="text-xs text-zinc-600">Image unavailable</span>
@@ -380,20 +379,12 @@ const Gallery = () => {
 
   return (
     <main className="relative min-h-screen overflow-hidden px-5 pb-16 pt-8 md:px-10 lg:px-14 xl:px-20">
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -left-24 top-4 h-96 w-96 rounded-full bg-cyan-500/10 blur-3xl" />
-        <div className="absolute right-[-9rem] top-28 h-[30rem] w-[30rem] rounded-full bg-fuchsia-500/10 blur-3xl" />
-        <div className="absolute bottom-0 left-1/4 h-80 w-80 rounded-full bg-amber-300/[0.07] blur-3xl" />
-      </div>
+      <div className="pointer-events-none absolute inset-0 overflow-hidden"></div>
 
       <section className="relative mx-auto max-w-7xl">
         <div className="mb-8 space-y-6">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="space-y-4">
-              <span className="inline-flex items-center gap-2 rounded-full border border-cyan-300/20 bg-cyan-300/[0.08] px-4 py-2 text-xs font-medium text-cyan-100">
-                <span className="h-2 w-2 rounded-full bg-cyan-300 shadow-[0_0_12px_rgba(103,232,249,0.9)]" />
-                NASA visual archive
-              </span>
               <h1 className="text-4xl font-light leading-tight tracking-[-0.05em] text-white sm:text-5xl lg:text-6xl">
                 Gallery of the cosmos.
               </h1>

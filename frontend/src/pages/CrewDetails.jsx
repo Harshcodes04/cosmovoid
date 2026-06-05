@@ -166,8 +166,7 @@ export default function CrewDetails() {
         className="pointer-events-none absolute inset-0 overflow-hidden"
         aria-hidden
       >
-        <div className="absolute -left-40 top-20 h-[400px] w-[400px] rounded-full bg-cyan-500/5 blur-[100px]" />
-        <div className="absolute -right-40 top-1/2 h-[350px] w-[350px] rounded-full bg-zinc-600/5 blur-[90px]" />
+
       </div>
 
       <div className="relative mx-auto max-w-5xl px-6 py-12 md:px-10 lg:px-16">

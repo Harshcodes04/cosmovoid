@@ -2,11 +2,36 @@ import { useEffect, useMemo, useState } from "react";
 import { getSkyEvents } from "../api/space";
 
 const TYPE_META = {
-  meteor_shower: { label: "Meteor Shower", color: "text-cyan-300", bg: "bg-cyan-300/10 border-cyan-300/20", dot: "bg-cyan-400" },
-  planet:        { label: "Planetary Event", color: "text-amber-300", bg: "bg-amber-300/10 border-amber-300/20", dot: "bg-amber-400" },
-  eclipse:       { label: "Eclipse", color: "text-red-300", bg: "bg-red-400/10 border-red-400/20", dot: "bg-red-400" },
-  solstice:      { label: "Solstice / Equinox", color: "text-violet-300", bg: "bg-violet-400/10 border-violet-400/20", dot: "bg-violet-400" },
-  conjunction:   { label: "Conjunction", color: "text-emerald-300", bg: "bg-emerald-400/10 border-emerald-400/20", dot: "bg-emerald-400" },
+  meteor_shower: {
+    label: "Meteor Shower",
+    color: "text-cyan-300",
+    bg: "bg-cyan-300/10 border-cyan-300/20",
+    dot: "bg-cyan-400",
+  },
+  planet: {
+    label: "Planetary Event",
+    color: "text-amber-300",
+    bg: "bg-amber-300/10 border-amber-300/20",
+    dot: "bg-amber-400",
+  },
+  eclipse: {
+    label: "Eclipse",
+    color: "text-red-300",
+    bg: "bg-red-400/10 border-red-400/20",
+    dot: "bg-red-400",
+  },
+  solstice: {
+    label: "Solstice / Equinox",
+    color: "text-violet-300",
+    bg: "bg-violet-400/10 border-violet-400/20",
+    dot: "bg-violet-400",
+  },
+  conjunction: {
+    label: "Conjunction",
+    color: "text-emerald-300",
+    bg: "bg-emerald-400/10 border-emerald-400/20",
+    dot: "bg-emerald-400",
+  },
 };
 
 const FILTERS = [
@@ -19,7 +44,9 @@ const FILTERS = [
 
 const formatDate = (iso) =>
   new Intl.DateTimeFormat("en-IN", {
-    day: "numeric", month: "long", year: "numeric",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
   }).format(new Date(iso));
 
 const formatMonth = (iso) =>
@@ -60,10 +87,16 @@ const EventCard = ({ event, onClick }) => {
       <div className="flex gap-0">
         {/* date column */}
         <div className="flex w-20 shrink-0 flex-col items-center justify-center gap-0.5 border-r border-white/8 py-5 px-3">
-          <span className="text-[10px] uppercase tracking-widest text-zinc-600">{formatMonth(event.date)}</span>
-          <span className="font-mono text-3xl font-light text-white leading-none">{formatDay(event.date)}</span>
+          <span className="text-[10px] uppercase tracking-widest text-zinc-600">
+            {formatMonth(event.date)}
+          </span>
+          <span className="font-mono text-3xl font-light text-white leading-none">
+            {formatDay(event.date)}
+          </span>
           {timer && (
-            <span className={`mt-2 rounded-full px-2 py-0.5 text-[9px] font-medium border ${meta.bg} ${meta.color}`}>
+            <span
+              className={`mt-2 rounded-full px-2 py-0.5 text-[9px] font-medium border ${meta.bg} ${meta.color}`}
+            >
               {timer}
             </span>
           )}
@@ -72,7 +105,9 @@ const EventCard = ({ event, onClick }) => {
         {/* content */}
         <div className="flex min-w-0 flex-1 flex-col gap-2 p-4">
           <div className="flex flex-wrap items-center gap-2">
-            <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-wider ${meta.bg} ${meta.color}`}>
+            <span
+              className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-wider ${meta.bg} ${meta.color}`}
+            >
               <span className={`h-1.5 w-1.5 rounded-full ${meta.dot}`} />
               {meta.label}
             </span>
@@ -85,7 +120,9 @@ const EventCard = ({ event, onClick }) => {
 
           {event.rate && (
             <p className="text-xs text-zinc-400">
-              <span className={`font-semibold ${meta.color}`}>{event.rate}</span>
+              <span className={`font-semibold ${meta.color}`}>
+                {event.rate}
+              </span>
               {event.duration && ` · ${event.duration}`}
             </p>
           )}
@@ -94,9 +131,7 @@ const EventCard = ({ event, onClick }) => {
             {event.description}
           </p>
 
-          <p className="text-xs text-zinc-600">
-            📍 {event.visibility}
-          </p>
+          <p className="text-xs text-zinc-600">📍 {event.visibility}</p>
         </div>
 
         <div className="flex items-center pr-4 text-zinc-700 transition-colors group-hover:text-zinc-400">
@@ -133,17 +168,29 @@ const DetailModal = ({ event, onClose }) => {
         <div className={`border-b border-white/8 px-6 py-5 pr-14 ${meta.bg}`}>
           <div className="flex items-center gap-2">
             <span className={`h-2.5 w-2.5 rounded-full ${meta.dot}`} />
-            <span className={`text-[10px] font-semibold uppercase tracking-widest ${meta.color}`}>
+            <span
+              className={`text-[10px] font-semibold uppercase tracking-widest ${meta.color}`}
+            >
               {meta.label}
             </span>
             {timer && (
-              <span className={`ml-auto text-xs font-medium ${meta.color}`}>{timer}</span>
+              <span className={`ml-auto text-xs font-medium ${meta.color}`}>
+                {timer}
+              </span>
             )}
           </div>
-          <h2 className="mt-3 text-2xl font-semibold text-white">{event.title}</h2>
+          <h2 className="mt-3 text-2xl font-semibold text-white">
+            {event.title}
+          </h2>
           <div className="mt-1 flex items-center gap-3">
-            <span className="text-sm text-zinc-400">{formatDate(event.date)}</span>
-            {event.time && <span className="text-sm text-zinc-600">· {event.time} local</span>}
+            <span className="text-sm text-zinc-400">
+              {formatDate(event.date)}
+            </span>
+            {event.time && (
+              <span className="text-sm text-zinc-600">
+                · {event.time} local
+              </span>
+            )}
             <StarRating rating={event.magnitude} />
           </div>
         </div>
@@ -154,22 +201,32 @@ const DetailModal = ({ event, onClose }) => {
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="rounded-xl border border-white/8 bg-white/[0.03] p-4">
-              <p className="text-[10px] uppercase tracking-widest text-zinc-600">Where to look</p>
+              <p className="text-[10px] uppercase tracking-widest text-zinc-600">
+                Where to look
+              </p>
               <p className="mt-1 text-sm text-zinc-200">{event.direction}</p>
             </div>
             <div className="rounded-xl border border-white/8 bg-white/[0.03] p-4">
-              <p className="text-[10px] uppercase tracking-widest text-zinc-600">Visibility</p>
+              <p className="text-[10px] uppercase tracking-widest text-zinc-600">
+                Visibility
+              </p>
               <p className="mt-1 text-sm text-zinc-200">{event.visibility}</p>
             </div>
             {event.rate && (
               <div className="rounded-xl border border-white/8 bg-white/[0.03] p-4">
-                <p className="text-[10px] uppercase tracking-widest text-zinc-600">Peak rate</p>
-                <p className={`mt-1 text-sm font-semibold ${meta.color}`}>{event.rate}</p>
+                <p className="text-[10px] uppercase tracking-widest text-zinc-600">
+                  Peak rate
+                </p>
+                <p className={`mt-1 text-sm font-semibold ${meta.color}`}>
+                  {event.rate}
+                </p>
               </div>
             )}
             {event.duration && (
               <div className="rounded-xl border border-white/8 bg-white/[0.03] p-4">
-                <p className="text-[10px] uppercase tracking-widest text-zinc-600">Duration</p>
+                <p className="text-[10px] uppercase tracking-widest text-zinc-600">
+                  Duration
+                </p>
                 <p className="mt-1 text-sm text-zinc-200">{event.duration}</p>
               </div>
             )}
@@ -177,7 +234,9 @@ const DetailModal = ({ event, onClose }) => {
 
           {event.tips && (
             <div className="rounded-xl border border-cyan-300/15 bg-cyan-300/[0.05] p-4">
-              <p className="text-[10px] uppercase tracking-widest text-cyan-600">Viewing tip</p>
+              <p className="text-[10px] uppercase tracking-widest text-cyan-600">
+                Viewing tip
+              </p>
               <p className="mt-1 text-sm text-zinc-300">{event.tips}</p>
             </div>
           )}
@@ -190,8 +249,11 @@ const DetailModal = ({ event, onClose }) => {
 const Skeleton = () => (
   <div className="space-y-3">
     {Array.from({ length: 6 }).map((_, i) => (
-      <div key={i} className="h-28 animate-pulse rounded-[1.5rem] border border-white/8 bg-white/[0.04]"
-        style={{ animationDelay: `${i * 60}ms` }} />
+      <div
+        key={i}
+        className="h-28 animate-pulse rounded-[1.5rem] border border-white/8 bg-white/[0.04]"
+        style={{ animationDelay: `${i * 60}ms` }}
+      />
     ))}
   </div>
 );
@@ -206,36 +268,37 @@ const Events = () => {
   useEffect(() => {
     let active = true;
     getSkyEvents()
-      .then((res) => { if (active) setEvents(res.data || []); })
-      .catch(() => { if (active) setError("Could not load sky events right now."); })
-      .finally(() => { if (active) setLoading(false); });
-    return () => { active = false; };
+      .then((res) => {
+        if (active) setEvents(res.data || []);
+      })
+      .catch(() => {
+        if (active) setError("Could not load sky events right now.");
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
   }, []);
 
-  const filtered = useMemo(() =>
-    filter === "all" ? events : events.filter((e) => e.type === filter),
-    [events, filter]
+  const filtered = useMemo(
+    () => (filter === "all" ? events : events.filter((e) => e.type === filter)),
+    [events, filter],
   );
 
   const nextEvent = events[0];
 
   return (
     <main className="relative min-h-screen overflow-hidden px-5 pb-16 pt-8 md:px-10 lg:px-14 xl:px-20">
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -left-24 top-4 h-96 w-96 rounded-full bg-violet-500/8 blur-3xl" />
-        <div className="absolute right-[-9rem] top-28 h-[30rem] w-[30rem] rounded-full bg-cyan-500/6 blur-3xl" />
-        <div className="absolute bottom-0 left-1/3 h-80 w-80 rounded-full bg-amber-300/[0.05] blur-3xl" />
-      </div>
+      <div className="pointer-events-none absolute inset-0 overflow-hidden"></div>
 
       <section className="relative mx-auto max-w-4xl">
         {/* header */}
         <div className="mb-8 space-y-4">
-          <span className="inline-flex items-center gap-2 rounded-full border border-violet-400/20 bg-violet-400/[0.08] px-4 py-2 text-xs font-medium text-violet-200">
-            <span className="h-2 w-2 rounded-full bg-violet-400 shadow-[0_0_10px_rgba(167,139,250,0.8)]" />
-            Upcoming sky events
-          </span>
           <h1 className="text-4xl font-light leading-tight tracking-[-0.05em] text-white sm:text-5xl lg:text-6xl">
-            What's happening<br />
+            What's happening
+            <br />
             <span className="text-zinc-500">up there.</span>
           </h1>
           <p className="max-w-xl text-sm leading-7 text-zinc-400">
@@ -246,31 +309,45 @@ const Events = () => {
         </div>
 
         {/* next event spotlight */}
-        {!loading && nextEvent && (() => {
-          const meta = TYPE_META[nextEvent.type] || TYPE_META.meteor_shower;
-          const timer = countdown(nextEvent.peak);
-          return (
-            <button
-              type="button"
-              onClick={() => setSelected(nextEvent)}
-              className={`mb-8 w-full overflow-hidden rounded-[1.5rem] border text-left ${meta.bg} transition-all hover:brightness-110`}
-            >
-              <div className="flex flex-wrap items-center justify-between gap-4 p-5 sm:p-6">
-                <div className="space-y-1">
-                  <p className={`text-[10px] font-semibold uppercase tracking-widest ${meta.color}`}>
-                    Next event
-                  </p>
-                  <h2 className="text-xl font-semibold text-white">{nextEvent.title}</h2>
-                  <p className="text-sm text-zinc-400">{formatDate(nextEvent.date)}</p>
+        {!loading &&
+          nextEvent &&
+          (() => {
+            const meta = TYPE_META[nextEvent.type] || TYPE_META.meteor_shower;
+            const timer = countdown(nextEvent.peak);
+            return (
+              <button
+                type="button"
+                onClick={() => setSelected(nextEvent)}
+                className={`mb-8 w-full overflow-hidden rounded-[1.5rem] border text-left ${meta.bg} transition-all hover:brightness-110`}
+              >
+                <div className="flex flex-wrap items-center justify-between gap-4 p-5 sm:p-6">
+                  <div className="space-y-1">
+                    <p
+                      className={`text-[10px] font-semibold uppercase tracking-widest ${meta.color}`}
+                    >
+                      Next event
+                    </p>
+                    <h2 className="text-xl font-semibold text-white">
+                      {nextEvent.title}
+                    </h2>
+                    <p className="text-sm text-zinc-400">
+                      {formatDate(nextEvent.date)}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    {timer && (
+                      <p
+                        className={`font-mono text-2xl font-light ${meta.color}`}
+                      >
+                        {timer}
+                      </p>
+                    )}
+                    <StarRating rating={nextEvent.magnitude} />
+                  </div>
                 </div>
-                <div className="text-right">
-                  {timer && <p className={`font-mono text-2xl font-light ${meta.color}`}>{timer}</p>}
-                  <StarRating rating={nextEvent.magnitude} />
-                </div>
-              </div>
-            </button>
-          );
-        })()}
+              </button>
+            );
+          })()}
 
         {/* filter pills */}
         {!loading && (
@@ -301,7 +378,9 @@ const Events = () => {
           </div>
         )}
 
-        {loading ? <Skeleton /> : filtered.length ? (
+        {loading ? (
+          <Skeleton />
+        ) : filtered.length ? (
           <div className="space-y-3">
             {filtered.map((event) => (
               <EventCard key={event.id} event={event} onClick={setSelected} />

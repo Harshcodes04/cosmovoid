@@ -269,8 +269,7 @@ export default function Launches() {
           className="pointer-events-none absolute inset-0 overflow-hidden"
           aria-hidden
         >
-          <div className="absolute -left-40 top-20 h-[450px] w-[450px] rounded-full bg-cyan-500/5 blur-[110px]" />
-          <div className="absolute -right-40 top-1/3 h-[400px] w-[400px] rounded-full bg-zinc-600/5 blur-[100px]" />
+
         </div>
 
         <div className="relative mx-auto max-w-7xl px-6 py-12 md:px-10 lg:px-16 xl:px-20">

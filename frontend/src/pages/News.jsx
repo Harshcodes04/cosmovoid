@@ -30,7 +30,8 @@ const isBlockedSource = (article) =>
   blockedSourceHosts.has(getArticleHost(article)) ||
   article?.news_site?.toLowerCase() === "nasaspaceflight";
 
-const canOpenSource = (article) => Boolean(article?.url) && !isBlockedSource(article);
+const canOpenSource = (article) =>
+  Boolean(article?.url) && !isBlockedSource(article);
 
 const ArticleLink = ({ article, children, className = "" }) =>
   canOpenSource(article) ? (
@@ -63,8 +64,6 @@ const ImageBlank = ({ className = "" }) => (
     className={`relative overflow-hidden bg-[linear-gradient(135deg,rgba(8,12,24,0.98)_0%,rgba(24,28,48,0.95)_52%,rgba(6,8,18,0.98)_100%)] ${className}`}
   >
     <div className="absolute inset-0 animate-pulse bg-[linear-gradient(110deg,transparent_0%,rgba(255,255,255,0.06)_45%,transparent_70%)]" />
-    <div className="absolute left-8 top-8 h-16 w-16 rounded-full border border-white/8 bg-white/5 blur-sm" />
-    <div className="absolute bottom-8 right-8 h-24 w-24 rounded-full bg-cyan-300/5 blur-2xl" />
   </div>
 );
 
@@ -166,19 +165,11 @@ const News = () => {
 
   return (
     <main className="relative min-h-screen overflow-hidden px-5 pb-16 pt-8 md:px-10 lg:px-14 xl:px-20">
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -left-24 top-10 h-96 w-96 rounded-full bg-cyan-500/10 blur-3xl" />
-        <div className="absolute right-[-10rem] top-32 h-[30rem] w-[30rem] rounded-full bg-zinc-600/8 blur-3xl" />
-        <div className="absolute bottom-0 left-1/3 h-80 w-80 rounded-full bg-amber-300/8 blur-3xl" />
-      </div>
+      <div className="pointer-events-none absolute inset-0 overflow-hidden"></div>
 
       <section className="relative mx-auto max-w-7xl">
         <div className="grid gap-6 lg:grid-cols-[1fr_360px] lg:items-end">
           <div className="space-y-5">
-            <span className="inline-flex items-center gap-2 rounded-full border border-cyan-300/20 bg-cyan-300/8 px-4 py-2 text-xs font-medium text-cyan-100">
-              <span className="h-2 w-2 rounded-full bg-cyan-300 shadow-[0_0_12px_rgba(103,232,249,0.9)]" />
-              Live space briefing
-            </span>
             <div className="max-w-3xl space-y-4">
               <h1 className="text-4xl font-light leading-tight text-white sm:text-5xl lg:text-6xl">
                 Space news,
@@ -193,7 +184,10 @@ const News = () => {
           </div>
 
           <div className="rounded-3xl border border-white/10 bg-zinc-950/70 p-4 shadow-[0_24px_60px_rgba(0,0,0,0.3)] backdrop-blur-xl">
-            <label className="text-sm font-medium text-zinc-200" htmlFor="news-search">
+            <label
+              className="text-sm font-medium text-zinc-200"
+              htmlFor="news-search"
+            >
               Search stories
             </label>
             <input
@@ -292,7 +286,7 @@ const News = () => {
 
               {secondaryStories.map((article) => (
                 <article
-                    key={article.id}
+                  key={article.id}
                   className={`group overflow-hidden rounded-3xl border border-white/10 bg-zinc-950/75 shadow-[0_18px_48px_rgba(0,0,0,0.24)] backdrop-blur-xl transition-transform duration-300 ${
                     canOpenSource(article) ? "hover:-translate-y-1" : ""
                   }`}

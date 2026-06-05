@@ -198,8 +198,7 @@ export default function Crew() {
           className="pointer-events-none absolute inset-0 overflow-hidden"
           aria-hidden
         >
-          <div className="absolute -left-40 top-1/4 h-[500px] w-[500px] rounded-full bg-cyan-500/5 blur-[120px]" />
-          <div className="absolute -right-20 top-1/2 h-[400px] w-[400px] rounded-full bg-zinc-500/5 blur-[100px]" />
+
         </div>
 
         <div className="relative mx-auto max-w-7xl px-6 py-12 md:px-10 lg:px-16 xl:px-20">

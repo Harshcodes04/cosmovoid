@@ -94,8 +94,7 @@ const ForgotPassword = () => {
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#080808] text-white flex flex-col">
       {/* ambient glows */}
-      <div className="pointer-events-none absolute -top-32 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-cyan-500/[0.07] blur-[120px]" />
-      <div className="pointer-events-none absolute bottom-0 right-0 h-80 w-80 rounded-full bg-violet-500/[0.05] blur-[100px]" />
+
 
       {/* top bar */}
       <div className="relative z-10 p-6">

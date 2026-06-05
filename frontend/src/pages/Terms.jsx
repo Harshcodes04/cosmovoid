@@ -8,8 +8,7 @@ const Terms = () => {
     <main className="relative min-h-screen overflow-x-hidden px-6 pb-16 pt-10 md:px-10 lg:px-14 xl:px-20">
       {/* Background gradients */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute left-[-12%] top-20 h-80 w-80 rounded-full bg-white/5 blur-3xl" />
-        <div className="absolute right-[-10%] top-32 h-96 w-96 rounded-full bg-zinc-600/5 blur-3xl" />
+
       </div>
 
       <div className="relative mx-auto max-w-4xl space-y-12">
@@ -28,7 +27,7 @@ const Terms = () => {
         </section>
 
         {/* Content */}
-        <section className="rounded-[2rem] border border-white/10 bg-[linear-gradient(135deg,rgba(13,22,48,0.4)_0%,rgba(8,10,22,0.6)_100%)] p-7 shadow-[0_26px_56px_rgba(0,0,0,0.3)] sm:p-10 space-y-12 backdrop-blur-md text-zinc-300">
+        <section className="rounded-2xl border border-white/10 bg-white/[0.02] p-7 sm:p-10 space-y-12 text-zinc-300">
           
           <div className="space-y-4">
             <h2 className="text-xl font-semibold text-white">1. Introduction</h2>

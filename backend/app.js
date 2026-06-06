@@ -23,6 +23,7 @@ const allowedOrigins = process.env.FRONTEND_URL
       'http://localhost:5173',                 // local dev
       'https://cosmovoid.vercel.app',          // vercel default
       'https://cosmovoid.is-a.dev',            // custom domain
+      'https://cosmovoid.dev',                 // custom domain
     ];
 
 app.use(cors({

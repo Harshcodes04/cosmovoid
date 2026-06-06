@@ -9,6 +9,8 @@ const contactCards = [
     label: "Email",
     title: "space.cosmovoid@gmail.com",
     copy: "For feature ideas, feedback, and data-source notes.",
+    href: "mailto:space.cosmovoid@gmail.com",
+    linkText: "Send email ->",
   },
   {
     Icon: FaGithub,
@@ -16,6 +18,7 @@ const contactCards = [
     title: "Project repository",
     copy: "Track improvements, fixes, and frontend experiments.",
     href: "https://github.com/Harshcodes04/cosmovoid",
+    linkText: "Open repository ->",
   },
   {
     Icon: FaHeadset,
@@ -118,7 +121,7 @@ const Contact = () => {
                       </p>
                       {card.href && (
                         <p className="mt-3 text-[11px] font-medium text-cyan-300 transition-colors group-hover:text-white">
-                          Open repository -&gt;
+                          {card.linkText}
                         </p>
                       )}
                     </div>

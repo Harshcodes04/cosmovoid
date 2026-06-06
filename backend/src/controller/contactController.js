@@ -7,8 +7,9 @@ exports.sendContact = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "All fields are required" });
 
   await transporter.sendMail({
-    from: `"Cosmovoid Contact" <${process.env.EMAIL_USER}>`,
-    to: process.env.EMAIL_USER,          
+    from: `"Cosmovoid Contact" <${process.env.SENDER_EMAIL || "space.cosmovoid@gmail.com"}>`,
+    to: process.env.SENDER_EMAIL || "space.cosmovoid@gmail.com",
+    replyTo: email,
     subject: `[Contact] ${subject}`,
     html: `
       <div style="font-family:sans-serif;max-width:560px;margin:auto;padding:32px;background:#0a0a0a;color:#e4e4e7;border-radius:16px;border:1px solid #27272a">

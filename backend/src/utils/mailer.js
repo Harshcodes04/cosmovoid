@@ -14,7 +14,7 @@ exports.transporter = transporter; // shared with contactController
 
 exports.sendOTPEmail = async (to, otp) => {
   await transporter.sendMail({
-    from: `"Cosmovoid" <${process.env.EMAIL_USER}>`,
+    from: `"Cosmovoid" <${process.env.SENDER_EMAIL || "space.cosmovoid@gmail.com"}>`,
     to,
     subject: "Your Cosmovoid verification code",
     html: `
@@ -30,7 +30,7 @@ exports.sendOTPEmail = async (to, otp) => {
 
 exports.sendPasswordResetEmail = async (to, otp) => {
   await transporter.sendMail({
-    from: `"Cosmovoid" <${process.env.EMAIL_USER}>`,
+    from: `"Cosmovoid" <${process.env.SENDER_EMAIL || "space.cosmovoid@gmail.com"}>`,
     to,
     subject: "Reset your Cosmovoid password",
     html: `

@@ -368,6 +368,7 @@ const RocketDetails = () => {
               strokeLinejoin="round"
             />
           </svg>
+          SpaceX Fleet
         </Link>
 
         {/* title row */}

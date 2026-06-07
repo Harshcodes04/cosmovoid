@@ -21,6 +21,9 @@ export const AuthProvider = ({ children }) => {
       password,
     });
     setUser(res.data.user);
+    if (res.data.token) {
+      localStorage.setItem("token", res.data.token);
+    }
   };
 
   const signup = async (username, email, password, confirmPassword) => {
@@ -31,11 +34,15 @@ export const AuthProvider = ({ children }) => {
       confirmPassword,
     });
     setUser(res.data.user);
+    if (res.data.token) {
+      localStorage.setItem("token", res.data.token);
+    }
   };
 
   const logout = async () => {
     await api.post("/auth/logout");
     setUser(null);
+    localStorage.removeItem("token");
   };
 
   return (

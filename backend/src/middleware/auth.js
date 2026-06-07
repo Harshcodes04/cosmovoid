@@ -3,7 +3,11 @@ const User = require("../models/user");
 const asyncHandler = require("../utils/asyncHandler");
 
 const authMiddleware = asyncHandler(async (req, res, next) => {
-  const token = req.cookies.token;
+  let token = req.cookies.token;
+  
+  if (req.headers.authorization && req.headers.authorization.startsWith("Bearer ")) {
+    token = req.headers.authorization.split(" ")[1];
+  }
 
   if (!token) {
     return res.status(401).json({ error: "Unauthorized" });

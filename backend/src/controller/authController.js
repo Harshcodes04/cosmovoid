@@ -82,6 +82,7 @@ exports.postSignup = [
     return res.status(201).json({
       message: "User created",
       user: userResponse,
+      token,
     });
   }),
 ];
@@ -127,6 +128,7 @@ exports.postLogin = asyncHandler(async (req, res, next) => {
   return res.json({
     message: "Login successful",
     user: userResponse,
+    token,
   });
 });
 

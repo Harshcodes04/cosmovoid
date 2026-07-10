@@ -160,7 +160,7 @@ const Navbar = () => {
         }}
         animate={hidden ? "hidden" : "visible"}
         transition={{ duration: 0.35, ease: "easeInOut" }}
-        className="cosmovoid-nav sticky top-0 z-[100] flex items-center justify-between border-b border-white/10 bg-zinc-950/80 px-6 py-4 shadow-[0_18px_48px_rgba(0,0,0,0.28)] backdrop-blur-xl md:px-12 lg:px-24 xl:px-40"
+        className="cosmovoid-nav sticky top-0 z-[100] flex items-center justify-between border-b border-white/10 bg-zinc-900/70 px-6 py-4 shadow-[0_18px_48px_rgba(0,0,0,0.28)] backdrop-blur-xl md:px-12 lg:px-24 xl:px-40"
       >
 
           {/* Logo */}

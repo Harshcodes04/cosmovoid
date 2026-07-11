@@ -431,7 +431,7 @@ export default function Home() {
         <Navbar />
       </header>
       <main className="hm">
-        <section className="relative min-h-screen overflow-hidden">
+        <section className="relative flex flex-col justify-start min-h-[100svh] overflow-hidden pt-16 lg:pt-20 pb-16">
           <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
           <div className="dot-bg absolute inset-0 opacity-60" />
           {/* orbs */}
@@ -443,9 +443,9 @@ export default function Home() {
             <div className="fl2 absolute -right-48 top-1/3 h-[500px] w-[500px] rounded-full bg-zinc-500/8 blur-[130px]" />
           </div>
 
-          <div className="relative z-10 mx-auto grid max-w-7xl gap-8 px-4 pt-20 pb-16 sm:px-6 md:px-10 lg:grid-cols-2 lg:items-start lg:gap-20 lg:px-16 xl:px-20 lg:pt-28">
+          <div className="relative z-10 mx-auto grid max-w-7xl w-full gap-8 px-4 sm:px-6 md:px-10 lg:grid-cols-2 lg:items-stretch lg:gap-16 lg:px-16 xl:px-20 min-h-[600px]">
             {/* text col */}
-            <div className="min-w-0">
+            <div className="min-w-0 self-start -mt-4 lg:-mt-8">
               <div className="ha ha1">
                 <span className="inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[10px] uppercase tracking-[0.32em] text-zinc-400 backdrop-blur-sm">
                   <span className="gp h-2 w-2 rounded-full bg-cyan-300 shadow-[0_0_12px_rgba(103,232,249,0.9)]" />

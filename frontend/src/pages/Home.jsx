@@ -36,7 +36,7 @@ const CSS = `
 @keyframes gp{0%,100%{opacity:.4;transform:scale(.9)}50%{opacity:1;transform:scale(1.2)}}
 .gp{animation:gp 2.4s ease-in-out infinite}
 @keyframes fl{0%,100%{transform:translate(0,0)}40%{transform:translate(18px,-20px)}70%{transform:translate(-14px,12px)}}
-.fl1{animation:fl 18s ease-in-out infinite}.fl2{animation:fl 25s ease-in-out infinite reverse;animation-delay:-10s}
+.fl1{animation:fl 15s ease-in-out infinite alternate}.fl2{animation:fl 25s ease-in-out infinite reverse;animation-delay:-10s}
 @keyframes si{0%,100%{opacity:.3;transform:translateY(0)}50%{opacity:.8;transform:translateY(7px)}}
 .si{animation:si 2.1s ease-in-out infinite}
 @keyframes cntdown{0%{opacity:1}49%{opacity:1}50%{opacity:.3}99%{opacity:.3}100%{opacity:1}}
@@ -96,6 +96,22 @@ const FEATS = [
     h: "Document your tiny existence properly.",
     p: "Save discoveries, midnight thoughts, and moments that made you feel small in a good way. Turns out staring into space is emotionally productive.",
     to: "/journal",
+    flip: false,
+  },
+  {
+    n: "04",
+    tag: "COSMIC NEWS",
+    h: "The universe is busy. Try to keep up.",
+    p: "We curate the most critical cosmic updates from around the globe so you don't have to scroll through Earth-drama.",
+    to: "/news",
+    flip: true,
+  },
+  {
+    n: "05",
+    tag: "NEAR-EARTH OBJECTS",
+    h: "Giant space rocks flying uncomfortably close.",
+    p: "Real-time tracking of asteroids passing by Earth. Complete with miss-distances and hazardous classifications.",
+    to: "/asteroids",
     flip: false,
   },
 ];
@@ -431,9 +447,9 @@ export default function Home() {
         <Navbar />
       </header>
       <main className="hm">
-        <section className="relative flex flex-col justify-start min-h-[100svh] overflow-hidden pt-16 lg:pt-20 pb-16">
-          <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
-          <div className="dot-bg absolute inset-0 opacity-60" />
+        <section className="relative flex flex-col justify-start min-h-[100svh] overflow-hidden pt-16 lg:pt-20 pb-16 snap-start">
+          <canvas ref={canvasRef} className="absolute inset-0 h-full w-full pointer-events-none" />
+          <div className="dot-bg absolute inset-0 opacity-60 pointer-events-none" />
           {/* orbs */}
           <div
             className="pointer-events-none absolute inset-0 overflow-hidden"
@@ -453,21 +469,21 @@ export default function Home() {
                 </span>
               </div>
               <h1
-                className="mt-8 font-light leading-[1.05] tracking-[-0.05em] text-white"
+                className="mt-6 font-light leading-[1.05] tracking-[-0.05em] text-white"
                 style={{ fontSize: "clamp(2.6rem,5.8vw,6rem)" }}
               >
-                <span className="ha ha2 block">Somewhere between</span>
+                <span className="ha ha2 block">Lost in</span>
                 <span className="ha ha3 block text-zinc-500 italic">
-                  curiosity
+                  quiet
                 </span>
-                <span className="ha ha4 block">and insignificance.</span>
+                <span className="ha ha4 block">wonder</span>
               </h1>
-              <p className="ha ha5 mt-12 max-w-lg text-base leading-7 text-zinc-500 sm:text-lg">
+              <p className="ha ha5 mt-6 max-w-lg text-base leading-7 text-zinc-500 sm:text-lg">
                 Rocket launches, asteroid flybys, NASA imagery, and the kind of
                 space rabbit holes that accidentally steal 2 hours of your
                 night.
               </p>
-              <div className="ha ha6 mt-8 flex flex-wrap gap-3">
+              <div className="ha ha6 mt-6 flex flex-wrap gap-3">
                 <Link
                   to={cta.to}
                   className="hov-lift group inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-zinc-950"
@@ -486,7 +502,7 @@ export default function Home() {
               </div>
             </div>
             {/* mockup col */}
-            <div className="ha ha5 lg:self-start lg:mt-8 min-w-0">
+            <div className="ha ha5 min-w-0 self-center -mt-16 lg:-mt-24">
               <DashMockup
                 globalUpcoming={liveData.globalUpcoming}
                 news={liveData.news}
@@ -518,36 +534,51 @@ export default function Home() {
           </div>
         </div>
 
-        <section className="relative px-6 py-28 md:px-10 lg:px-16 xl:px-20">
+        <section className="relative flex flex-col justify-center min-h-[100svh] px-6 py-28 md:px-10 lg:px-16 xl:px-20 overflow-hidden snap-start">
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] pointer-events-none z-0" />
           <div
             className="pointer-events-none absolute inset-0 overflow-hidden"
             aria-hidden
           >
-            <div className="fl1 absolute -right-48 top-0 h-[500px] w-[500px] rounded-full bg-zinc-600/5 blur-[120px]" />
-            <div className="fl2 absolute -left-40 bottom-0 h-[400px] w-[400px] rounded-full bg-cyan-500/4 blur-[100px]" />
+            <div className="fl1 absolute -right-48 top-1/4 h-[600px] w-[600px] rounded-full bg-zinc-600/10 blur-[150px]" />
+            <div className="fl2 absolute -left-40 bottom-1/4 h-[500px] w-[500px] rounded-full bg-cyan-500/5 blur-[120px]" />
           </div>
-          <div className="relative mx-auto max-w-7xl">
-            <div className="rv mb-10 sm:mb-16">
-              <p className="text-[10px] uppercase tracking-[0.32em] text-zinc-700">
-                What's inside
-              </p>
+          <div className="relative mx-auto max-w-7xl w-full text-center">
+            <div className="rv">
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[10px] uppercase tracking-[0.32em] text-cyan-400 backdrop-blur-sm mb-6">
+                <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.8)]" />
+                Signal Acquired
+              </span>
               <h2
-                className="mt-3 font-light tracking-[-0.05em] text-white"
-                style={{ fontSize: "clamp(1.8rem,5vw,4.5rem)" }}
+                className="font-light tracking-[-0.05em] text-white"
+                style={{ fontSize: "clamp(2.5rem,8vw,6.5rem)", lineHeight: 1.1 }}
               >
-                The internet got noisy
+                The internet got noisy.
                 <br />
-                <span className="text-zinc-600">Space didn’t</span>
+                <span className="text-zinc-600 italic">Space didn’t.</span>
               </h2>
             </div>
+          </div>
+        </section>
 
-            <div className="space-y-0">
-              {FEATS.map((f, i) => (
-                <div key={f.n}>
-                  <div className="feat-line" />
-                  <div
-                    className={`group grid gap-6 py-10 sm:py-14 lg:grid-cols-2 lg:items-center`}
-                  >
+        {FEATS.map((f, i) => {
+          const colors = [
+            "bg-blue-500/10",
+            "bg-purple-500/10",
+            "bg-emerald-500/10",
+            "bg-yellow-500/10",
+            "bg-orange-500/10",
+          ];
+          const orbColor = colors[i] || "bg-cyan-500/10";
+          return (
+          <section key={f.n} className="relative flex flex-col justify-center min-h-[100svh] px-6 py-28 md:px-10 lg:px-16 xl:px-20 overflow-hidden snap-start">
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] pointer-events-none z-0" />
+            <div className={`absolute ${f.flip ? '-left-1/4' : '-right-1/4'} top-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full ${orbColor} blur-[150px] opacity-50 pointer-events-none z-0`} />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[45vw] font-black text-white/[0.02] select-none pointer-events-none z-0 tracking-tighter mix-blend-overlay">
+              {f.n}
+            </div>
+            <div className="relative mx-auto max-w-7xl w-full z-10">
+              <div className={`group grid gap-12 lg:grid-cols-2 lg:items-center`}>
                     <div
                       className={`space-y-4 sm:space-y-5 min-w-0 ${f.flip ? "lg:order-2" : ""}`}
                     >
@@ -804,34 +835,98 @@ export default function Home() {
                           )}
                         </div>
                       )}
+                      {i === 3 && (
+                        <div className="hov-lift rounded-2xl border border-white/8 bg-zinc-950 p-6 shadow-[0_20px_50px_rgba(0,0,0,.5)]">
+                          <div className="flex items-center gap-2 mb-5">
+                            <span className="gp h-2 w-2 rounded-full bg-yellow-400 shadow-[0_0_8px_rgba(250,204,21,0.8)]" />
+                            <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-yellow-400">
+                              Latest Headline
+                            </span>
+                          </div>
+                          {liveData.loading ? (
+                            <div className="h-24 animate-pulse rounded-xl bg-white/4" />
+                          ) : liveData.news ? (
+                            <div className="rounded-xl border border-white/6 bg-white/3 p-4">
+                              <p className="text-sm font-medium text-white leading-snug line-clamp-3">
+                                {liveData.news.title}
+                              </p>
+                              <div className="mt-3 flex items-center justify-between">
+                                <span className="text-[10px] text-zinc-500">
+                                  {liveData.news.news_site || "Space News"}
+                                </span>
+                                <span className="text-[10px] text-zinc-600">
+                                  Read story →
+                                </span>
+                              </div>
+                            </div>
+                          ) : (
+                            <p className="text-xs text-zinc-600">No news available</p>
+                          )}
+                        </div>
+                      )}
+                      {i === 4 && (
+                        <div className="hov-lift rounded-2xl border border-white/8 bg-zinc-950 p-6 shadow-[0_20px_50px_rgba(0,0,0,.5)]">
+                          <div className="flex items-center gap-2 mb-5">
+                            <span className="gp h-2 w-2 rounded-full bg-orange-400 shadow-[0_0_8px_rgba(251,146,60,0.8)]" />
+                            <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-orange-400">
+                              Near-Earth Objects
+                            </span>
+                          </div>
+                          {liveData.loading ? (
+                            [0, 1].map((k) => (
+                              <div key={k} className="mb-3 h-12 animate-pulse rounded-xl bg-white/4" />
+                            ))
+                          ) : liveData.asteroids?.length ? (
+                            liveData.asteroids.slice(0, 3).map((a) => {
+                              const miss = Number(a.close_approach_data?.[0]?.miss_distance?.astronomical || 0).toFixed(3);
+                              const hazard = a.is_potentially_hazardous_asteroid;
+                              return (
+                                <div key={a.id} className="mb-2.5 flex items-center justify-between rounded-xl border border-white/6 bg-white/3 px-4 py-3">
+                                  <div className="flex items-center gap-3">
+                                    <span className={`h-2 w-2 rounded-full ${hazard ? "bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]" : "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]"}`} />
+                                    <span className="text-sm font-medium text-white truncate max-w-[120px] sm:max-w-[200px]">
+                                      {a.name.replace(/[\(\)]/g, '')}
+                                    </span>
+                                  </div>
+                                  <div className="text-right">
+                                    <p className="font-mono text-xs text-orange-300">{miss} AU</p>
+                                    <p className="text-[9px] uppercase tracking-wider text-zinc-600 mt-0.5">Miss Dist</p>
+                                  </div>
+                                </div>
+                              );
+                            })
+                          ) : (
+                            <p className="text-xs text-zinc-600">No objects tracked today</p>
+                          )}
+                        </div>
+                      )}
                     </div>
-                  </div>
-                </div>
-              ))}
-              <div className="feat-line" />
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )})}
 
-        <section className="relative px-4 py-16 sm:px-6 sm:py-20 md:px-10 md:py-24 lg:px-16 xl:px-20">
+        <section className="relative flex flex-col justify-center min-h-[100svh] px-4 py-16 sm:px-6 sm:py-20 md:px-10 md:py-24 lg:px-16 xl:px-20 overflow-hidden snap-start">
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] pointer-events-none z-0" />
           <div
             className="pointer-events-none absolute inset-0 overflow-hidden"
             aria-hidden
           >
-            <div className="fl2 absolute -left-40 top-0 h-[400px] w-[400px] rounded-full bg-violet-500/4 blur-[100px]" />
+            <div className="fl2 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[800px] w-[800px] rounded-full bg-violet-500/10 blur-[150px]" />
           </div>
-          <div className="relative mx-auto max-w-7xl">
-            <div className="rv mb-8 sm:mb-12 flex items-end justify-between gap-4">
+          <div className="relative mx-auto max-w-7xl w-full">
+            <div className="rv mb-12 sm:mb-16 flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6">
               <div>
-                <p className="text-[10px] uppercase tracking-[0.32em] text-zinc-700">
-                  All sections
-                </p>
+                <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[10px] uppercase tracking-[0.32em] text-violet-400 backdrop-blur-sm mb-4">
+                  Database
+                </span>
                 <h2
-                  className="mt-2 sm:mt-3 font-light tracking-[-0.05em] text-white"
-                  style={{ fontSize: "clamp(1.5rem,4vw,3.5rem)" }}
+                  className="font-light tracking-[-0.05em] text-white"
+                  style={{ fontSize: "clamp(2rem,5vw,4rem)", lineHeight: 1.1 }}
                 >
                   Every corner of
-                  <span className="text-zinc-600"> the platform.</span>
+                  <br />
+                  <span className="text-zinc-600">the platform.</span>
                 </h2>
               </div>
               <Link
@@ -867,8 +962,8 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="relative px-4 py-16 sm:px-6 sm:py-20 md:px-10 lg:px-16 xl:px-20">
-          <div className="mx-auto max-w-7xl grid grid-cols-2 gap-6 sm:gap-8 lg:grid-cols-4">
+        <section className="relative flex flex-col justify-center min-h-[100svh] px-4 py-16 sm:px-6 sm:py-20 md:px-10 lg:px-16 xl:px-20 overflow-hidden snap-start">
+          <div className="mx-auto max-w-7xl w-full grid grid-cols-2 gap-6 sm:gap-8 lg:grid-cols-4 relative z-10">
             {[
               [
                 liveData.loading
@@ -905,11 +1000,11 @@ export default function Home() {
                 "Your mission journal",
               ],
             ].map(([v, l], i) => (
-              <div key={l} className={`rv d${i + 1} text-center`}>
-                <p className="text-4xl font-light tracking-[-0.06em] text-white sm:text-5xl lg:text-6xl">
+              <div key={l} className={`rv d${i + 1} flex flex-col items-center justify-center p-8 rounded-[2rem] border border-white/5 bg-white/[0.01] backdrop-blur-md transition-all duration-300 hover:bg-white/[0.03] hover:-translate-y-1`}>
+                <p className="text-5xl font-light tracking-[-0.04em] text-white sm:text-6xl lg:text-7xl">
                   {v}
                 </p>
-                <p className="mt-2 text-[10px] uppercase tracking-[0.22em] text-zinc-600 sm:mt-3 sm:tracking-[0.26em]">
+                <p className="mt-4 text-[10px] uppercase tracking-[0.3em] text-zinc-500 text-center">
                   {l}
                 </p>
               </div>
@@ -917,33 +1012,32 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="relative px-4 py-16 sm:px-6 sm:py-20 md:px-10 md:py-24 lg:px-16 xl:px-20">
+        <section className="relative flex flex-col justify-center min-h-[100svh] px-4 py-16 sm:px-6 sm:py-20 md:px-10 md:py-24 lg:px-16 xl:px-20 overflow-hidden snap-start">
           <div className="dot-bg absolute inset-0 opacity-40" />
           <div
             className="pointer-events-none absolute inset-0 overflow-hidden"
             aria-hidden
           >
-            <div className="fl1 absolute left-1/2 top-0 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-cyan-500/7 blur-[140px]" />
+            <div className="fl1 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[600px] w-[600px] rounded-full bg-cyan-500/10 blur-[150px]" />
           </div>
-          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-300/15 to-transparent" />
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-400/20 to-transparent" />
 
-          <div className="relative mx-auto max-w-3xl text-center">
-            <div className="rv">
-              <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/4 px-4 py-2 text-[9px] uppercase tracking-[0.3em] text-zinc-600 backdrop-blur-sm">
-                <span className="gp h-1.5 w-1.5 rounded-full bg-cyan-300 shadow-[0_0_8px_rgba(103,232,249,0.8)]" />
+          <div className="relative mx-auto max-w-3xl w-full text-center">
+            <div className="rv flex justify-center">
+              <span className="inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-5 py-2.5 text-[10px] uppercase tracking-[0.3em] text-cyan-400 backdrop-blur-sm shadow-[0_0_20px_rgba(34,211,238,0.1)] mb-8">
+                <span className="gp h-1.5 w-1.5 rounded-full bg-cyan-300 shadow-[0_0_10px_rgba(103,232,249,0.9)]" />
                 Ready for launch?
               </span>
             </div>
             <h2
-              className="rv d1 mt-8 font-light tracking-[-0.06em] text-white"
-              style={{ fontSize: "clamp(2.8rem,7vw,7rem)", lineHeight: 1 }}
+              className="rv d1 font-light tracking-[-0.06em] text-white"
+              style={{ fontSize: "clamp(3.5rem,10vw,8.5rem)", lineHeight: 0.95 }}
             >
               Still here?
-              <br />
-              Yeah, you’re one of us.
             </h2>
-            <p className="rv d2 mx-auto mt-6 max-w-md text-base leading-7 text-zinc-500">
-              Free forever. Because curiosity should be.
+            <p className="rv d2 mx-auto mt-8 max-w-lg text-lg leading-relaxed text-zinc-400">
+              Yeah, you’re one of us.<br />
+              <span className="text-zinc-500 text-sm mt-2 block">Free forever. Because curiosity should be.</span>
             </p>
             <div className="rv d3 mt-10 flex flex-wrap items-center justify-center gap-4">
               <Link

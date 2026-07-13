@@ -84,7 +84,7 @@ const FEATS = [
   },
   {
     n: "02",
-    tag: "NASA IMAGERY",
+    tag: "COSMIC GALLERY",
     h: "Today’s reminder that Earth isn’t the main character.",
     p: "Some days it’s galaxies. Some days it’s cosmic horror. Either way, it’s gorgeous.",
     to: "/gallery",

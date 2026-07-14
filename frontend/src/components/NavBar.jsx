@@ -225,7 +225,7 @@ const Navbar = () => {
                   to="/signup"
                   className="group flex items-center gap-2 rounded-full bg-white px-5 py-2 text-sm font-medium text-zinc-950 transition-transform hover:scale-105"
                 >
-                  Get started
+                  Launch Now
                 </Link>
               </>
             )}
@@ -319,7 +319,7 @@ const Navbar = () => {
                     className="w-full rounded-xl bg-white px-5 py-3 text-center text-sm font-bold text-zinc-950 transition-transform hover:scale-[1.02]"
                     onClick={closeMenu}
                   >
-                    Get started
+                    Launch Now
                   </Link>
                 </div>
               )}

@@ -332,7 +332,7 @@ export default function Home() {
   const canvasRef = useRef(null);
   const cta = user
     ? { to: "/dashboard", label: "Open Mission Control" }
-    : { to: "/signup", label: "Start for free" };
+    : { to: "/signup", label: "Launch Now" };
   const sec = user
     ? { to: "/explore", label: "Browse sections" }
     : { to: "/login", label: "Sign in" };
@@ -502,7 +502,7 @@ export default function Home() {
               </div>
             </div>
             {/* mockup col */}
-            <div className="ha ha5 min-w-0 self-center -mt-16 lg:-mt-24">
+            <div className="ha ha5 min-w-0 self-center mt-8 lg:-mt-24">
               <DashMockup
                 globalUpcoming={liveData.globalUpcoming}
                 news={liveData.news}
